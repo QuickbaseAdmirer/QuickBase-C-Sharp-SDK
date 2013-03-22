@@ -1,0 +1,215 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{72AE7ED2-1321-499E-8E0E-ECFD91B8C850}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Intuit.QuickBase.Core</RootNamespace>
+    <AssemblyName>Intuit.QuickBase.Core</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AddField.cs" />
+    <Compile Include="AddRecord.cs" />
+    <Compile Include="AddReplaceDBPage.cs" />
+    <Compile Include="AddUserToRole.cs" />
+    <Compile Include="Authenticate.cs" />
+    <Compile Include="ChangeRecordOwner.cs" />
+    <Compile Include="ChangeUserRole.cs" />
+    <Compile Include="CloneDatabase.cs" />
+    <Compile Include="CreateDatabase.cs" />
+    <Compile Include="CreateTable.cs" />
+    <Compile Include="DeleteDatabase.cs" />
+    <Compile Include="DeleteField.cs" />
+    <Compile Include="DeleteRecord.cs" />
+    <Compile Include="DoQuery.cs" />
+    <Compile Include="DoQueryCount.cs" />
+    <Compile Include="DownloadFile.cs" />
+    <Compile Include="EditRecord.cs" />
+    <Compile Include="Exceptions\AccountSizeLimitExceededException.cs" />
+    <Compile Include="Exceptions\AccountSuspendedException.cs" />
+    <Compile Include="Exceptions\APINotAllowedOnApplicationTableException.cs" />
+    <Compile Include="Exceptions\APIRequestLimitExceededException.cs" />
+    <Compile Include="Exceptions\ApplicationDoesNotExistOrDeletedException.cs" />
+    <Compile Include="Exceptions\AttemptingToAddNonUniqueValueException.cs" />
+    <Compile Include="Exceptions\BadTicketException.cs" />
+    <Compile Include="Exceptions\CachedRecordsNotFoundException.cs" />
+    <Compile Include="Exceptions\CannotChangeValueOfFieldException.cs" />
+    <Compile Include="Exceptions\CloningException.cs" />
+    <Compile Include="Exceptions\ColumnDoesNotExistInTableExecption.cs" />
+    <Compile Include="Exceptions\DatabaseSizeLimitExceededException.cs" />
+    <Compile Include="Exceptions\FeatureNotSupportedException.cs" />
+    <Compile Include="Exceptions\FieldDoesNotExistInRecordException.cs" />
+    <Compile Include="Exceptions\InsufficientPermissionsException.cs" />
+    <Compile Include="Exceptions\InvalidAccountIDException.cs" />
+    <Compile Include="Exceptions\InvalidApplicationTokenException.cs" />
+    <Compile Include="Exceptions\InvalidChoiceException.cs" />
+    <Compile Include="Exceptions\InvalidInputException.cs" />
+    <Compile Include="Exceptions\InvalidRoleException.cs" />
+    <Compile Include="Exceptions\InvalidSourceDBIDException.cs" />
+    <Compile Include="Exceptions\ItemNotFoundException.cs" />
+    <Compile Include="Exceptions\MissingDBIDOrWrongTypeException.cs" />
+    <Compile Include="Exceptions\MissingRequiredFieldException.cs" />
+    <Compile Include="Exceptions\NoDataReturnedException.cs" />
+    <Compile Include="Exceptions\NoSuchDatabaseException.cs" />
+    <Compile Include="Exceptions\NoSuchFieldException.cs" />
+    <Compile Include="Exceptions\NoSuchQueryException.cs" />
+    <Compile Include="Exceptions\NoSuchRecordException.cs" />
+    <Compile Include="Exceptions\NoSuchReportException.cs" />
+    <Compile Include="Exceptions\NotAllowedToCreateApplicationException.cs" />
+    <Compile Include="Exceptions\NoUserInRoleException.cs" />
+    <Compile Include="Exceptions\OperationTookTooLongException.cs" />
+    <Compile Include="Exceptions\OverflowException.cs" />
+    <Compile Include="Exceptions\PeriodicReportContainsRestrictedFieldException.cs" />
+    <Compile Include="Exceptions\RecordDoesNotExistInTableException.cs" />
+    <Compile Include="Exceptions\RequiredFieldsMissingFromImportException.cs" />
+    <Compile Include="Exceptions\SignInRequiredException.cs" />
+    <Compile Include="Exceptions\SSLRequiredOnTableException.cs" />
+    <Compile Include="Exceptions\SyntaxErrorException.cs" />
+    <Compile Include="Exceptions\TableDoesNotExistInQuickBase.cs" />
+    <Compile Include="Exceptions\TechnicalDifficultiesException.cs" />
+    <Compile Include="Exceptions\TooManyCriteriaInQueryException.cs" />
+    <Compile Include="Exceptions\UnableToParseXMLException.cs" />
+    <Compile Include="Exceptions\UnimplementedOperationException.cs" />
+    <Compile Include="Exceptions\UnknownUserException.cs" />
+    <Compile Include="Exceptions\UnknownUsernamePasswordException.cs" />
+    <Compile Include="Exceptions\UpdateConflictDetectedException.cs" />
+    <Compile Include="Exceptions\UserAlreadyInRoleException.cs" />
+    <Compile Include="Exceptions\UserExistsException.cs" />
+    <Compile Include="Exceptions\ViewTooLargeException.cs" />
+    <Compile Include="Field.cs" />
+    <Compile Include="FieldAddChoices.cs" />
+    <Compile Include="FieldRemoveChoices.cs" />
+    <Compile Include="FieldType.cs" />
+    <Compile Include="FindDBByName.cs" />
+    <Compile Include="GenResultsTable.cs" />
+    <Compile Include="GetAppDtmInfo.cs" />
+    <Compile Include="GetDBInfo.cs" />
+    <Compile Include="GetDBPage.cs" />
+    <Compile Include="GetDBvar.cs" />
+    <Compile Include="GetNumRecords.cs" />
+    <Compile Include="GetRecordAsHTML.cs" />
+    <Compile Include="GetRecordInfo.cs" />
+    <Compile Include="GetRoleInfo.cs" />
+    <Compile Include="GetSchema.cs" />
+    <Compile Include="GetUserInfo.cs" />
+    <Compile Include="GetUserRole.cs" />
+    <Compile Include="GrantedDBs.cs" />
+    <Compile Include="Http.cs" />
+    <Compile Include="HttpPost.cs" />
+    <Compile Include="HttpPostString.cs" />
+    <Compile Include="HttpPostXml.cs" />
+    <Compile Include="IField.cs" />
+    <Compile Include="ImportFromCSV.cs" />
+    <Compile Include="IQGetObject.cs" />
+    <Compile Include="IQObject.cs" />
+    <Compile Include="Mode.cs" />
+    <Compile Include="PageType.cs" />
+    <Compile Include="Payload\AddFieldPayload.cs" />
+    <Compile Include="Payload\AddRecordPayload.cs" />
+    <Compile Include="Payload\AddReplaceDBPagePayload.cs" />
+    <Compile Include="Payload\AddUserToRolePayload.cs" />
+    <Compile Include="Payload\ApplicationTicket.cs" />
+    <Compile Include="Payload\ApplicationToken.cs" />
+    <Compile Include="Payload\AuthenticatePayload.cs" />
+    <Compile Include="Payload\ChangeRecordOwnerPayload.cs" />
+    <Compile Include="Payload\ChangeUserRolePayload.cs" />
+    <Compile Include="Payload\CloneDatabasePayload.cs" />
+    <Compile Include="Payload\CreateDatabasePayload.cs" />
+    <Compile Include="Payload\CreateTablePayload.cs" />
+    <Compile Include="Payload\DeleteDatabasePayload.cs" />
+    <Compile Include="Payload\DeleteFieldPayload.cs" />
+    <Compile Include="Payload\DeleteRecordPayload.cs" />
+    <Compile Include="Payload\DoQueryCountPayload.cs" />
+    <Compile Include="Payload\DoQueryPayload.cs" />
+    <Compile Include="Payload\EditRecordPayload.cs" />
+    <Compile Include="Payload\FieldChoicesPayload.cs" />
+    <Compile Include="Payload\FindDbByNamePayload.cs" />
+    <Compile Include="Payload\GetDbInfoPayload.cs" />
+    <Compile Include="Payload\GetDBPagePayload.cs" />
+    <Compile Include="Payload\GetDBvarPayload.cs" />
+    <Compile Include="Payload\GetNumRecordsPayload.cs" />
+    <Compile Include="Payload\GetRecordAsHtmlPayload.cs" />
+    <Compile Include="Payload\GetRecordInfoPayload.cs" />
+    <Compile Include="Payload\GetRoleInfoPayload.cs" />
+    <Compile Include="Payload\GetSchemaPayload.cs" />
+    <Compile Include="Payload\GetUserInfoPayload.cs" />
+    <Compile Include="Payload\GetUserRolePayload.cs" />
+    <Compile Include="Payload\GrantDBsPayload.cs" />
+    <Compile Include="Payload\ImportFromCSVPayload.cs" />
+    <Compile Include="Payload\Payload.cs" />
+    <Compile Include="Payload\PayloadDecorator.cs" />
+    <Compile Include="Payload\ProvisionUserPayload.cs" />
+    <Compile Include="Payload\PurgeRecordsPayload.cs" />
+    <Compile Include="Payload\RemoveUserFromRolePayload.cs" />
+    <Compile Include="Payload\RenameAppPayload.cs" />
+    <Compile Include="Payload\RunImportPayload.cs" />
+    <Compile Include="Payload\SendInvitationPayload.cs" />
+    <Compile Include="Payload\SetDBvarPayload.cs" />
+    <Compile Include="Payload\SignOutPayload.cs" />
+    <Compile Include="Payload\UserRolesPayload.cs" />
+    <Compile Include="Payload\WrapPayload.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ProvisionUser.cs" />
+    <Compile Include="PurgeRecords.cs" />
+    <Compile Include="RemoveUserFromRole.cs" />
+    <Compile Include="RenameApp.cs" />
+    <Compile Include="RunImport.cs" />
+    <Compile Include="SendInvitation.cs" />
+    <Compile Include="SetDBvar.cs" />
+    <Compile Include="SignOut.cs" />
+    <Compile Include="Uri\IQUri.cs" />
+    <Compile Include="Uri\QUri.cs" />
+    <Compile Include="Uri\QUriDbid.cs" />
+    <Compile Include="Uri\QUriMain.cs" />
+    <Compile Include="UserRoles.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

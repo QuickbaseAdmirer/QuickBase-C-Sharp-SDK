@@ -1,0 +1,48 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Intuit.QuickBase.Client", "Intuit.QuickBase.Client\Intuit.QuickBase.Client.csproj", "{F25380B0-B55A-4567-941E-B938723F6E07}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Intuit.QuickBase.Core", "Intuit.QuickBase.Core\Intuit.QuickBase.Core.csproj", "{72AE7ED2-1321-499E-8E0E-ECFD91B8C850}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Intuit.QuickBase.UnitTests", "Intuit.QuickBase.UnitTests\Intuit.QuickBase.UnitTests.csproj", "{F5896BE7-8236-4A53-AACB-E6F33A436D04}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Library", "Library", "{2E052995-62F2-44FD-BD11-D481FB2C687C}"
+	ProjectSection(SolutionItems) = preProject
+		Library\nunit.framework.dll = Library\nunit.framework.dll
+		Library\Rhino.Mocks.dll = Library\Rhino.Mocks.dll
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Intuit.QuickBase.IntegrationTests", "Intuit.QuickBase.IntegrationTests\Intuit.QuickBase.IntegrationTests.csproj", "{D88A7B14-7A52-4A78-B51C-D33BA947F551}"
+EndProject
+Global
+	GlobalSection(SubversionScc) = preSolution
+		Svn-Managed = True
+		Manager = AnkhSVN - Subversion Support for Visual Studio
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F25380B0-B55A-4567-941E-B938723F6E07}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F25380B0-B55A-4567-941E-B938723F6E07}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F25380B0-B55A-4567-941E-B938723F6E07}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F25380B0-B55A-4567-941E-B938723F6E07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72AE7ED2-1321-499E-8E0E-ECFD91B8C850}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72AE7ED2-1321-499E-8E0E-ECFD91B8C850}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72AE7ED2-1321-499E-8E0E-ECFD91B8C850}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72AE7ED2-1321-499E-8E0E-ECFD91B8C850}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5896BE7-8236-4A53-AACB-E6F33A436D04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5896BE7-8236-4A53-AACB-E6F33A436D04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5896BE7-8236-4A53-AACB-E6F33A436D04}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5896BE7-8236-4A53-AACB-E6F33A436D04}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D88A7B14-7A52-4A78-B51C-D33BA947F551}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D88A7B14-7A52-4A78-B51C-D33BA947F551}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D88A7B14-7A52-4A78-B51C-D33BA947F551}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D88A7B14-7A52-4A78-B51C-D33BA947F551}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

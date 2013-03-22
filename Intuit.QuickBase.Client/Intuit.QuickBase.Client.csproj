@@ -1,0 +1,111 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="3.5" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{F25380B0-B55A-4567-941E-B938723F6E07}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Intuit.QuickBase.Client</RootNamespace>
+    <AssemblyName>Intuit.QuickBase.Client</AssemblyName>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.DataSetExtensions">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AppDtm.cs" />
+    <Compile Include="AppInfo.cs" />
+    <Compile Include="ComparisonOperator.cs" />
+    <Compile Include="Dtm.cs" />
+    <Compile Include="GrantedAppsInfo.cs" />
+    <Compile Include="GrantedInfo.cs" />
+    <Compile Include="GrantedTablesInfo.cs" />
+    <Compile Include="IDBInfo.cs" />
+    <Compile Include="IQApplication.cs" />
+    <Compile Include="IQClient.cs" />
+    <Compile Include="IQColumn.cs" />
+    <Compile Include="IQRecord.cs" />
+    <Compile Include="IQTable.cs" />
+    <Compile Include="LogicalOperator.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QApplication.cs" />
+    <Compile Include="QApplicationFactory.cs" />
+    <Compile Include="QApplicationFactoryBase.cs" />
+    <Compile Include="QClient.cs" />
+    <Compile Include="QClientFactory.cs" />
+    <Compile Include="QClientFactoryBase.cs" />
+    <Compile Include="QColumn.cs" />
+    <Compile Include="QColumnCollection.cs" />
+    <Compile Include="QColumnFactory.cs" />
+    <Compile Include="QColumnFactoryBase.cs" />
+    <Compile Include="QField.cs" />
+    <Compile Include="QRecord.cs" />
+    <Compile Include="QRecordCollection.cs" />
+    <Compile Include="QRecordFactory.cs" />
+    <Compile Include="QRecordFactoryBase.cs" />
+    <Compile Include="QTable.cs" />
+    <Compile Include="QTableFactory.cs" />
+    <Compile Include="QTableFactoryBase.cs" />
+    <Compile Include="Query.cs" />
+    <Compile Include="QueryStrings.cs" />
+    <Compile Include="QuickBase.cs" />
+    <Compile Include="RecordState.cs" />
+    <Compile Include="ResponseColumnType.cs" />
+    <Compile Include="ResponseRecordType.cs" />
+    <Compile Include="RoleInfo.cs" />
+    <Compile Include="TableDtm.cs" />
+    <Compile Include="TableInfo.cs" />
+    <Compile Include="UserInfo.cs" />
+    <Compile Include="UserRoleInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Intuit.QuickBase.Core\Intuit.QuickBase.Core.csproj">
+      <Project>{72AE7ED2-1321-499E-8E0E-ECFD91B8C850}</Project>
+      <Name>Intuit.QuickBase.Core</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
