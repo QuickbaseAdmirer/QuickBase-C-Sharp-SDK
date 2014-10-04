@@ -6,6 +6,7 @@
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Intuit.QuickBase.Client
 {
@@ -20,12 +21,7 @@ namespace Intuit.QuickBase.Client
 
         public override string ToString()
         {
-            var querys = string.Empty;
-            foreach (var query in _queryStrings)
-            {
-                querys += query.ToString();
-            }
-            return querys;
+            return _queryStrings.Aggregate(string.Empty, (current, query) => current + query.ToString());
         }
     }
 }
