@@ -17,9 +17,16 @@ namespace Intuit.QuickBase.Client
         void AcceptChanges();
         void DownloadFile(string columnName, string path, int versionId);
         void ChangeOwnerTo(string newOwner);
+        string GetAsCSV(string clist);
         bool Equals(IQRecord record);
         bool Equals(object obj);
         int GetHashCode();
         string ToString();
+    }
+
+    internal interface IQRecord_int
+    {
+        void ForceUpdateState(int RecordId);
+        void ForceUpdateState();        
     }
 }

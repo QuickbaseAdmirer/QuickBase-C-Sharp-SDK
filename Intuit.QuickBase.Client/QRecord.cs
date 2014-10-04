@@ -8,6 +8,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
 using System.Xml;
 using System.Xml.XPath;
 using Intuit.QuickBase.Core;
@@ -15,7 +17,7 @@ using Intuit.QuickBase.Core.Exceptions;
 
 namespace Intuit.QuickBase.Client
 {
-    public class QRecord : IQRecord
+    public class QRecord : IQRecord, IQRecord_int
     {
         // Instance fields
         private readonly List<QField> _fields;
@@ -153,6 +155,46 @@ namespace Intuit.QuickBase.Client
             }
         }
 
+        public string GetAsCSV(string clist)
+        {
+            List<string> csvList = new List<string>();
+            List<int> cols = clist.Split('.').Select(Int32.Parse).ToList();
+            foreach (int col in cols)
+            {
+                QField field = _fields.FirstOrDefault(fld => fld.FieldId == col);
+                if (field == null)
+                {
+                    csvList.Add(String.Empty);
+                }
+                else
+                {                    
+                    if (field.Type == FieldType.file) throw new InvalidChoiceException();
+                    csvList.Add(CSVQuoter(field.Value));
+                }
+            }
+            return String.Join(",", csvList);
+        }
+
+        private string CSVQuoter(string inStr)
+        {
+            //if the string contains quote character(s), surround the string with quotes
+            if (inStr.Contains("\""))
+                return "\"" + inStr + "\"";
+            else
+                return inStr;
+        }
+
+        public void ForceUpdateState(int RecID)
+        {
+            RecordId = RecID;
+        }
+
+        public void ForceUpdateState()
+        {
+            RecordState = RecordState.Unchanged;
+            IsOnServer = true;
+        }
+
         private void FillRecord(XPathNavigator recordNode)
         {
             IsOnServer = true;
@@ -264,7 +306,7 @@ namespace Intuit.QuickBase.Client
             });
             if (index == -1)
             {
-                throw new ColumnDoesNotExistInTableExecption("Column not found in table.");
+                throw new ColumnDoesNotExistInTableExecption(string.Format("Column '{0}' not found in table.", columnName));
             }
             return index;
         }

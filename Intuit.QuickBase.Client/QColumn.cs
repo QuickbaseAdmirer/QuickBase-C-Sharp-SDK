@@ -26,10 +26,18 @@ namespace Intuit.QuickBase.Client
             ColumnId = columnId;
         }
 
+        internal QColumn(int columnId, string columnName, FieldType columnType, bool columnVirtual)
+            : this(columnName, columnType)
+        {
+            ColumnVirtual = columnVirtual;
+            ColumnId = columnId;
+        }
+
         // Properties
         public int ColumnId { get; set; }
         public string ColumnName { get; set; }
         public FieldType ColumnType { get; set; }
+        public bool ColumnVirtual { get; set; }
 
         // Methods
         public bool Equals(IQColumn column)

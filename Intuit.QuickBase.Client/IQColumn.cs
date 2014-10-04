@@ -14,6 +14,7 @@ namespace Intuit.QuickBase.Client
         int ColumnId { get; set; }
         string ColumnName { get; set; }
         FieldType ColumnType { get; set; }
+        bool ColumnVirtual { get; set; }
         bool Equals(IQColumn column);
         bool Equals(object obj);
         int GetHashCode();
