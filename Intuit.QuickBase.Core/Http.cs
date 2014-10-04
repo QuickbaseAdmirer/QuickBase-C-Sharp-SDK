@@ -87,9 +87,14 @@ namespace Intuit.QuickBase.Core
         internal static void CheckForException(XPathDocument xml)
         {
             var xmlNav = xml.CreateNavigator();
-            var errorcode = xmlNav.SelectSingleNode("/qdbapi/errcode").Value;
-            var errortext = xmlNav.SelectSingleNode("/qdbapi/errtext").Value;
-
+            string errorcode = xmlNav.SelectSingleNode("/qdbapi/errcode").Value;
+            string errortext = xmlNav.SelectSingleNode("/qdbapi/errtext").Value;
+            var errDetailNode = xmlNav.SelectSingleNode("/qdbapi/errdetail");
+            if (errDetailNode != null)
+            {
+                string errdetail = errDetailNode.Value;
+                if (errdetail.Length > 0) errortext += ":" + errdetail;
+            }
             if ("2".Equals(errorcode))
             {
                 throw new InvalidInputException(errortext);
