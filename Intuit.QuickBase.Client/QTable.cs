@@ -314,7 +314,8 @@ namespace Intuit.QuickBase.Client
             if (acnt + mcnt > 0)
             {
                 List<String> csvLines = new List<string>(acnt + mcnt);
-                String clist = String.Join(".", KeyFID == -1 ? Columns.Where(col => col.ColumnVirtual == false || col.ColumnName == "Record ID#").Select(col => col.ColumnId.ToString()) : Columns.Where(col => col.ColumnVirtual == false || col.ColumnId == KeyFID).Select(col => col.ColumnId.ToString()));
+                String clist = String.Join(".", KeyFID == -1 ? Columns.Where(col => (col.ColumnVirtual == false && col.ColumnLookup == false) || col.ColumnName == "Record ID#").Select(col => col.ColumnId.ToString())
+                                                             : Columns.Where(col => (col.ColumnVirtual == false && col.ColumnLookup == false) || col.ColumnId == KeyFID).Select(col => col.ColumnId.ToString()));
                 if (acnt > 0)
                 {
                     csvLines.AddRange(addList.Select(record => record.GetAsCSV(clist)));
@@ -390,7 +391,8 @@ namespace Intuit.QuickBase.Client
                 var label = columnNode.SelectSingleNode("label").Value;
 
                 bool virt = columnNode.GetAttribute("mode", String.Empty) == "virtual";
-                var col = ColumnFactory.CreateInstace(columnId, label, type, virt);
+                bool lookup = columnNode.GetAttribute("mode", String.Empty) == "lookup";
+                var col = ColumnFactory.CreateInstace(columnId, label, type, virt, lookup);
                 Columns.Add(col);
             }
         }

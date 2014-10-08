@@ -26,10 +26,11 @@ namespace Intuit.QuickBase.Client
             ColumnId = columnId;
         }
 
-        internal QColumn(int columnId, string columnName, FieldType columnType, bool columnVirtual)
+        internal QColumn(int columnId, string columnName, FieldType columnType, bool columnVirtual, bool columnLookup)
             : this(columnName, columnType)
         {
             ColumnVirtual = columnVirtual;
+            ColumnLookup = columnLookup;
             ColumnId = columnId;
         }
 
@@ -38,6 +39,7 @@ namespace Intuit.QuickBase.Client
         public string ColumnName { get; set; }
         public FieldType ColumnType { get; set; }
         public bool ColumnVirtual { get; set; }
+        public bool ColumnLookup { get; set; }
 
         // Methods
         public bool Equals(IQColumn column)
