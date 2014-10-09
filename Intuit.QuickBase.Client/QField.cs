@@ -6,12 +6,14 @@
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
 using System;
+using System.IO;
 using Intuit.QuickBase.Core;
 
 namespace Intuit.QuickBase.Client
 {
     internal class QField
     {
+        private static readonly DateTime qbOffset = new DateTime(1970, 1, 1, 0, 0, 0, 0);
         // Instance fields
         private string _value;
 
@@ -26,11 +28,17 @@ namespace Intuit.QuickBase.Client
             FieldId = fieldId;
             Type = type;
             Record = record; // needs to be before Value.
-            Value = value;
+            _value = value;
         }
 
         // Properties
         internal int FieldId { get; private set; }
+
+        internal string QBValue
+        {
+            get { return _value; }
+        }
+
         internal string Value
         {
             get
@@ -38,6 +46,8 @@ namespace Intuit.QuickBase.Client
                 switch (Type)
                 {
                     case FieldType.timestamp:
+                    case FieldType.date:
+                    case FieldType.timeofday:
                         return ConvertQBMillisecondsToDateTime(_value).ToString();
                     default:
                         return _value;
@@ -49,7 +59,17 @@ namespace Intuit.QuickBase.Client
                 {
                     Update = true;
                 }
-                _value = value;
+                switch (Type)
+                {
+                    case FieldType.timestamp:
+                    case FieldType.date:
+                    case FieldType.timeofday:
+                        _value = ConvertDateTimeStringToQBMilliseconds(value);
+                        break;
+                    default:
+                        _value = value;
+                        break;
+                }
             }
         }
         internal FieldType Type { get; set; }
@@ -84,8 +104,20 @@ namespace Intuit.QuickBase.Client
 
         private static DateTime ConvertQBMillisecondsToDateTime(string milliseconds)
         {
-            var date = new DateTime(1970, 1, 1, 0, 0, 0, 0);
-            return new DateTime(date.Ticks + (Int64.Parse(milliseconds) * TimeSpan.TicksPerMillisecond));
+            return new DateTime(qbOffset.Ticks + (Int64.Parse(milliseconds) * TimeSpan.TicksPerMillisecond));
+        }
+
+        private static string ConvertDateTimeStringToQBMilliseconds(string inDateStr)
+        {
+            DateTime inDate;
+            if (DateTime.TryParse(inDateStr, out inDate))
+            {
+                return ((inDate.Ticks - qbOffset.Ticks)/TimeSpan.TicksPerMillisecond).ToString();
+            }
+            else
+            {
+                throw new InvalidDataException(String.Format("Can't parse '{0}' into a date format", inDateStr));
+            }
         }
     }
 }

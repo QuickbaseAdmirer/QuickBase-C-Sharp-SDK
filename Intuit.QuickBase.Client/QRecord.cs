@@ -121,7 +121,7 @@ namespace Intuit.QuickBase.Client
                 {
                     if (field.Update)
                     {
-                        IField qField = new Field(field.FieldId, field.Type, field.Value);
+                        IField qField = new Field(field.FieldId, field.Type, field.QBValue);
                         if(field.Type == FieldType.file)
                         {
                             qField.File = field.FullName;
@@ -138,7 +138,7 @@ namespace Intuit.QuickBase.Client
             {
                 foreach (var field in _fields)
                 {
-                    IField qField = new Field(field.FieldId, field.Type, field.Value);
+                    IField qField = new Field(field.FieldId, field.Type, field.QBValue);
                     if (field.Type == FieldType.file)
                     {
                         qField.File = field.FullName;
@@ -169,7 +169,7 @@ namespace Intuit.QuickBase.Client
                 else
                 {                    
                     if (field.Type == FieldType.file) throw new InvalidChoiceException();
-                    csvList.Add(CSVQuoter(field.Value));
+                    csvList.Add(CSVQuoter(field.QBValue));
                 }
             }
             return String.Join(",", csvList);
