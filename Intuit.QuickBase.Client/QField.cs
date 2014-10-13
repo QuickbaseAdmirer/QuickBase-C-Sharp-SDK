@@ -23,12 +23,24 @@ namespace Intuit.QuickBase.Client
         }
 
         // Constructors
-        internal QField(int fieldId, string value, FieldType type, IQRecord record)
+        internal QField(int fieldId, string value, FieldType type, IQRecord record) : this(fieldId, value, type, record, false)
+        {
+        }
+
+        internal QField(int fieldId, string value, FieldType type, IQRecord record, bool QBinternal)
         {
             FieldId = fieldId;
             Type = type;
             Record = record; // needs to be before Value.
-            _value = value;
+            if (QBinternal)
+            {
+                _value = value;
+            }
+            else
+            {
+                Value = value;
+                Update = false;
+            }
         }
 
         // Properties

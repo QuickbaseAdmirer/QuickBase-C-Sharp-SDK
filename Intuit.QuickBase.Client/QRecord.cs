@@ -58,6 +58,21 @@ namespace Intuit.QuickBase.Client
             }
         }
 
+        private void FieldLoad(int index, string value)
+        {
+            // Get field location with column index
+            var fieldIndex = _fields.IndexOf(new QField(Columns[index].ColumnId));
+
+            if (fieldIndex > -1)
+            {
+                SetExistingField(index, fieldIndex, value);
+            }
+            else
+            {
+                CreateNewField(index, value, true);
+            }            
+        }
+
         public string this[int index]
         {
             get
@@ -77,7 +92,7 @@ namespace Intuit.QuickBase.Client
                 }
                 else
                 {
-                    CreateNewField(index, value);
+                    CreateNewField(index, value, false);
                 }
             }
         }
@@ -106,7 +121,7 @@ namespace Intuit.QuickBase.Client
                 }
                 else
                 {
-                    CreateNewField(index, value);
+                    CreateNewField(index, value, false);
                 }
             }
         }
@@ -205,11 +220,11 @@ namespace Intuit.QuickBase.Client
                 if (fieldNode.HasChildren && fieldNode.MoveToChild("url", String.Empty))
                 {
                     fieldNode.MoveToFirst();
-                    this[colIndex] = fieldNode.TypedValue as string;
+                    FieldLoad(colIndex, fieldNode.TypedValue as string);
                 }
                 else
                 {
-                    this[colIndex] = fieldNode.TypedValue as string;
+                    FieldLoad(colIndex, fieldNode.TypedValue as string);
                 }
 
                 if (fieldNode.GetAttribute("id", String.Empty).Equals("3"))
@@ -263,11 +278,11 @@ namespace Intuit.QuickBase.Client
             return RecordId.ToString();
         }
 
-        private void CreateNewField(int index, string value)
+        private void CreateNewField(int index, string value, bool QBInternal)
         {
             if (Columns[index].ColumnType == FieldType.file && !IsOnServer)
             {
-                var field = new QField(Columns[index].ColumnId, Path.GetFileName(value), Columns[index].ColumnType, this)
+                var field = new QField(Columns[index].ColumnId, Path.GetFileName(value), Columns[index].ColumnType, this, QBInternal)
                 {
                     FullName = value
                 };
@@ -275,7 +290,7 @@ namespace Intuit.QuickBase.Client
             }
             else
             {
-                var field = new QField(Columns[index].ColumnId, value, Columns[index].ColumnType, this);
+                var field = new QField(Columns[index].ColumnId, value, Columns[index].ColumnType, this, QBInternal);
                 _fields.Add(field);
             }
         }
