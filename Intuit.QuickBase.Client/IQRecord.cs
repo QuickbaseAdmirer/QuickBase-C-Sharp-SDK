@@ -12,8 +12,8 @@ namespace Intuit.QuickBase.Client
         int RecordId { get; }
         RecordState RecordState { get; }
         bool IsOnServer { get; }
-        string this[int index] { get; set; }
-        string this[string columnName] { get; set; }
+        object this[int index] { get; set; }
+        object this[string columnName] { get; set; }
         void AcceptChanges();
         void DownloadFile(string columnName, string path, int versionId);
         void ChangeOwnerTo(string newOwner);

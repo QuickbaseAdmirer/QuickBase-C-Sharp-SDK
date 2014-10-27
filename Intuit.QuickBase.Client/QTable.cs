@@ -74,11 +74,62 @@ namespace Intuit.QuickBase.Client
             Columns.Clear();
         }
 
+        public string GenCsv()
+        {
+            var genResultsTable = new GenResultsTable.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
+                .SetOptions("csv")
+                .Build();
+            var xml = genResultsTable.Post().CreateNavigator();
+            return xml.SelectSingleNode("/response_data").Value;
+        }
+
         public string GenCsv(int queryId)
         {
             var genResultsTable = new GenResultsTable.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
                 .SetQid(queryId)
                 .SetOptions("csv")
+                .Build();
+            var xml = genResultsTable.Post().CreateNavigator();
+            return xml.SelectSingleNode("/response_data").Value;
+        }
+
+        public string GenCsv(Query query)
+        {
+            var genResultsTable = new GenResultsTable.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
+                .SetQuery(query.ToString())
+                .SetOptions("csv")
+                .Build();
+            var xml = genResultsTable.Post().CreateNavigator();
+            return xml.SelectSingleNode("/response_data").Value;
+        }
+
+        public string GenHtml(string options = "", string clist = "a")
+        {
+            var genResultsTable = new GenResultsTable.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
+                .SetOptions(options)
+                .SetCList(clist)
+                .Build();
+            var xml = genResultsTable.Post().CreateNavigator();
+            return xml.SelectSingleNode("/response_data").Value;
+        }
+
+        public string GenHtml(int queryId, string options = "", string clist = "a")
+        {
+            var genResultsTable = new GenResultsTable.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
+                .SetQid(queryId)
+                .SetOptions(options)
+                .SetCList(clist)
+                .Build();
+            var xml = genResultsTable.Post().CreateNavigator();
+            return xml.SelectSingleNode("/response_data").Value;
+        }
+
+        public string GenHtml(Query query, string options = "", string clist = "a")
+        {
+            var genResultsTable = new GenResultsTable.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
+                .SetQuery(query.ToString())
+                .SetOptions(options)
+                .SetCList(clist)
                 .Build();
             var xml = genResultsTable.Post().CreateNavigator();
             return xml.SelectSingleNode("/response_data").Value;
@@ -389,10 +440,31 @@ namespace Intuit.QuickBase.Client
                 var type =
                     (FieldType)Enum.Parse(typeof(FieldType), columnNode.GetAttribute("field_type", String.Empty), true);
                 var label = columnNode.SelectSingleNode("label").Value;
-
+                bool hidden = false;
+                var hidNode = columnNode.SelectSingleNode("appears_by_default");
+                if (hidNode != null && hidNode.Value == "0") hidden = true;
                 bool virt = columnNode.GetAttribute("mode", String.Empty) == "virtual";
                 bool lookup = columnNode.GetAttribute("mode", String.Empty) == "lookup";
-                var col = ColumnFactory.CreateInstace(columnId, label, type, virt, lookup);
+                IQColumn col = ColumnFactory.CreateInstace(columnId, label, type, virt, lookup, hidden);
+                foreach (XPathNavigator choicenode in columnNode.Select("choices/choice"))
+                {
+                    object value;
+                    switch (type)
+                    {
+                        case FieldType.rating:
+                            value = Int32.Parse(choicenode.Value);
+                            break;
+                        default:
+                            value = choicenode.Value;
+                            break;
+                    }
+                    ((IQColumn_int)col).AddChoice(value);
+                }
+                Dictionary<string, int> colComposites = ((IQColumn_int)col).GetComposites();
+                foreach (XPathNavigator compositenode in columnNode.Select("compositeFields/compositeField"))
+                {
+                    colComposites.Add(compositenode.GetAttribute("key", String.Empty), Int32.Parse(compositenode.GetAttribute("id", String.Empty)));
+                }
                 Columns.Add(col);
             }
         }

@@ -17,7 +17,12 @@ namespace Intuit.QuickBase.Client
         QRecordCollection Records { get; }
         QColumnCollection Columns { get; }
         void Clear();
+        string GenCsv();
         string GenCsv(int queryId);
+        string GenCsv(Query query);
+        string GenHtml(string options = "", string clist = "a");
+        string GenHtml(int queryId, string options = "", string clist = "a");
+        string GenHtml(Query query, string options = "", string clist = "a");
         XPathDocument GetTableSchema();
         TableInfo GetTableInfo();
         int GetServerRecordCount();

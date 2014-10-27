@@ -44,7 +44,7 @@ namespace Intuit.QuickBase.Client
             {
                 int keyfield = Table.KeyFID;
                 if (keyfield == -1) keyfield = Table.Columns.Single(c => c.ColumnName == "Record ID#").ColumnId;
-                List<String> lstQry =
+                List<string> lstQry =
                     _recordsToRemove.Select(recordId => String.Format("{{'{0}'.EQ.'{1}'}}", keyfield, (object)recordId))
                         .ToList();
                 //TODO: further optimization possible: sort and search through lstQry combining conjoining spans
@@ -52,7 +52,7 @@ namespace Intuit.QuickBase.Client
                 for (int i = 0; i < cnt; i += 100)
                 {
                     int k = Math.Min(100, cnt - i);
-                    String qry = String.Join(" OR ", lstQry.Skip(i).Take(k));
+                    string qry = String.Join(" OR ", lstQry.Skip(i).Take(k));
                     var prBuild = new PurgeRecords.Builder(Application.Client.Ticket, Application.Token,
                         Application.Client.AccountDomain, Table.TableId);
                     prBuild.SetQuery(qry);

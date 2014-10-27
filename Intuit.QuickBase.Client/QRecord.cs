@@ -73,7 +73,7 @@ namespace Intuit.QuickBase.Client
             }            
         }
 
-        public string this[int index]
+        public object this[int index]
         {
             get
             {
@@ -97,7 +97,7 @@ namespace Intuit.QuickBase.Client
             }
         }
 
-        public string this[string columnName]
+        public object this[string columnName]
         {
             get
             {
@@ -192,8 +192,8 @@ namespace Intuit.QuickBase.Client
 
         private string CSVQuoter(string inStr)
         {
-            //if the string contains quote character(s), surround the string with quotes
-            if (inStr.Contains("\""))
+            //if the string contains quote character(s), newlines or commas, surround the string with quotes
+            if (inStr.Contains("\"") || inStr.Contains(",") || inStr.Contains("\n") || inStr.Contains("\r"))
                 return "\"" + inStr + "\"";
             else
                 return inStr;
@@ -240,7 +240,7 @@ namespace Intuit.QuickBase.Client
         {
             var index = GetColumnIndex(columnName);
             var field = _fields[_fields.IndexOf(new QField(Columns[index].ColumnId))];
-            var fileName = field.Value;
+            string fileName = (string)field.Value;
 
             var fileToDownload = new DownloadFile(Application.Client.Ticket, Application.Client.AccountDomain, path, fileName, Table.TableId, RecordId,
                                                            field.FieldId, versionId);
@@ -278,29 +278,31 @@ namespace Intuit.QuickBase.Client
             return RecordId.ToString();
         }
 
-        private void CreateNewField(int index, string value, bool QBInternal)
+        private void CreateNewField(int index, object value, bool QBInternal)
         {
             if (Columns[index].ColumnType == FieldType.file && !IsOnServer)
             {
-                var field = new QField(Columns[index].ColumnId, Path.GetFileName(value), Columns[index].ColumnType, this, QBInternal)
+                string fileName = (string)value;
+                var field = new QField(Columns[index].ColumnId, Path.GetFileName(fileName), Columns[index].ColumnType, this, Columns[index], QBInternal)
                 {
-                    FullName = value
+                    FullName = fileName
                 };
                 _fields.Add(field);
             }
             else
             {
-                var field = new QField(Columns[index].ColumnId, value, Columns[index].ColumnType, this, QBInternal);
+                var field = new QField(Columns[index].ColumnId, value, Columns[index].ColumnType, this, Columns[index], QBInternal);
                 _fields.Add(field);
             }
         }
 
-        private void SetExistingField(int index, int fieldIndex, string value)
+        private void SetExistingField(int index, int fieldIndex, object value)
         {
             if (Columns[index].ColumnType == FieldType.file)
             {
-                _fields[fieldIndex].Value = Path.GetFileName(value);
-                _fields[fieldIndex].FullName = value;
+                string fileName = (string) value;
+                _fields[fieldIndex].Value = Path.GetFileName(fileName);
+                _fields[fieldIndex].FullName = fileName;
             }
             else
             {
