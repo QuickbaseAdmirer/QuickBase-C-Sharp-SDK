@@ -61,8 +61,7 @@ namespace Intuit.QuickBase.Client
                     case FieldType.date:
                         return ConvertDateTimeToQBMilliseconds((DateTime)_value);
                     case FieldType.timeofday:
-                    case FieldType.duration:
-                        return ConvertTimeSpanToMilliseconds((TimeSpan)_value);
+                        return ConvertTimeSpanToQBMilliseconds((TimeSpan)_value);
                     case FieldType.checkbox:
                         return (bool)_value == true ? "1" : "0";
                     case FieldType.percent:
@@ -82,8 +81,10 @@ namespace Intuit.QuickBase.Client
                         _value = String.IsNullOrEmpty(value) ? new DateTime?() : ConvertQBMillisecondsToDateTime(value).Date;
                         break;
                     case FieldType.timeofday:
+                        _value = String.IsNullOrEmpty(value) ? new TimeSpan?() : ConvertQBMillisecondsToDateTime(value).TimeOfDay;
+                        break;
                     case FieldType.duration:
-                        _value = String.IsNullOrEmpty(value) ? new TimeSpan?() : ConvertMillisecondsToTimeSpan(value);
+                        _value = String.IsNullOrEmpty(value) ? new TimeSpan?() : TimeSpan.Parse(value);
                         break;
                     case FieldType.timestamp:
                         _value = String.IsNullOrEmpty(value) ? new DateTime?() : ConvertQBMillisecondsToDateTime(value);
@@ -239,12 +240,6 @@ namespace Intuit.QuickBase.Client
             return Value.ToString();
         }
 
-        private static TimeSpan ConvertMillisecondsToTimeSpan(string milliseconds)
-        {
-            Int64 val = Int64.Parse(milliseconds);
-            return new TimeSpan(val * 10000);
-        }
-
         private static DateTime ConvertQBMillisecondsToDateTime(string milliseconds)
         {
             return new DateTime(qbOffset.Ticks + (Int64.Parse(milliseconds) * TimeSpan.TicksPerMillisecond));
@@ -255,7 +250,7 @@ namespace Intuit.QuickBase.Client
             return ((inDate.Ticks - qbOffset.Ticks)/TimeSpan.TicksPerMillisecond).ToString();
         }
 
-        private static string ConvertTimeSpanToMilliseconds(TimeSpan inTime)
+        private static string ConvertTimeSpanToQBMilliseconds(TimeSpan inTime)
         {
             return (inTime.Ticks / TimeSpan.TicksPerMillisecond).ToString();
         }

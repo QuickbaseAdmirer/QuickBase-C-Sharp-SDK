@@ -104,8 +104,15 @@ namespace Intuit.QuickBase.Client
                 // Get column index
                 var index = GetColumnIndex(columnName);
 
-                // Return field with column index
-                return _fields[index].Value;
+                // Get field location with column index
+                var fieldIndex = _fields.IndexOf(new QField(Columns[index].ColumnId));
+
+                if (fieldIndex > -1)
+                {
+                    // Return field with column index
+                    return _fields[fieldIndex].Value;
+                }
+                else throw new Exception("Can't get a nonexistant field (field not yet set");
             }
             set
             {
@@ -315,7 +322,7 @@ namespace Intuit.QuickBase.Client
             }
         }
 
-        private int GetColumnIndex(string columnName)
+        public int GetColumnIndex(string columnName)
         {
             var index = Columns.IndexOf(new QColumn
             {

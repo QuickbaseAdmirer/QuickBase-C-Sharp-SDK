@@ -7,6 +7,8 @@
  */
 
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
+using System.Security.AccessControl;
 using Intuit.QuickBase.Core;
 
 namespace Intuit.QuickBase.Client
