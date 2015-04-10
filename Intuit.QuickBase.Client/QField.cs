@@ -62,6 +62,8 @@ namespace Intuit.QuickBase.Client
                         return ConvertDateTimeToQBMilliseconds((DateTime)_value);
                     case FieldType.timeofday:
                         return ConvertTimeSpanToQBMilliseconds((TimeSpan)_value);
+                    case FieldType.duration:
+                        return ((TimeSpan)_value).Milliseconds.ToString();
                     case FieldType.checkbox:
                         return (bool)_value == true ? "1" : "0";
                     case FieldType.percent:
@@ -84,7 +86,7 @@ namespace Intuit.QuickBase.Client
                         _value = String.IsNullOrEmpty(value) ? new TimeSpan?() : ConvertQBMillisecondsToDateTime(value).TimeOfDay;
                         break;
                     case FieldType.duration:
-                        _value = String.IsNullOrEmpty(value) ? new TimeSpan?() : TimeSpan.Parse(value);
+                        _value = String.IsNullOrEmpty(value) ? new TimeSpan?() : TimeSpan.FromMilliseconds(Int64.Parse(value));
                         break;
                     case FieldType.timestamp:
                         _value = String.IsNullOrEmpty(value) ? new DateTime?() : ConvertQBMillisecondsToDateTime(value);
