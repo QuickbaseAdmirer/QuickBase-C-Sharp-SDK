@@ -1,9 +1,0 @@
-C:\IPSUtilities\QuickBase-C-Sharp-SDK-master\QBFunctionTest\bin\Debug\QBFunctionTest.dll
-C:\IPSUtilities\QuickBase-C-Sharp-SDK-master\QBFunctionTest\bin\Debug\QBFunctionTest.pdb
-C:\IPSUtilities\QuickBase-C-Sharp-SDK-master\QBFunctionTest\bin\Debug\Intuit.QuickBase.Client.dll
-C:\IPSUtilities\QuickBase-C-Sharp-SDK-master\QBFunctionTest\bin\Debug\Intuit.QuickBase.Core.dll
-C:\IPSUtilities\QuickBase-C-Sharp-SDK-master\QBFunctionTest\bin\Debug\Intuit.QuickBase.Client.pdb
-C:\IPSUtilities\QuickBase-C-Sharp-SDK-master\QBFunctionTest\bin\Debug\Intuit.QuickBase.Core.pdb
-C:\IPSUtilities\QuickBase-C-Sharp-SDK-master\QBFunctionTest\obj\Debug\QBFunctionTest.csprojResolveAssemblyReference.cache
-C:\IPSUtilities\QuickBase-C-Sharp-SDK-master\QBFunctionTest\obj\Debug\QBFunctionTest.dll
-C:\IPSUtilities\QuickBase-C-Sharp-SDK-master\QBFunctionTest\obj\Debug\QBFunctionTest.pdb

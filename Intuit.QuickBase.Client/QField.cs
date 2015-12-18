@@ -15,7 +15,7 @@ namespace Intuit.QuickBase.Client
 {
     internal class QField
     {
-        private static readonly DateTime qbOffset = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+        private static readonly DateTime qbTSOffset = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
         // Instance fields
         private object _value;
 
@@ -244,12 +244,12 @@ namespace Intuit.QuickBase.Client
 
         private static DateTime ConvertQBMillisecondsToDateTime(string milliseconds)
         {
-            return new DateTime(qbOffset.Ticks + (Int64.Parse(milliseconds) * TimeSpan.TicksPerMillisecond));
+            return qbTSOffset.AddMilliseconds(double.Parse(milliseconds)).ToLocalTime();
         }
 
-        private static string ConvertDateTimeToQBMilliseconds(DateTime inDate)
+        private static string ConvertDateTimeToQBMilliseconds(DateTime inDT)
         {
-            return ((inDate.Ticks - qbOffset.Ticks)/TimeSpan.TicksPerMillisecond).ToString();
+            return ((inDT.ToUniversalTime().Ticks - qbTSOffset.Ticks)/TimeSpan.TicksPerMillisecond).ToString();
         }
 
         private static string ConvertTimeSpanToQBMilliseconds(TimeSpan inTime)

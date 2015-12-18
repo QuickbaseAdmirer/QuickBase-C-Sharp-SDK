@@ -77,8 +77,17 @@ namespace Intuit.QuickBase.Client
         {
             get
             {
+                // Get field location with column index
+                var fieldIndex = _fields.IndexOf(new QField(Columns[index].ColumnId));
+
+                if (fieldIndex == -1)
+                {
+                    //make null field
+                    CreateNewField(index, null, false);
+                    fieldIndex = _fields.IndexOf(new QField(Columns[index].ColumnId));
+                }
                 // Return field with column index
-                return _fields[index].Value;
+                return _fields[fieldIndex].Value;
             }
 
             set
@@ -107,12 +116,14 @@ namespace Intuit.QuickBase.Client
                 // Get field location with column index
                 var fieldIndex = _fields.IndexOf(new QField(Columns[index].ColumnId));
 
-                if (fieldIndex > -1)
+                if (fieldIndex == -1)
                 {
-                    // Return field with column index
-                    return _fields[fieldIndex].Value;
+                    //make null field
+                    CreateNewField(index, null, false);
+                    fieldIndex = _fields.IndexOf(new QField(Columns[index].ColumnId));
                 }
-                else throw new Exception("Can't get a nonexistant field (field not yet set");
+                // Return field with column index
+                return _fields[fieldIndex].Value;
             }
             set
             {
