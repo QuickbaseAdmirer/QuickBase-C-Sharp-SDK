@@ -1,3 +1,4 @@
 .svn
-Intuit.QuickBase.Client/obj/Debug/Intuit.QuickBase.Client.csproj.FileListAbsolute.txt
-Intuit.QuickBase.Core/obj/Debug/Intuit.QuickBase.Core.csproj.FileListAbsolute.txt
+Intuit.QuickBase.Client/obj/
+Intuit.QuickBase.Core/obj/
+QBFunctionTest/obj/

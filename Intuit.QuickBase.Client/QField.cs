@@ -249,7 +249,14 @@ namespace Intuit.QuickBase.Client
 
         private static string ConvertDateTimeToQBMilliseconds(DateTime inDT)
         {
-            return ((inDT.ToUniversalTime().Ticks - qbTSOffset.Ticks)/TimeSpan.TicksPerMillisecond).ToString();
+            //string msecs = ((inDT.ToUniversalTime().Ticks - qbTSOffset.Ticks) / TimeSpan.TicksPerMillisecond).ToString();  // this SHOULD work, why?
+            string msecs = ((inDT.Ticks - qbTSOffset.Ticks) / TimeSpan.TicksPerMillisecond).ToString();
+            //DateTime check = ConvertQBMillisecondsToDateTime(msecs);
+            //if (!check.Equals(inDT))
+            //{
+            //    Console.WriteLine("DateTime doesn't round trip?");
+            //}
+            return msecs;
         }
 
         private static string ConvertTimeSpanToQBMilliseconds(TimeSpan inTime)
