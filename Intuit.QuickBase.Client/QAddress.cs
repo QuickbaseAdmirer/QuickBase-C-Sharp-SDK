@@ -18,5 +18,9 @@
             PostalCode = postCode;
             Country = country;
         }
+
+        public QAddress()
+        {
+        }
     }
 }

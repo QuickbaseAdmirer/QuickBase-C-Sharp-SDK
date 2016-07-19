@@ -61,9 +61,8 @@ namespace Intuit.QuickBase.Client
                     case FieldType.date:
                         return ConvertDateTimeToQBMilliseconds((DateTime)_value);
                     case FieldType.timeofday:
-                        return ConvertTimeSpanToQBMilliseconds((TimeSpan)_value);
                     case FieldType.duration:
-                        return ((TimeSpan)_value).Milliseconds.ToString();
+                        return ((TimeSpan) _value).ToString();
                     case FieldType.checkbox:
                         return (bool)_value == true ? "1" : "0";
                     case FieldType.percent:
@@ -80,13 +79,13 @@ namespace Intuit.QuickBase.Client
                         // do nothing: child columns will fill this out
                         break;
                     case FieldType.date:
-                        _value = String.IsNullOrEmpty(value) ? new DateTime?() : ConvertQBMillisecondsToDateTime(value).Date;
+                        _value = String.IsNullOrEmpty(value) ? new DateTime?() : ConvertQBMillisecondsToDate(value);
                         break;
                     case FieldType.timeofday:
-                        _value = String.IsNullOrEmpty(value) ? new TimeSpan?() : ConvertQBMillisecondsToDateTime(value).TimeOfDay;
+                        _value = String.IsNullOrEmpty(value) ? new TimeSpan?() : ConvertQBMillisecondsToTime(value);
                         break;
                     case FieldType.duration:
-                        _value = String.IsNullOrEmpty(value) ? new TimeSpan?() : TimeSpan.FromMilliseconds(Int64.Parse(value));
+                        _value = String.IsNullOrEmpty(value) ? new TimeSpan?() : TimeSpan.Parse(value);
                         break;
                     case FieldType.timestamp:
                         _value = String.IsNullOrEmpty(value) ? new DateTime?() : ConvertQBMillisecondsToDateTime(value);
@@ -246,17 +245,18 @@ namespace Intuit.QuickBase.Client
         {
             return qbTSOffset.AddMilliseconds(double.Parse(milliseconds)).ToLocalTime();
         }
+        private static DateTime ConvertQBMillisecondsToDate(string milliseconds)
+        {
+            return qbTSOffset.AddMilliseconds(double.Parse(milliseconds)).Date;
+        }
+        private static TimeSpan ConvertQBMillisecondsToTime(string milliseconds)
+        {
+            return qbTSOffset.AddMilliseconds(double.Parse(milliseconds)).TimeOfDay;
+        }
 
         private static string ConvertDateTimeToQBMilliseconds(DateTime inDT)
         {
-            //string msecs = ((inDT.ToUniversalTime().Ticks - qbTSOffset.Ticks) / TimeSpan.TicksPerMillisecond).ToString();  // this SHOULD work, why?
-            string msecs = ((inDT.Ticks - qbTSOffset.Ticks) / TimeSpan.TicksPerMillisecond).ToString();
-            //DateTime check = ConvertQBMillisecondsToDateTime(msecs);
-            //if (!check.Equals(inDT))
-            //{
-            //    Console.WriteLine("DateTime doesn't round trip?");
-            //}
-            return msecs;
+            return ((inDT.Ticks - qbTSOffset.Ticks) / TimeSpan.TicksPerMillisecond).ToString();
         }
 
         private static string ConvertTimeSpanToQBMilliseconds(TimeSpan inTime)
