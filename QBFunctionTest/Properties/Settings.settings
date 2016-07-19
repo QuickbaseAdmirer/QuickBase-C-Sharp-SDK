@@ -1,0 +1,21 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="QBFunctionTest.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="qbUser" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">***REMOVED***</Value>
+    </Setting>
+    <Setting Name="qbPass" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">***REMOVED***</Value>
+    </Setting>
+    <Setting Name="qbAppToken" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">***REMOVED***</Value>
+    </Setting>
+    <Setting Name="qbSiteURL" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">***REMOVED***</Value>
+    </Setting>
+    <Setting Name="qbAppDBID" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">***REMOVED***</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

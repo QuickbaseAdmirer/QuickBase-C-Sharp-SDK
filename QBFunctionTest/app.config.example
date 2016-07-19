@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+    <configSections>
+        <sectionGroup name="applicationSettings" type="System.Configuration.ApplicationSettingsGroup, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" >
+            <section name="QBFunctionTest.Properties.Settings" type="System.Configuration.ClientSettingsSection, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" requirePermission="false" />
+        </sectionGroup>
+    </configSections>
+    <applicationSettings>
+        <QBFunctionTest.Properties.Settings>
+            <setting name="qbUser" serializeAs="String">
+                <value>user@example.com</value>
+            </setting>
+            <setting name="qbPass" serializeAs="String">
+                <value>VeryStrongPassword1234!@#$</value>
+            </setting>
+            <setting name="qbAppToken" serializeAs="String">
+                <value>apptokenfromqbgoeshere</value>
+            </setting>
+            <setting name="qbSiteURL" serializeAs="String">
+                <value>example.quickbase.com</value>
+            </setting>
+            <setting name="qbAppDBID" serializeAs="String">
+                <value>appdatabaseidfromqbgoeshere</value>
+            </setting>
+        </QBFunctionTest.Properties.Settings>
+    </applicationSettings>
+</configuration>

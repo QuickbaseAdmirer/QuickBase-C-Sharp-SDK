@@ -173,7 +173,7 @@ namespace Intuit.QuickBase.Client
                 .SetFmt(true)
                 .Build();
             var xml = doQuery.Post().CreateNavigator();
-            LoadColumns(xml); //Must be done each time, incase the schema changes do to another user
+            LoadColumns(xml); //Must be done each time, incase the schema changes due to another user, or from a previous query that has a difering subset of columns
             LoadRecords(xml);
         }
 
