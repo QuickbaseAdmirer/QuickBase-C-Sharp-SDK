@@ -28,6 +28,7 @@ namespace Intuit.QuickBase.Client
             {
                 var addCol = new AddField(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, Table.TableId, column.ColumnName, column.ColumnType);
                 var xml = addCol.Post().CreateNavigator();
+                //todo: need to put in error checking here
                 var columnId = int.Parse(xml.SelectSingleNode("/qdbapi/fid").Value);
                 column.ColumnId = columnId;
             }

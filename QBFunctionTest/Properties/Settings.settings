@@ -1,0 +1,21 @@
+﻿<?xml version='1.0' encoding='utf-8'?>
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="QBFunctionTest.Properties" GeneratedClassName="Settings">
+  <Profiles />
+  <Settings>
+    <Setting Name="qbUser" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">jhein@denverips.com</Value>
+    </Setting>
+    <Setting Name="qbPass" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">Mr!PokeyLope1</Value>
+    </Setting>
+    <Setting Name="qbAppToken" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">cir3mretgzsj5bm2xqh5b6g32yc</Value>
+    </Setting>
+    <Setting Name="qbSiteURL" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">integratedprintingsolutions.quickbase.com</Value>
+    </Setting>
+    <Setting Name="qbAppDBID" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">bkha68kn9</Value>
+    </Setting>
+  </Settings>
+</SettingsFile>

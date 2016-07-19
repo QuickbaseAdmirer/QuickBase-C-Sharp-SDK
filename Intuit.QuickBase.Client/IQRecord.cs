@@ -12,14 +12,22 @@ namespace Intuit.QuickBase.Client
         int RecordId { get; }
         RecordState RecordState { get; }
         bool IsOnServer { get; }
-        string this[int index] { get; set; }
-        string this[string columnName] { get; set; }
+        object this[int index] { get; set; }
+        object this[string columnName] { get; set; }
         void AcceptChanges();
         void DownloadFile(string columnName, string path, int versionId);
         void ChangeOwnerTo(string newOwner);
+        string GetAsCSV(string clist);
         bool Equals(IQRecord record);
         bool Equals(object obj);
         int GetHashCode();
         string ToString();
+    }
+
+    internal interface IQRecord_int
+    {
+        void ForceUpdateState(int RecordId);
+        void ForceUpdateState();
+        int GetColumnIndex(string colName);
     }
 }

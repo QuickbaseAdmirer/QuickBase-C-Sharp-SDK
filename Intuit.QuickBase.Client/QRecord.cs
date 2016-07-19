@@ -8,6 +8,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Text;
 using System.Xml;
 using System.Xml.XPath;
 using Intuit.QuickBase.Core;
@@ -15,7 +17,7 @@ using Intuit.QuickBase.Core.Exceptions;
 
 namespace Intuit.QuickBase.Client
 {
-    public class QRecord : IQRecord
+    public class QRecord : IQRecord, IQRecord_int
     {
         // Instance fields
         private readonly List<QField> _fields;
@@ -56,12 +58,36 @@ namespace Intuit.QuickBase.Client
             }
         }
 
-        public string this[int index]
+        private void FieldLoad(int index, string value)
+        {
+            // Get field location with column index
+            var fieldIndex = _fields.IndexOf(new QField(Columns[index].ColumnId));
+
+            if (fieldIndex > -1)
+            {
+                SetExistingField(index, fieldIndex, value);
+            }
+            else
+            {
+                CreateNewField(index, value, true);
+            }            
+        }
+
+        public object this[int index]
         {
             get
             {
+                // Get field location with column index
+                var fieldIndex = _fields.IndexOf(new QField(Columns[index].ColumnId));
+
+                if (fieldIndex == -1)
+                {
+                    //make null field
+                    CreateNewField(index, null, false);
+                    fieldIndex = _fields.IndexOf(new QField(Columns[index].ColumnId));
+                }
                 // Return field with column index
-                return _fields[index].Value;
+                return _fields[fieldIndex].Value;
             }
 
             set
@@ -75,20 +101,29 @@ namespace Intuit.QuickBase.Client
                 }
                 else
                 {
-                    CreateNewField(index, value);
+                    CreateNewField(index, value, false);
                 }
             }
         }
 
-        public string this[string columnName]
+        public object this[string columnName]
         {
             get
             {
                 // Get column index
                 var index = GetColumnIndex(columnName);
 
+                // Get field location with column index
+                var fieldIndex = _fields.IndexOf(new QField(Columns[index].ColumnId));
+
+                if (fieldIndex == -1)
+                {
+                    //make null field
+                    CreateNewField(index, null, false);
+                    fieldIndex = _fields.IndexOf(new QField(Columns[index].ColumnId));
+                }
                 // Return field with column index
-                return _fields[index].Value;
+                return _fields[fieldIndex].Value;
             }
             set
             {
@@ -104,7 +139,7 @@ namespace Intuit.QuickBase.Client
                 }
                 else
                 {
-                    CreateNewField(index, value);
+                    CreateNewField(index, value, false);
                 }
             }
         }
@@ -119,7 +154,7 @@ namespace Intuit.QuickBase.Client
                 {
                     if (field.Update)
                     {
-                        IField qField = new Field(field.FieldId, field.Type, field.Value);
+                        IField qField = new Field(field.FieldId, field.Type, field.QBValue);
                         if(field.Type == FieldType.file)
                         {
                             qField.File = field.FullName;
@@ -136,7 +171,7 @@ namespace Intuit.QuickBase.Client
             {
                 foreach (var field in _fields)
                 {
-                    IField qField = new Field(field.FieldId, field.Type, field.Value);
+                    IField qField = new Field(field.FieldId, field.Type, field.QBValue);
                     if (field.Type == FieldType.file)
                     {
                         qField.File = field.FullName;
@@ -153,6 +188,46 @@ namespace Intuit.QuickBase.Client
             }
         }
 
+        public string GetAsCSV(string clist)
+        {
+            List<string> csvList = new List<string>();
+            List<int> cols = clist.Split('.').Select(Int32.Parse).ToList();
+            foreach (int col in cols)
+            {
+                QField field = _fields.FirstOrDefault(fld => fld.FieldId == col);
+                if (field == null)
+                {
+                    csvList.Add(String.Empty);
+                }
+                else
+                {                    
+                    if (field.Type == FieldType.file) throw new InvalidChoiceException();
+                    csvList.Add(CSVQuoter(field.QBValue));
+                }
+            }
+            return String.Join(",", csvList);
+        }
+
+        private string CSVQuoter(string inStr)
+        {
+            //if the string contains quote character(s), newlines or commas, surround the string with quotes
+            if (inStr.Contains("\"") || inStr.Contains(",") || inStr.Contains("\n") || inStr.Contains("\r"))
+                return "\"" + inStr + "\"";
+            else
+                return inStr;
+        }
+
+        public void ForceUpdateState(int RecID)
+        {
+            RecordId = RecID;
+        }
+
+        public void ForceUpdateState()
+        {
+            RecordState = RecordState.Unchanged;
+            IsOnServer = true;
+        }
+
         private void FillRecord(XPathNavigator recordNode)
         {
             IsOnServer = true;
@@ -163,11 +238,11 @@ namespace Intuit.QuickBase.Client
                 if (fieldNode.HasChildren && fieldNode.MoveToChild("url", String.Empty))
                 {
                     fieldNode.MoveToFirst();
-                    this[colIndex] = fieldNode.TypedValue as string;
+                    FieldLoad(colIndex, fieldNode.TypedValue as string);
                 }
                 else
                 {
-                    this[colIndex] = fieldNode.TypedValue as string;
+                    FieldLoad(colIndex, fieldNode.TypedValue as string);
                 }
 
                 if (fieldNode.GetAttribute("id", String.Empty).Equals("3"))
@@ -183,7 +258,7 @@ namespace Intuit.QuickBase.Client
         {
             var index = GetColumnIndex(columnName);
             var field = _fields[_fields.IndexOf(new QField(Columns[index].ColumnId))];
-            var fileName = field.Value;
+            string fileName = (string)field.Value;
 
             var fileToDownload = new DownloadFile(Application.Client.Ticket, Application.Client.AccountDomain, path, fileName, Table.TableId, RecordId,
                                                            field.FieldId, versionId);
@@ -221,29 +296,31 @@ namespace Intuit.QuickBase.Client
             return RecordId.ToString();
         }
 
-        private void CreateNewField(int index, string value)
+        private void CreateNewField(int index, object value, bool QBInternal)
         {
             if (Columns[index].ColumnType == FieldType.file && !IsOnServer)
             {
-                var field = new QField(Columns[index].ColumnId, Path.GetFileName(value), Columns[index].ColumnType, this)
+                string fileName = (string)value;
+                var field = new QField(Columns[index].ColumnId, Path.GetFileName(fileName), Columns[index].ColumnType, this, Columns[index], QBInternal)
                 {
-                    FullName = value
+                    FullName = fileName
                 };
                 _fields.Add(field);
             }
             else
             {
-                var field = new QField(Columns[index].ColumnId, value, Columns[index].ColumnType, this);
+                var field = new QField(Columns[index].ColumnId, value, Columns[index].ColumnType, this, Columns[index], QBInternal);
                 _fields.Add(field);
             }
         }
 
-        private void SetExistingField(int index, int fieldIndex, string value)
+        private void SetExistingField(int index, int fieldIndex, object value)
         {
             if (Columns[index].ColumnType == FieldType.file)
             {
-                _fields[fieldIndex].Value = Path.GetFileName(value);
-                _fields[fieldIndex].FullName = value;
+                string fileName = (string) value;
+                _fields[fieldIndex].Value = Path.GetFileName(fileName);
+                _fields[fieldIndex].FullName = fileName;
             }
             else
             {
@@ -256,7 +333,7 @@ namespace Intuit.QuickBase.Client
             }
         }
 
-        private int GetColumnIndex(string columnName)
+        public int GetColumnIndex(string columnName)
         {
             var index = Columns.IndexOf(new QColumn
             {
@@ -264,7 +341,7 @@ namespace Intuit.QuickBase.Client
             });
             if (index == -1)
             {
-                throw new ColumnDoesNotExistInTableExecption("Column not found in table.");
+                throw new ColumnDoesNotExistInTableExecption(string.Format("Column '{0}' not found in table.", columnName));
             }
             return index;
         }
