@@ -42,17 +42,21 @@ namespace QBFunctionTest
             public void SetupTestValues()
             {
                 textVal = "Test string #1";
-                floatVal = (decimal)3452.54;
+                floatVal = 3452.54m;
                 checkboxVal = true;
                 dateVal = new DateTime(2015, 04, 15);
                 timeStampVal = new DateTime(1970, 02, 28, 23, 55, 00, DateTimeKind.Local);
                 timeOfDayVal = new DateTime(2000, 1, 1, 12, 34, 56).TimeOfDay;
-                durationVal = new TimeSpan(3, 4, 5, 6);
+                durationVal = new TimeSpan(0, 4, 5, 6);
                 addressVal.Line1 = "1313 Mockingbird Ln";
                 addressVal.City = "Culver City";
                 addressVal.Province = "CA";
                 addressVal.PostalCode = "90120";
                 addressVal.Country = "USA";
+                currencyVal = 50.50m;
+                emailVal = "test@example.com";
+                phoneVal = "(303) 555-1212";
+                percentVal = 95.5m;
             }
         }
 
@@ -83,10 +87,10 @@ namespace QBFunctionTest
             testTable.Columns.Add(new QColumn("TimeOfDayTest", FieldType.timeofday));
             testTable.Columns.Add(new QColumn("DurationTest", FieldType.duration));
             //testTable.Columns.Add(new QColumn("AddressTest", FieldType.address));
-            //testTable.Columns.Add(new QColumn("CurrencyTest", FieldType.currency));
-            //testTable.Columns.Add(new QColumn("EmailTest", FieldType.email));
-            //testTable.Columns.Add(new QColumn("PhoneTest", FieldType.phone));
-            //testTable.Columns.Add(new QColumn("PercentTest", FieldType.percent));
+            testTable.Columns.Add(new QColumn("CurrencyTest", FieldType.currency));
+            testTable.Columns.Add(new QColumn("PercentTest", FieldType.percent));
+            testTable.Columns.Add(new QColumn("EmailTest", FieldType.email));
+            testTable.Columns.Add(new QColumn("PhoneTest", FieldType.phone));
 
             TestRecord exemplar = new TestRecord();
             exemplar.SetupTestValues();
@@ -98,8 +102,12 @@ namespace QBFunctionTest
             inRec["DateTest"] = exemplar.dateVal;
             inRec["TimeStampTest"] = exemplar.timeStampVal;
             inRec["TimeOfDayTest"] = exemplar.timeOfDayVal;
-            //inRec["DurationTest"] = exemplar.durationVal;
+            inRec["DurationTest"] = exemplar.durationVal;
             //inRec["AddressTest"] = exemplar.addressVal;
+            inRec["CurrencyTest"] = exemplar.currencyVal;
+            inRec["PercentTest"] = exemplar.percentVal;
+            inRec["EmailTest"] = exemplar.emailVal;
+            inRec["PhoneTest"] = exemplar.phoneVal;
 
             Assert.AreEqual(exemplar.textVal, inRec["TextTest"], "Strings setter fails");
             Assert.AreEqual(exemplar.floatVal, inRec["FloatTest"], "Floats setter fails");
@@ -107,7 +115,11 @@ namespace QBFunctionTest
             Assert.AreEqual(exemplar.dateVal, inRec["DateTest"], "Dates setter fails");
             Assert.AreEqual(exemplar.timeStampVal, inRec["TimeStampTest"], "TimeStamps setter fails");
             Assert.AreEqual(exemplar.timeOfDayVal, inRec["TimeOfDayTest"], "TimeOfDays setter fails");
-            //Assert.AreEqual(exemplar.durationVal, inRec["DurationTest"], "Durations setter fails");
+            Assert.AreEqual(exemplar.durationVal, inRec["DurationTest"], "Durations setter fails");
+            Assert.AreEqual(exemplar.currencyVal, inRec["CurrencyTest"], "Currency setter fails");
+            Assert.AreEqual(exemplar.percentVal, inRec["PercentTest"], "Percent setter fails");
+            Assert.AreEqual(exemplar.emailVal, inRec["EmailTest"], "Email setter fails");
+            Assert.AreEqual(exemplar.phoneVal, inRec["PhoneTest"], "Phone setter fails");
 
             testTable.Records.Add(inRec);
             testTable.AcceptChanges();
@@ -118,7 +130,11 @@ namespace QBFunctionTest
             Assert.AreEqual(exemplar.dateVal, inRec["DateTest"], "Dates wrong post upload");
             Assert.AreEqual(exemplar.timeStampVal, inRec["TimeStampTest"], "TimeStamps wrong post upload");
             Assert.AreEqual(exemplar.timeOfDayVal, inRec["TimeOfDayTest"], "TimeOfDays wrong post upload");
-            //Assert.AreEqual(exemplar.durationVal, inRec["DurationTest"], "Durations wrong post upload");
+            Assert.AreEqual(exemplar.durationVal, inRec["DurationTest"], "Durations wrong post upload");
+            Assert.AreEqual(exemplar.currencyVal, inRec["CurrencyTest"], "Currency wrong post upload");
+            Assert.AreEqual(exemplar.percentVal, inRec["PercentTest"], "Percent wrong post upload");
+            Assert.AreEqual(exemplar.emailVal, inRec["EmailTest"], "Email wrong post upload");
+            Assert.AreEqual(exemplar.phoneVal, inRec["PhoneTest"], "Phone wrong post upload");
 
             testTable.Records.Clear();
             testTable.Query();
@@ -130,8 +146,11 @@ namespace QBFunctionTest
             Assert.AreEqual(exemplar.dateVal, outRec["DateTest"], "Dates don't roundtrip");
             Assert.AreEqual(exemplar.timeStampVal, outRec["TimeStampTest"], "TimeStamps don't roundtrip");
             Assert.AreEqual(exemplar.timeOfDayVal, outRec["TimeOfDayTest"], "TimeOfDays don't roundtrip");
-            //Assert.AreEqual(exemplar.durationVal, outRec["DurationTest"], "Durations don't roundtrip");
-
+            Assert.AreEqual(exemplar.durationVal, outRec["DurationTest"], "Durations don't roundtrip");
+            Assert.AreEqual(exemplar.currencyVal, outRec["CurrencyTest"], "Currencies don't roundtrip");
+            Assert.AreEqual(exemplar.percentVal, outRec["PercentTest"], "Percents don't roundtrip");
+            Assert.AreEqual(exemplar.emailVal, outRec["EmailTest"], "Emails don't roundtrip");
+            Assert.AreEqual(exemplar.phoneVal, outRec["PhoneTest"], "Phones don't roundtrip");
         }
     }
 }

@@ -254,6 +254,20 @@ namespace Intuit.QuickBase.Client
             RecordState = RecordState.Unchanged;
         }
 
+        public void UploadFile(string columnName, string filePath)
+        {
+            // create new field with columnName
+            var index = GetColumnIndex(columnName);
+            CreateNewField(index, columnName, false);
+            
+            // change type to file
+            Columns[index].ColumnType = FieldType.file;
+            
+            // Get field location with column index
+            var fieldIndex = _fields.IndexOf(new QField(Columns[index].ColumnId));
+            SetExistingField(index, fieldIndex, filePath);
+        }
+
         public void DownloadFile(string columnName, string path, int versionId)
         {
             var index = GetColumnIndex(columnName);
@@ -296,6 +310,7 @@ namespace Intuit.QuickBase.Client
             return RecordId.ToString();
         }
 
+        //value 'QBInternal' is passed into the QField, and specifies if the column exists inside QB's internal dataformat, or is .Net datatype
         private void CreateNewField(int index, object value, bool QBInternal)
         {
             if (Columns[index].ColumnType == FieldType.file && !IsOnServer)

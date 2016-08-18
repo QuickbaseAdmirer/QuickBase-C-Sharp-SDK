@@ -62,11 +62,9 @@ namespace Intuit.QuickBase.Client
                         return ConvertDateTimeToQBMilliseconds((DateTime)_value);
                     case FieldType.timeofday:
                     case FieldType.duration:
-                        return ((TimeSpan) _value).ToString();
+                        return ((TimeSpan)_value).ToString();
                     case FieldType.checkbox:
                         return (bool)_value == true ? "1" : "0";
-                    case FieldType.percent:
-                        return Math.Round((float) _value * 100.0, 6).ToString(); //Get around roundtrip bug in Quickbase
                     default:
                         return _value.ToString();
                 }
@@ -82,10 +80,8 @@ namespace Intuit.QuickBase.Client
                         _value = String.IsNullOrEmpty(value) ? new DateTime?() : ConvertQBMillisecondsToDate(value);
                         break;
                     case FieldType.timeofday:
-                        _value = String.IsNullOrEmpty(value) ? new TimeSpan?() : ConvertQBMillisecondsToTime(value);
-                        break;
                     case FieldType.duration:
-                        _value = String.IsNullOrEmpty(value) ? new TimeSpan?() : TimeSpan.Parse(value);
+                        _value = String.IsNullOrEmpty(value) ? new TimeSpan?() : ConvertQBMillisecondsToTime(value);
                         break;
                     case FieldType.timestamp:
                         _value = String.IsNullOrEmpty(value) ? new DateTime?() : ConvertQBMillisecondsToDateTime(value);
@@ -93,9 +89,11 @@ namespace Intuit.QuickBase.Client
                     case FieldType.checkbox:
                         _value = String.IsNullOrEmpty(value) ? new bool?() : (value == "1" || value == "true");
                         break;
-                    case FieldType.percent:
                     case FieldType.rating:
                         _value = String.IsNullOrEmpty(value) ? new float?() : float.Parse(value);
+                        break;
+                    case FieldType.percent:
+                        _value = String.IsNullOrEmpty(value) ? new decimal?() : decimal.Parse(value) * 100; //get around roundtrip bug
                         break;
                     case FieldType.@float:
                     case FieldType.currency:
@@ -183,6 +181,7 @@ namespace Intuit.QuickBase.Client
                                 break;
                             case FieldType.@float:
                             case FieldType.currency:
+                            case FieldType.percent:
                                 decimal? val = value as decimal?;
                                 Int32? val2 = value as Int32?;
                                 if (val == null && val2 == null)
