@@ -336,16 +336,23 @@ namespace Intuit.QuickBase.Client
                 string fileName = (string) value;
                 _fields[fieldIndex].Value = Path.GetFileName(fileName);
                 _fields[fieldIndex].FullName = fileName;
+                if (RecordState != RecordState.New)
+                {
+                    RecordState = RecordState.Modified;
+                }
             }
             else
             {
-                _fields[fieldIndex].Value = value;
+                if (!_fields[fieldIndex].Value.Equals(value))
+                {
+                    _fields[fieldIndex].Value = value;
+                    if (RecordState != RecordState.New)
+                    {
+                        RecordState = RecordState.Modified;
+                    }
+                }
             }
 
-            if (RecordState != RecordState.New)
-            {
-                RecordState = RecordState.Modified;
-            }
         }
 
         public int GetColumnIndex(string columnName)

@@ -58,6 +58,27 @@ namespace QBFunctionTest
                 phoneVal = "(303) 555-1212";
                 percentVal = 95.5m;
             }
+
+            public void Setup2ndValues()
+            {
+                textVal = "Test string #2 & an ampersand";
+                floatVal = 1234.56m;
+                checkboxVal = false;
+                dateVal = new DateTime(2010, 01, 12);
+                timeStampVal = new DateTime(1971, 03, 24, 23, 55, 00, DateTimeKind.Local);
+                timeOfDayVal = new DateTime(2002, 2, 2, 23, 45, 56).TimeOfDay;
+                durationVal = new TimeSpan(0, 1, 2, 3);
+                addressVal.Line1 = "1313 Mockingbird Ln";
+                addressVal.City = "Culver City";
+                addressVal.Province = "CA";
+                addressVal.PostalCode = "90120";
+                addressVal.Country = "USA";
+                currencyVal = 25.25m;
+                emailVal = "test2@example.com";
+                phoneVal = "(719) 555-1212";
+                percentVal = 95.5m;
+            }
+
         }
 
         [TestMethod]
@@ -86,7 +107,6 @@ namespace QBFunctionTest
             testTable.Columns.Add(new QColumn("TimeStampTest", FieldType.timestamp));
             testTable.Columns.Add(new QColumn("TimeOfDayTest", FieldType.timeofday));
             testTable.Columns.Add(new QColumn("DurationTest", FieldType.duration));
-            //testTable.Columns.Add(new QColumn("AddressTest", FieldType.address));
             testTable.Columns.Add(new QColumn("CurrencyTest", FieldType.currency));
             testTable.Columns.Add(new QColumn("PercentTest", FieldType.percent));
             testTable.Columns.Add(new QColumn("EmailTest", FieldType.email));
@@ -103,7 +123,6 @@ namespace QBFunctionTest
             inRec["TimeStampTest"] = exemplar.timeStampVal;
             inRec["TimeOfDayTest"] = exemplar.timeOfDayVal;
             inRec["DurationTest"] = exemplar.durationVal;
-            //inRec["AddressTest"] = exemplar.addressVal;
             inRec["CurrencyTest"] = exemplar.currencyVal;
             inRec["PercentTest"] = exemplar.percentVal;
             inRec["EmailTest"] = exemplar.emailVal;
@@ -151,6 +170,36 @@ namespace QBFunctionTest
             Assert.AreEqual(exemplar.percentVal, outRec["PercentTest"], "Percents don't roundtrip");
             Assert.AreEqual(exemplar.emailVal, outRec["EmailTest"], "Emails don't roundtrip");
             Assert.AreEqual(exemplar.phoneVal, outRec["PhoneTest"], "Phones don't roundtrip");
+
+            exemplar.Setup2ndValues();
+            outRec["TextTest"] = exemplar.textVal;
+            outRec["FloatTest"] = exemplar.floatVal;
+            outRec["CheckboxTest"] = exemplar.checkboxVal;
+            outRec["DateTest"] = exemplar.dateVal;
+            outRec["TimeStampTest"] = exemplar.timeStampVal;
+            outRec["TimeOfDayTest"] = exemplar.timeOfDayVal;
+            outRec["DurationTest"] = exemplar.durationVal;
+            outRec["CurrencyTest"] = exemplar.currencyVal;
+            outRec["PercentTest"] = exemplar.percentVal;
+            outRec["EmailTest"] = exemplar.emailVal;
+            outRec["PhoneTest"] = exemplar.phoneVal;
+
+            testTable.AcceptChanges();
+            testTable.Query();
+
+            IQRecord outRec2 = testTable.Records[0];
+            Assert.AreEqual(exemplar.textVal, outRec2["TextTest"], "Strings don't update");
+            Assert.AreEqual(exemplar.floatVal, outRec2["FloatTest"], "Floats don't update");
+            Assert.AreEqual(exemplar.checkboxVal, outRec2["CheckboxTest"], "Checkboxes don't update");
+            Assert.AreEqual(exemplar.dateVal, outRec2["DateTest"], "Dates don't update");
+            Assert.AreEqual(exemplar.timeStampVal, outRec2["TimeStampTest"], "TimeStamps don't update");
+            Assert.AreEqual(exemplar.timeOfDayVal, outRec2["TimeOfDayTest"], "TimeOfDays don't update");
+            Assert.AreEqual(exemplar.durationVal, outRec2["DurationTest"], "Durations don't update");
+            Assert.AreEqual(exemplar.currencyVal, outRec2["CurrencyTest"], "Currencies don't update");
+            Assert.AreEqual(exemplar.percentVal, outRec2["PercentTest"], "Percents don't update");
+            Assert.AreEqual(exemplar.emailVal, outRec2["EmailTest"], "Emails don't update");
+            Assert.AreEqual(exemplar.phoneVal, outRec2["PhoneTest"], "Phones don't update");
+
         }
     }
 }
