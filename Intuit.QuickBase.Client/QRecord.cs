@@ -152,6 +152,7 @@ namespace Intuit.QuickBase.Client
             {
                 foreach (var field in _fields)
                 {
+                    if (field.Column.ColumnLookup == true) continue; //don't try to update values that are results of lookups
                     if (field.Update)
                     {
                         IField qField = new Field(field.FieldId, field.Type, field.QBValue);
@@ -171,6 +172,7 @@ namespace Intuit.QuickBase.Client
             {
                 foreach (var field in _fields)
                 {
+                    if (field.Column.ColumnLookup == true) continue; //don't try to update values that are results of lookups
                     IField qField = new Field(field.FieldId, field.Type, field.QBValue);
                     if (field.Type == FieldType.file)
                     {

@@ -131,10 +131,10 @@ namespace Intuit.QuickBase.Core
             _uri = new QUriDbid(builder.AccountDomain, builder.Dbid);
         }
 
-        internal string Options
-        {
-            get { return (DoQueryPayload)_doQueryPayload.Options; }
-        }
+        //internal string Options
+        //{
+        //    get { return (DoQueryPayload)_doQueryPayload.Options; }
+        //}
 
         public string XmlPayload
         {
