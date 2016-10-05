@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.XPath;
 using Intuit.QuickBase.Core;
+using Intuit.QuickBase.Core.Exceptions;
 
 namespace Intuit.QuickBase.Client
 {
@@ -166,15 +167,30 @@ namespace Intuit.QuickBase.Client
             return int.Parse(xml.SelectSingleNode("/qdbapi/num_records").Value);
         }
 
+        private void _doQuery(DoQuery qry)
+        {
+            XPathNavigator xml;
+            Records.Clear();
+            try
+            {
+                xml = qry.Post().CreateNavigator();
+            }
+            catch (ViewTooLargeException ex)
+            {
+                //split into smaller queries automagically eventually
+                throw;
+            }
+            LoadColumns(xml); //Must be done each time, incase the schema changes due to another user, or from a previous query that has a differing subset of columns
+            LoadRecords(xml);
+        }
+
         public void Query()
         {
             var doQuery = new DoQuery.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
                 .SetCList("a")
                 .SetFmt(true)
                 .Build();
-            var xml = doQuery.Post().CreateNavigator();
-            LoadColumns(xml); //Must be done each time, incase the schema changes due to another user, or from a previous query that has a difering subset of columns
-            LoadRecords(xml);
+            _doQuery(doQuery);
         }
 
         public void Query(string options)
@@ -184,9 +200,7 @@ namespace Intuit.QuickBase.Client
                 .SetFmt(true)
                 .SetOptions(options)
                 .Build();
-            var xml = doQuery.Post().CreateNavigator();
-            LoadColumns(xml);
-            LoadRecords(xml);
+            _doQuery(doQuery);
         }
 
         public void Query(int[] clist)
@@ -197,9 +211,7 @@ namespace Intuit.QuickBase.Client
                 .SetCList(colList)
                 .SetFmt(true)
                 .Build();
-            var xml = doQuery.Post().CreateNavigator();
-            LoadColumns(xml);
-            LoadRecords(xml);
+            _doQuery(doQuery);
         }
 
         public void Query(int[] clist, string options)
@@ -211,9 +223,7 @@ namespace Intuit.QuickBase.Client
                 .SetOptions(options)
                 .SetFmt(true)
                 .Build();
-            var xml = doQuery.Post().CreateNavigator();
-            LoadColumns(xml);
-            LoadRecords(xml);
+            _doQuery(doQuery);
         }
 
         public void Query(Query query)
@@ -223,9 +233,7 @@ namespace Intuit.QuickBase.Client
                 .SetCList("a")
                 .SetFmt(true)
                 .Build();
-            var xml = doQuery.Post().CreateNavigator();
-            LoadColumns(xml);
-            LoadRecords(xml);
+            _doQuery(doQuery);
         }
 
         public void Query(Query query, string options)
@@ -236,9 +244,7 @@ namespace Intuit.QuickBase.Client
                 .SetOptions(options)
                 .SetFmt(true)
                 .Build();
-            var xml = doQuery.Post().CreateNavigator();
-            LoadColumns(xml);
-            LoadRecords(xml);
+            _doQuery(doQuery);
         }
 
         public void Query(Query query, int[] clist)
@@ -250,9 +256,7 @@ namespace Intuit.QuickBase.Client
                 .SetCList(colList)
                 .SetFmt(true)
                 .Build();
-            var xml = doQuery.Post().CreateNavigator();
-            LoadColumns(xml);
-            LoadRecords(xml);
+            _doQuery(doQuery);
         }
 
         public void Query(Query query, int[] clist, int[] slist)
@@ -266,9 +270,7 @@ namespace Intuit.QuickBase.Client
                 .SetSList(solList)
                 .SetFmt(true)
                 .Build();
-            var xml = doQuery.Post().CreateNavigator();
-            LoadColumns(xml);
-            LoadRecords(xml);
+            _doQuery(doQuery);
         }
 
         public void Query(Query query, int[] clist, int[] slist, string options)
@@ -283,9 +285,7 @@ namespace Intuit.QuickBase.Client
                 .SetOptions(options)
                 .SetFmt(true)
                 .Build();
-            var xml = doQuery.Post().CreateNavigator();
-            LoadColumns(xml);
-            LoadRecords(xml);
+            _doQuery(doQuery);
         }
 
         public void Query(int queryId)
@@ -294,9 +294,7 @@ namespace Intuit.QuickBase.Client
                 .SetQid(queryId)
                 .SetFmt(true)
                 .Build();
-            var xml = doQuery.Post().CreateNavigator();
-            LoadColumns(xml);
-            LoadRecords(xml);
+            _doQuery(doQuery);
         }
 
         public void Query(int queryId, string options)
@@ -306,9 +304,7 @@ namespace Intuit.QuickBase.Client
                 .SetFmt(true)
                 .SetOptions(options)
                 .Build();
-            var xml = doQuery.Post().CreateNavigator();
-            LoadColumns(xml);
-            LoadRecords(xml);
+            _doQuery(doQuery);
         }
 
         public int QueryCount(Query query)
@@ -362,7 +358,10 @@ namespace Intuit.QuickBase.Client
             List<IQRecord> modList = Records.Where(record => record.RecordState == RecordState.Modified).ToList();
             int acnt = addList.Count;
             int mcnt = modList.Count;
-            if (acnt + mcnt > 0)
+            bool hasFileColumn = false;
+            foreach (var col in Columns)
+                if (col.ColumnType == FieldType.file) hasFileColumn = true;
+            if (acnt + mcnt > 5 && !hasFileColumn)  // if greater than 5 and no file-type columns involved, use csv upload method for reducing API calls
             {
                 List<String> csvLines = new List<string>(acnt + mcnt);
                 String clist = String.Join(".", KeyFID == -1 ? Columns.Where(col => (col.ColumnVirtual == false && col.ColumnLookup == false) || col.ColumnName == "Record ID#").Select(col => col.ColumnId.ToString())
@@ -387,12 +386,19 @@ namespace Intuit.QuickBase.Client
                 foreach (IQRecord rec in addList)
                 {
                     xNodes.MoveNext();
-                    ((IQRecord_int)rec).ForceUpdateState(Int32.Parse(xNodes.Current.Value));
+                    ((IQRecord_int)rec).ForceUpdateState(Int32.Parse(xNodes.Current.Value)); //set in-memory recordid to new server value
                 }
                 foreach (IQRecord rec in modList)
                 {
                     ((IQRecord_int)rec).ForceUpdateState();
                 }
+            }
+            else
+            {
+                foreach (IQRecord rec in addList)
+                    rec.AcceptChanges();
+                foreach (IQRecord rec in modList)
+                    rec.AcceptChanges();
             }
         }
 
@@ -414,7 +420,6 @@ namespace Intuit.QuickBase.Client
 
         private void LoadRecords(XPathNavigator xml)
         {
-            Records.Clear();
             var recordNodes = xml.Select("/qdbapi/table/records/record");
             foreach (XPathNavigator recordNode in recordNodes)
             {

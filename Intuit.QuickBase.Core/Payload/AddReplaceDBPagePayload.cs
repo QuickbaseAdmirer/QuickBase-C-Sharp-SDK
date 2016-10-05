@@ -7,6 +7,7 @@
  */
 using System;
 using System.Text;
+using System.Xml.Linq;
 
 namespace Intuit.QuickBase.Core.Payload
 {
@@ -71,10 +72,10 @@ namespace Intuit.QuickBase.Core.Payload
         internal override string GetXmlPayload()
         {
             var sb = new StringBuilder();
-            sb.Append(PageId > 0 ? String.Format("<pageid>{0}</pageid>", PageId) : String.Empty);
-            sb.Append(!String.IsNullOrEmpty(PageName) ? String.Format("<pagename>{0}</pagename>", PageName) : String.Empty);
-            sb.Append(String.Format("<pagetype>{0}</pagetype>", (int)PageType));
-            sb.Append(String.Format("<pagebody>{0}</pagebody>", PageBody));
+            if (PageId > 0) sb.Append(new XElement("pageid", PageId));
+            if (!string.IsNullOrEmpty(PageName)) sb.Append(new XElement("pagename", PageName));
+            sb.Append(new XElement("pagetype", (int)PageType));
+            sb.Append(new XElement("pagebody", PageBody));
             return sb.ToString();
         }
     }

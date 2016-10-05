@@ -2,5 +2,8 @@
 Intuit.QuickBase.Client/obj/
 Intuit.QuickBase.Core/obj/
 QBFunctionTest/obj/
-QBFunctionTest/app.config
+QBFunctionTest/*.config
 TestResults/
+*.CodeAnalysisLog.xml
+*.ruleset
+*.lastcodeanalysissucceeded

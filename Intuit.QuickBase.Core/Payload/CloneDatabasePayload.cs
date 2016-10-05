@@ -7,6 +7,7 @@
  */
 using System;
 using System.Text;
+using System.Xml.Linq;
 
 namespace Intuit.QuickBase.Core.Payload
 {
@@ -58,11 +59,12 @@ namespace Intuit.QuickBase.Core.Payload
 
         internal override string GetXmlPayload()
         {
-            var xmlData = new StringBuilder();
-            xmlData.Append(String.Format("<newdbname>{0}</newdbname><newdbdesc>{1}</newdbdesc>", _newDBName, _newDBDesc));
-            xmlData.Append(_keepData ? "<keepData>1</keepData>" : String.Empty);
-            xmlData.Append(_excludeFiles ? "<excludefiles>1</excludefiles>" : String.Empty);
-            return xmlData.ToString();
+            var sb = new StringBuilder();
+            sb.Append(new XElement("newdbname", _newDBName));
+            sb.Append(new XElement("newdbdesc", _newDBDesc));
+            if (_keepData) sb.Append(new XElement("keepData", 1));
+            if (_excludeFiles) sb.Append(new XElement("excludefiles", 1));
+            return sb.ToString();
         }
     }
 }

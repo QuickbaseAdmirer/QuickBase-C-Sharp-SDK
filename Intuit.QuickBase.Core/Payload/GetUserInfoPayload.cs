@@ -6,6 +6,7 @@
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
 using System;
+using System.Xml.Linq;
 
 namespace Intuit.QuickBase.Core.Payload
 {
@@ -33,7 +34,7 @@ namespace Intuit.QuickBase.Core.Payload
 
         internal override string GetXmlPayload()
         {
-            return !String.IsNullOrEmpty(Email) ? String.Format("<email>{0}</email>", Email) : String.Empty;
+            return !String.IsNullOrEmpty(Email) ? new XElement("email", Email).ToString() : string.Empty;
         }
     }
 }

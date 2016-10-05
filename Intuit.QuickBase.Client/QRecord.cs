@@ -201,7 +201,7 @@ namespace Intuit.QuickBase.Client
                 }
                 else
                 {                    
-                    if (field.Type == FieldType.file) throw new InvalidChoiceException();
+                    if (field.Type == FieldType.file) throw new InvalidChoiceException(); //Can't upload a file via CSV upload
                     csvList.Add(CSVQuoter(field.QBValue));
                 }
             }

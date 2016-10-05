@@ -6,7 +6,9 @@
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
 using System;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using System.Text;
+using System.Xml.Linq;
 
 namespace Intuit.QuickBase.Core.Payload
 {
@@ -17,7 +19,7 @@ namespace Intuit.QuickBase.Core.Payload
         private readonly string _qName;
         private readonly string _cList;
         private readonly string _sList;
-        private readonly string _options;
+        private string _options;
         private readonly bool _fmt;
 
         internal class Builder
@@ -88,16 +90,22 @@ namespace Intuit.QuickBase.Core.Payload
             _fmt = builder.Fmt;
         }
 
+        public string Options
+        {
+            get { return _options; }
+            set { _options = value; }
+        }
+
         internal override string GetXmlPayload()
         {
             var sb = new StringBuilder();
-            sb.Append(!String.IsNullOrEmpty(_query) ? String.Format("<query>{0}</query>", _query) : String.Empty);
-            sb.Append(_qid > 0 ? String.Format("<qid>{0}</qid>", _qid) : String.Empty);
-            sb.Append(!String.IsNullOrEmpty(_qName) ? String.Format("<qname>{0}</qname>", _qName) : String.Empty);
-            sb.Append(!String.IsNullOrEmpty(_cList) ? String.Format("<clist>{0}</clist>", _cList) : String.Empty);
-            sb.Append(!String.IsNullOrEmpty(_sList) ? String.Format("<slist>{0}</slist>", _sList) : String.Empty);
-            sb.Append(!String.IsNullOrEmpty(_options) ? String.Format("<options>{0}</options>", _options) : String.Empty);
-            sb.Append(_fmt ? "<fmt>structured</fmt>" : String.Empty);
+            if (!string.IsNullOrEmpty(_query)) sb.Append(new XElement("query", _query));
+            if (_qid > 0) sb.Append(new XElement("qid", _qid));
+            if (!string.IsNullOrEmpty(_qName)) sb.Append(new XElement("qname", _qName));
+            if (!string.IsNullOrEmpty(_cList)) sb.Append(new XElement("clist", _cList));
+            if (!string.IsNullOrEmpty(_sList)) sb.Append(new XElement("slist", _sList));
+            if (!string.IsNullOrEmpty(_options)) sb.Append(new XElement("options", _options));
+            sb.Append(new XElement("fmt", "structured"));
             return sb.ToString();
         }
     }

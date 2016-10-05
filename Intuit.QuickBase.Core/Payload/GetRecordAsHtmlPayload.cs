@@ -7,6 +7,7 @@
  */
 using System;
 using System.Text;
+using System.Xml.Linq;
 
 namespace Intuit.QuickBase.Core.Payload
 {
@@ -40,8 +41,8 @@ namespace Intuit.QuickBase.Core.Payload
         internal override string GetXmlPayload()
         {
             var sb = new StringBuilder();
-            sb.Append(String.Format("<rid>{0}</rid>", Rid));
-            sb.Append(Jht ? "<jht>" + "1" + "</jht>" : String.Empty);
+            sb.Append(new XElement("rid", Rid));
+            if (Jht) sb.Append(new XElement("jht", 1));
             return sb.ToString();
         }
     }

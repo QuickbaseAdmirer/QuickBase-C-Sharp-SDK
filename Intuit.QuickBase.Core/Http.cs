@@ -47,8 +47,7 @@ namespace Intuit.QuickBase.Core
             BinaryReader br = null;
             BinaryWriter bw = null;
             WebResponse response = null;
-            Stream responseStream = null;
-            
+
             try
             {
                 // Request
@@ -63,7 +62,7 @@ namespace Intuit.QuickBase.Core
 
                 // Response
                 response = request.GetResponse();
-                responseStream = response.GetResponseStream();
+                var responseStream = response.GetResponseStream();
 
                 // Write file
                 if (!Directory.Exists(downloadFile.Path))
@@ -79,7 +78,6 @@ namespace Intuit.QuickBase.Core
             {
                 if (bw != null) bw.Close();
                 if (br != null) br.Close();
-                if (responseStream != null) responseStream.Close();
                 if (response != null) response.Close();
             }
         }

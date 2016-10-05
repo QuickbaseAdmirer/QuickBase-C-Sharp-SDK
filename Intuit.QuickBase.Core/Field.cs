@@ -50,7 +50,7 @@ namespace Intuit.QuickBase.Core
         {
             get
             {
-                return EncodeSpecialCharacters(_value);
+                return _value;
             }
             private set
             {
@@ -72,16 +72,6 @@ namespace Intuit.QuickBase.Core
                 if (value.Trim() == String.Empty) throw new ArgumentException("file");
                 _file = value;
             }
-        }
-
-        private static string EncodeSpecialCharacters(string strLine)
-        {
-            strLine = Regex.Replace(strLine, "&(?!amp;)", "&amp;");
-            strLine = Regex.Replace(strLine, "<", "&lt;");
-            strLine = Regex.Replace(strLine, ">", "&gt;");
-            strLine = Regex.Replace(strLine, "\"", "&quot;");
-            strLine = Regex.Replace(strLine, "'", "&apos;");
-            return strLine;
         }
     }
 }

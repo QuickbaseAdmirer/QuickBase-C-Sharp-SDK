@@ -7,6 +7,7 @@
  */
 using System;
 using System.Text;
+using System.Xml.Linq;
 
 namespace Intuit.QuickBase.Core.Payload
 {
@@ -55,9 +56,9 @@ namespace Intuit.QuickBase.Core.Payload
         internal override string GetXmlPayload()
         {
             var sb = new StringBuilder();
-            sb.Append(String.Format("<records_csv><![CDATA[{0}]]></records_csv>", _recordsCsv));
-            sb.Append((!String.IsNullOrEmpty(_cList)) ? String.Format("<clist>{0}</clist>", _cList) : String.Empty);
-            sb.Append(_skipFirst ? "<skipfirst>1</skipfirst>" : String.Empty);
+            sb.Append(new XElement("records_csv", new XCData(_recordsCsv)));
+            if (!string.IsNullOrEmpty(_cList)) sb.Append(new XElement("clist", _cList));
+            if (_skipFirst) sb.Append(new XElement("skipfirst", 1));
             return sb.ToString();
         }
     }

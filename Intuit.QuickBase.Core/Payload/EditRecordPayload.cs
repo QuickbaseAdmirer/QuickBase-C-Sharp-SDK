@@ -8,7 +8,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using System.Xml.Linq;
 
 namespace Intuit.QuickBase.Core.Payload
 {
@@ -70,25 +72,26 @@ namespace Intuit.QuickBase.Core.Payload
         internal override string GetXmlPayload()
         {
             var sb = new StringBuilder();
-            sb.Append(String.Format("<rid>{0}</rid>", _rid));
-            sb.Append(!String.IsNullOrEmpty(_updateId) ? String.Format("<update_id>{0}</update_id>", _updateId) : String.Empty);
+            sb.Append(new XElement("rid", _rid));
+            if (!string.IsNullOrEmpty(_updateId)) sb.Append(new XElement("update_id", _updateId));
             foreach (var field in _fields)
             {
                 if (field.Type == FieldType.file)
                 {
-                    sb.Append(String.Format(
-                        "<field fid=\"{0}\" filename=\"{1}\">{2}</field>",
-                        field.Fid, field.Value, EncodeFile(field.File)));
+                    XElement xelm = new XElement("field", EncodeFile(field.File));
+                    xelm.SetAttributeValue("fid", field.Fid);
+                    xelm.SetAttributeValue("filename", field.Value);
+                    sb.Append(xelm);
                 }
                 else
                 {
-                    sb.Append(String.Format(
-                        "<field fid=\"{0}\">{1}</field>",
-                        field.Fid, field.Value));
+                    XElement xelm = new XElement("field", field.Value);
+                    xelm.SetAttributeValue("fid", field.Fid);
+                    sb.Append(xelm);
                 }
             }
-            sb.Append(_disprec ? "<disprec/>" : String.Empty);
-            sb.Append(_fform ? "<fform/>" : String.Empty);
+            if (_disprec) sb.Append(new XElement("disprec"));
+            if (_fform) sb.Append(new XElement("fform"));
             return sb.ToString();
         }
 

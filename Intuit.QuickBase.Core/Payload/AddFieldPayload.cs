@@ -7,6 +7,7 @@
  */
 using System;
 using System.Text;
+using System.Xml.Linq;
 
 namespace Intuit.QuickBase.Core.Payload
 {
@@ -44,8 +45,9 @@ namespace Intuit.QuickBase.Core.Payload
         internal override string GetXmlPayload()
         {
             var sb = new StringBuilder();
-            sb.Append(String.Format("<label>{0}</label><type>{1}</type>", Label, Type));
-            sb.Append(Mode != Mode.none ? String.Format("<mode>{0}</mode>", Mode) : String.Empty);
+            sb.Append(new XElement("label", Label));
+            sb.Append(new XElement("type", Type));
+            if (Mode != Mode.none) sb.Append(new XElement("mode", Mode));
             return sb.ToString();
         }
     }

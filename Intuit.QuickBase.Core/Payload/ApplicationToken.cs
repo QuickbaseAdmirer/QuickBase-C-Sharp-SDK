@@ -6,6 +6,7 @@
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
 using System;
+using System.Xml.Linq;
 
 namespace Intuit.QuickBase.Core.Payload
 {
@@ -21,7 +22,8 @@ namespace Intuit.QuickBase.Core.Payload
 
         internal override string GetXmlPayload()
         {
-            return !String.IsNullOrEmpty(Token) ? String.Format("{0}<apptoken>{1}</apptoken>", Payload.GetXmlPayload(), Token) : Payload.GetXmlPayload();
+            return Payload.GetXmlPayload() +
+                   (!string.IsNullOrEmpty(Token) ? new XElement("apptoken", Token).ToString() : string.Empty);
         }
     }
 }
