@@ -152,7 +152,7 @@ namespace Intuit.QuickBase.Client
             {
                 foreach (var field in _fields)
                 {
-                    if (field.Column.ColumnLookup == true) continue; //don't try to update values that are results of lookups
+                    if (field.Column.ColumnLookup) continue; //don't try to update values that are results of lookups
                     if (field.Update)
                     {
                         IField qField = new Field(field.FieldId, field.Type, field.QBValue);
@@ -172,7 +172,7 @@ namespace Intuit.QuickBase.Client
             {
                 foreach (var field in _fields)
                 {
-                    if (field.Column.ColumnLookup == true) continue; //don't try to update values that are results of lookups
+                    if (field.Column.ColumnLookup) continue; //don't try to update values that are results of lookups
                     IField qField = new Field(field.FieldId, field.Type, field.QBValue);
                     if (field.Type == FieldType.file)
                     {
@@ -219,9 +219,9 @@ namespace Intuit.QuickBase.Client
                 return inStr;
         }
 
-        public void ForceUpdateState(int RecID)
+        public void ForceUpdateState(int recId)
         {
-            RecordId = RecID;
+            RecordId = recId;
         }
 
         public void ForceUpdateState()
@@ -345,7 +345,7 @@ namespace Intuit.QuickBase.Client
             }
             else
             {
-                if (!_fields[fieldIndex].Value.Equals(value))
+                if (_fields[fieldIndex].Value == null || !_fields[fieldIndex].Value.Equals(value))
                 {
                     _fields[fieldIndex].Value = value;
                     if (RecordState != RecordState.New)

@@ -27,7 +27,7 @@ namespace Intuit.QuickBase.Client
 
     internal interface IQRecord_int
     {
-        void ForceUpdateState(int RecordId);
+        void ForceUpdateState(int recId);
         void ForceUpdateState();
         int GetColumnIndex(string colName);
     }
