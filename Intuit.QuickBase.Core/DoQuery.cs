@@ -25,6 +25,8 @@ namespace Intuit.QuickBase.Core
         private const string QUICKBASE_ACTION = "API_DoQuery";
         private readonly Payload.Payload _doQueryPayload;
         private readonly IQUri _uri;
+        private readonly string _options;
+        private readonly string _query;
 
         public class Builder
         {
@@ -125,16 +127,23 @@ namespace Intuit.QuickBase.Core
                 .SetFmt(builder.Fmt)
                 .SetOptions(builder.Options)
                 .Build();
+            _options = builder.Options;
+            _query = builder.Query;
             _doQueryPayload = new ApplicationTicket(_doQueryPayload, builder.Ticket);
             _doQueryPayload = new ApplicationToken(_doQueryPayload, builder.AppToken);
             _doQueryPayload = new WrapPayload(_doQueryPayload);
             _uri = new QUriDbid(builder.AccountDomain, builder.Dbid);
         }
 
-        //internal string Options
-        //{
-        //    get { return (DoQueryPayload)_doQueryPayload.Options; }
-        //}
+        public string Options
+        {
+            get { return _options; }
+        }
+
+        public string Query
+        {
+            get { return _query; }
+        }
 
         public string XmlPayload
         {

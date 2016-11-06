@@ -169,19 +169,75 @@ namespace Intuit.QuickBase.Client
 
         private void _doQuery(DoQuery qry)
         {
-            XPathNavigator xml;
             Records.Clear();
             try
             {
-                xml = qry.Post().CreateNavigator();
+                XPathNavigator xml = qry.Post().CreateNavigator();
+                LoadColumns(xml); //Must be done each time, incase the schema changes due to another user, or from a previous query that has a differing subset of columns
+                LoadRecords(xml);
             }
-            catch (ViewTooLargeException ex)
+            catch (ViewTooLargeException)
             {
-                //split into smaller queries automagically eventually
-                throw;
+                //split into smaller queries automagically
+                List<string> optionsList = new List<string>();
+                string query = qry.Query;
+                int maxCount = 0;
+                int baseSkip = 0;
+                if (!string.IsNullOrEmpty(qry.Options))
+                {
+                    string[] optArry = qry.Options.Split('.');
+                    foreach (string opt in optArry)
+                    {
+                        if (opt.StartsWith("num-"))
+                        {
+                            maxCount = int.Parse(opt.Substring(4));
+                        }
+                        else if (opt.StartsWith("skp-"))
+                        {
+                            baseSkip = int.Parse(opt.Substring(4));
+                        }
+                        else
+                        {
+                            optionsList.Add(opt);
+                        }
+                    }
+                }
+                if (maxCount == 0)
+                {
+                    var doQuery = new DoQueryCount.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
+                        .SetQuery(query)
+                        .Build();
+                    var cntXml = doQuery.Post().CreateNavigator();
+                    maxCount = int.Parse(cntXml.SelectSingleNode("/qdbapi/numMatches").Value);
+                }
+                int stride = maxCount/2;
+                int fetched = 0;
+                while (fetched < maxCount)
+                {
+                    List<string> optLst = new List<string>();
+                    optLst.AddRange(optionsList);
+                    optLst.Add($"skp-{fetched + baseSkip}");
+                    optLst.Add($"num-{stride}");
+                    string options = string.Join(".",optLst);
+                    var doQuery = new DoQuery.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
+                        .SetQuery(query)
+                        .SetCList("a")
+                        .SetOptions(options)
+                        .SetFmt(true)
+                        .Build();
+                    try
+                    {
+                        XPathNavigator xml = doQuery.Post().CreateNavigator();
+                        if (fetched == 0) LoadColumns(xml);
+                        LoadRecords(xml);
+                        fetched += stride;
+                    }
+                    catch (ViewTooLargeException)
+                    {
+                        stride = stride/2;
+                    }
+                }
             }
-            LoadColumns(xml); //Must be done each time, incase the schema changes due to another user, or from a previous query that has a differing subset of columns
-            LoadRecords(xml);
         }
 
         public void Query()
