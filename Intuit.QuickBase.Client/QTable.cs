@@ -181,6 +181,7 @@ namespace Intuit.QuickBase.Client
                 //split into smaller queries automagically
                 List<string> optionsList = new List<string>();
                 string query = qry.Query;
+                string collist = qry.Collist;
                 int maxCount = 0;
                 int baseSkip = 0;
                 if (!string.IsNullOrEmpty(qry.Options))
@@ -204,10 +205,15 @@ namespace Intuit.QuickBase.Client
                 }
                 if (maxCount == 0)
                 {
-                    var doQuery = new DoQueryCount.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
-                        .SetQuery(query)
-                        .Build();
-                    var cntXml = doQuery.Post().CreateNavigator();
+                    DoQueryCount dqryCnt;
+                    if (string.IsNullOrEmpty(query))
+                        dqryCnt = new DoQueryCount.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
+                            .Build();
+                    else
+                        dqryCnt = new DoQueryCount.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
+                            .SetQuery(query)
+                            .Build();
+                    var cntXml = dqryCnt.Post().CreateNavigator();
                     maxCount = int.Parse(cntXml.SelectSingleNode("/qdbapi/numMatches").Value);
                 }
                 int stride = maxCount/2;
@@ -216,18 +222,26 @@ namespace Intuit.QuickBase.Client
                 {
                     List<string> optLst = new List<string>();
                     optLst.AddRange(optionsList);
-                    optLst.Add($"skp-{fetched + baseSkip}");
-                    optLst.Add($"num-{stride}");
+                    optLst.Add("skp-" + (fetched + baseSkip));
+                    optLst.Add("num-" + stride);
                     string options = string.Join(".",optLst);
-                    var doQuery = new DoQuery.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
-                        .SetQuery(query)
-                        .SetCList("a")
-                        .SetOptions(options)
-                        .SetFmt(true)
-                        .Build();
+                    DoQuery dqry;
+                    if (string.IsNullOrEmpty(query))
+                       dqry = new DoQuery.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
+                           .SetCList(collist)
+                           .SetOptions(options)
+                           .SetFmt(true)
+                           .Build();
+                    else
+                       dqry = new DoQuery.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
+                           .SetQuery(query)
+                           .SetCList(collist)
+                           .SetOptions(options)
+                           .SetFmt(true)
+                           .Build();
                     try
                     {
-                        XPathNavigator xml = doQuery.Post().CreateNavigator();
+                        XPathNavigator xml = dqry.Post().CreateNavigator();
                         if (fetched == 0) LoadColumns(xml);
                         LoadRecords(xml);
                         fetched += stride;

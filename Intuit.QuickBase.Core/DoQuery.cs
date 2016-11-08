@@ -27,6 +27,7 @@ namespace Intuit.QuickBase.Core
         private readonly IQUri _uri;
         private readonly string _options;
         private readonly string _query;
+        private readonly string _collist;
 
         public class Builder
         {
@@ -129,6 +130,7 @@ namespace Intuit.QuickBase.Core
                 .Build();
             _options = builder.Options;
             _query = builder.Query;
+            _collist = builder.CList;
             _doQueryPayload = new ApplicationTicket(_doQueryPayload, builder.Ticket);
             _doQueryPayload = new ApplicationToken(_doQueryPayload, builder.AppToken);
             _doQueryPayload = new WrapPayload(_doQueryPayload);
@@ -143,6 +145,11 @@ namespace Intuit.QuickBase.Core
         public string Query
         {
             get { return _query; }
+        }
+
+        public string Collist
+        {
+           get { return _collist; }
         }
 
         public string XmlPayload
