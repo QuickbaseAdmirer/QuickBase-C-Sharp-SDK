@@ -17,19 +17,27 @@ namespace Intuit.QuickBase.Core
         private Payload.Payload _getUserInfoPayload;
         private IQUri _uri;
 
-        public GetUserInfo(string ticket, string appToken, string accountDomain, string email)
+        public GetUserInfo(string ticket, string appToken, string accountDomain, string email, string userToken = "")
         {
-            CommonConstruction(ticket, appToken, accountDomain, new GetUserInfoPayload(email));
+            CommonConstruction(ticket, appToken, accountDomain, new GetUserInfoPayload(email), userToken);
         }
 
-        public GetUserInfo(string ticket, string appToken, string accountDomain)
+        public GetUserInfo(string ticket, string appToken, string accountDomain, string userToken = "")
         {
-            CommonConstruction(ticket, appToken, accountDomain, new GetUserInfoPayload());
+            CommonConstruction(ticket, appToken, accountDomain, new GetUserInfoPayload(), userToken);
         }
 
-        private void CommonConstruction(string ticket, string appToken, string accountDomain, Payload.Payload payload)
+        private void CommonConstruction(string ticket, string appToken, string accountDomain, Payload.Payload payload, string userToken = "")
         {
-            _getUserInfoPayload = new ApplicationTicket(payload, ticket);
+            //If a user token is provided, use it instead of a ticket
+            if (userToken.Length > 0)
+            {
+                _getUserInfoPayload = new ApplicationUserToken(payload, userToken);
+            }
+            else
+            {
+                _getUserInfoPayload = new ApplicationTicket(payload, ticket);
+            }
             _getUserInfoPayload = new ApplicationToken(_getUserInfoPayload, appToken);
             _getUserInfoPayload = new WrapPayload(_getUserInfoPayload);
             _uri = new QUriMain(accountDomain);

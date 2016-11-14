@@ -17,19 +17,27 @@ namespace Intuit.QuickBase.Core
         private Payload.Payload _provisionUserPayload;
         private IQUri _uri;
 
-        public ProvisionUser(string ticket, string appToken, string accountDomain, string dbid, string email, int roleId, string firstName, string lastName)
+        public ProvisionUser(string ticket, string appToken, string accountDomain, string dbid, string email, int roleId, string firstName, string lastName, string userToken = "")
         {
-            CommonConstruction(ticket, appToken, accountDomain, dbid, new ProvisionUserPayload(email, roleId, firstName, lastName));
+            CommonConstruction(ticket, appToken, accountDomain, dbid, new ProvisionUserPayload(email, roleId, firstName, lastName), userToken);
         }
 
-        public ProvisionUser(string ticket, string appToken, string accountDomain, string dbid, string email, string firstName, string lastName)
+        public ProvisionUser(string ticket, string appToken, string accountDomain, string dbid, string email, string firstName, string lastName, string userToken = "")
         {
-            CommonConstruction(ticket, appToken, accountDomain, dbid, new ProvisionUserPayload(email, firstName, lastName));
+            CommonConstruction(ticket, appToken, accountDomain, dbid, new ProvisionUserPayload(email, firstName, lastName), userToken);
         }
 
-        private void CommonConstruction(string ticket, string appToken, string accountDomain, string dbid, Payload.Payload payload)
+        private void CommonConstruction(string ticket, string appToken, string accountDomain, string dbid, Payload.Payload payload, string userToken = "")
         {
-            _provisionUserPayload = new ApplicationTicket(payload, ticket);
+            //If a user token is provided, use it instead of a ticket
+            if (userToken.Length > 0)
+            {
+                _provisionUserPayload = new ApplicationUserToken(payload, userToken);
+            }
+            else
+            {
+                _provisionUserPayload = new ApplicationTicket(payload, ticket);
+            }
             _provisionUserPayload = new ApplicationToken(_provisionUserPayload, appToken);
             _provisionUserPayload = new WrapPayload(_provisionUserPayload);
 

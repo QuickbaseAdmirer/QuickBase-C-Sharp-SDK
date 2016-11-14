@@ -17,10 +17,18 @@ namespace Intuit.QuickBase.Core
         private readonly Payload.Payload _addUserToRolePayload;
         private readonly IQUri _uri;
 
-        public AddUserToRole(string ticket, string appToken, string accountDomain, string dbid, string userId, int roleId)
+        public AddUserToRole(string ticket, string appToken, string accountDomain, string dbid, string userId, int roleId, string userToken = "")
         {
             _addUserToRolePayload = new AddUserToRolePayload(userId, roleId);
-            _addUserToRolePayload = new ApplicationTicket(_addUserToRolePayload, ticket);
+            //If a user token is provided, use it instead of a ticket
+            if (userToken.Length > 0)
+            {
+                _addUserToRolePayload = new ApplicationUserToken(_addUserToRolePayload, userToken);
+            }
+            else
+            {
+                _addUserToRolePayload = new ApplicationTicket(_addUserToRolePayload, ticket);
+            }
             _addUserToRolePayload = new ApplicationToken(_addUserToRolePayload, appToken);
             _addUserToRolePayload = new WrapPayload(_addUserToRolePayload);
             _uri = new QUriDbid(accountDomain, dbid);

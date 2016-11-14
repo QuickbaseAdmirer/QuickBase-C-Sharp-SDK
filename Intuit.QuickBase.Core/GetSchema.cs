@@ -30,10 +30,19 @@ namespace Intuit.QuickBase.Core
         /// <param name="appToken">Supply application token that is assigned to your QuickBase Application. See QuickBase Online help to obtain an application token.</param>
         /// <param name="accountDomain"></param>
         /// <param name="dbid">Supply application-level or table-level dbid.</param>
-        public GetSchema(string ticket, string appToken, string accountDomain, string dbid)
+        /// <param name="userToken">optional user token that can be used instead of a ticket</param>
+        public GetSchema(string ticket, string appToken, string accountDomain, string dbid, string userToken = "")
         {
             _getRecordInfoPayload = new GetSchemaPayload();
-            _getRecordInfoPayload = new ApplicationTicket(_getRecordInfoPayload, ticket);
+            //If a user token is provided, use it instead of a ticket
+            if (userToken.Length > 0)
+            {
+                _getRecordInfoPayload = new ApplicationUserToken(_getRecordInfoPayload, userToken);
+            }
+            else
+            {
+                _getRecordInfoPayload = new ApplicationTicket(_getRecordInfoPayload, ticket);
+            }
             _getRecordInfoPayload = new ApplicationToken(_getRecordInfoPayload, appToken);
             _getRecordInfoPayload = new WrapPayload(_getRecordInfoPayload);
             _uri = new QUriDbid(accountDomain, dbid);

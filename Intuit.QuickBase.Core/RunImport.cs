@@ -17,10 +17,18 @@ namespace Intuit.QuickBase.Core
         private readonly Payload.Payload _runImportPayload;
         private readonly IQUri _uri;
 
-        public RunImport(string ticket, string appToken, string accountDomain, string dbid, int id)
+        public RunImport(string ticket, string appToken, string accountDomain, string dbid, int id, string userToken = "")
         {
             _runImportPayload = new RunImportPayload(id);
-            _runImportPayload = new ApplicationTicket(_runImportPayload, ticket);
+            //If a user token is provided, use it instead of a ticket
+            if (userToken.Length > 0)
+            {
+                _runImportPayload = new ApplicationUserToken(_runImportPayload, userToken);
+            }
+            else
+            {
+                _runImportPayload = new ApplicationTicket(_runImportPayload, ticket);
+            }
             _runImportPayload = new ApplicationToken(_runImportPayload, appToken);
             _runImportPayload = new WrapPayload(_runImportPayload);
             _uri = new QUriDbid(accountDomain, dbid);

@@ -28,10 +28,19 @@ namespace Intuit.QuickBase.Core
         /// <param name="ticket">Supply auth ticket for application access. See com.intuit.quickbase.API_Authenticate class to obtain a ticket.</param>
         /// <param name="accountDomain"></param>
         /// <param name="dbName">Supply application name to search for.</param>
-        public FindDbByName(string ticket, string accountDomain, string dbName)
+        /// <param name="userToken">option user token that can be used instead of ticket</param>
+        public FindDbByName(string ticket, string accountDomain, string dbName, string userToken = "")
         {
             _findDbByNamePayload = new FindDbByNamePayload(dbName);
-            _findDbByNamePayload = new ApplicationTicket(_findDbByNamePayload, ticket);
+            //If a user token is provided, use it instead of a ticket
+            if (userToken.Length > 0)
+            {
+                _findDbByNamePayload = new ApplicationUserToken(_findDbByNamePayload, userToken);
+            }
+            else
+            {
+                _findDbByNamePayload = new ApplicationTicket(_findDbByNamePayload, ticket);
+            }
             _findDbByNamePayload = new WrapPayload(_findDbByNamePayload);
             _uri = new QUriMain(accountDomain);
         }

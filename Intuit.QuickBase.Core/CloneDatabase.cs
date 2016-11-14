@@ -34,6 +34,7 @@ namespace Intuit.QuickBase.Core
             private string _newDBDesc;
 
             internal string Ticket { get; set; }
+            internal string UserToken { get; set; }
             internal string AppToken { get; set; }
             internal string AccountDomain { get; set; }
             internal string Dbid { get; set; }
@@ -65,9 +66,10 @@ namespace Intuit.QuickBase.Core
                 }
             }
 
-            public Builder(string ticket, string appToken, string accountDomain, string dbid, string newDBName, string newDBDesc)
+            public Builder(string ticket, string appToken, string accountDomain, string dbid, string newDBName, string newDBDesc, string userToken = "")
             {
                 Ticket = ticket;
+                UserToken = userToken;
                 AppToken = appToken;
                 AccountDomain = accountDomain;
                 Dbid = dbid;
@@ -103,7 +105,15 @@ namespace Intuit.QuickBase.Core
                 .SetKeepData(builder.KeepData)
                 .SetExcludeFiles(builder.ExcludeFiles)
                 .Build();
-            _cloneDatabasePayload = new ApplicationTicket(_cloneDatabasePayload, builder.Ticket);
+            //If a user token is provided, use it instead of a ticket
+            if (builder.UserToken.Length > 0)
+            {
+                _cloneDatabasePayload = new ApplicationUserToken(_cloneDatabasePayload, builder.UserToken);
+            }
+            else
+            {
+                _cloneDatabasePayload = new ApplicationTicket(_cloneDatabasePayload, builder.Ticket);
+            }
             _cloneDatabasePayload = new ApplicationToken(_cloneDatabasePayload, builder.AppToken);
             _cloneDatabasePayload = new WrapPayload(_cloneDatabasePayload);
             _uri = new QUriDbid(builder.AccountDomain, builder.Dbid);

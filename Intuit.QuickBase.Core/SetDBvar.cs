@@ -17,10 +17,18 @@ namespace Intuit.QuickBase.Core
         private readonly Payload.Payload _setDbVarPayload;
         private readonly IQUri _uri;
 
-        public SetDBvar(string ticket, string appToken, string accountDomain, string dbid, string varName, string value)
+        public SetDBvar(string ticket, string appToken, string accountDomain, string dbid, string varName, string value, string userToken = "")
         {
             _setDbVarPayload = new SetDBvarPayload(varName, value);
-            _setDbVarPayload = new ApplicationTicket(_setDbVarPayload, ticket);
+            //If a user token is provided, use it instead of a ticket
+            if (userToken.Length > 0)
+            {
+                _setDbVarPayload = new ApplicationUserToken(_setDbVarPayload, userToken);
+            }
+            else
+            {
+                _setDbVarPayload = new ApplicationTicket(_setDbVarPayload, ticket);
+            }
             _setDbVarPayload = new ApplicationToken(_setDbVarPayload, appToken);
             _setDbVarPayload = new WrapPayload(_setDbVarPayload);
             _uri = new QUriDbid(accountDomain, dbid);

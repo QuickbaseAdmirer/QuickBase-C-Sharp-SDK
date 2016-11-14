@@ -12,6 +12,7 @@ namespace Intuit.QuickBase.Core
     public class DownloadFile
     {
         private string _ticket;
+        private string _userToken;
         private string _accountDomain;
         private string _path;
         private string _file;
@@ -20,14 +21,15 @@ namespace Intuit.QuickBase.Core
         private int _fieldId;
         private int _versionId;
 
-        public DownloadFile(string ticket, string accountDomain, string path, string file, string tableId, int recordId, int fieldId)
-            : this(ticket, accountDomain, path, file, tableId, recordId, fieldId, 0)
+        public DownloadFile(string ticket, string accountDomain, string path, string file, string tableId, int recordId, int fieldId, string userToken = "")
+            : this(ticket, accountDomain, path, file, tableId, recordId, fieldId, 0, userToken)
         {
         }
 
-        public DownloadFile(string ticket, string accountDomain, string path, string file, string tableId, int recordId, int fieldId, int versionId)
+        public DownloadFile(string ticket, string accountDomain, string path, string file, string tableId, int recordId, int fieldId, int versionId, string userToken = "")
         {
             Ticket = ticket;
+            UserToken = userToken;
             AccountDomain = accountDomain;
             Path = path;
             File = file;
@@ -45,6 +47,17 @@ namespace Intuit.QuickBase.Core
                 if (value == null) throw new ArgumentNullException("ticket");
                 if (value.Trim() == String.Empty) throw new ArgumentException("ticket");
                 _ticket = value;
+            }
+        }
+
+        public string UserToken
+        {
+            get { return _userToken; }
+            set
+            {
+                if (value == null) throw new ArgumentNullException("usertoken");
+                if (value.Trim() == String.Empty) throw new ArgumentException("usertoken");
+                _userToken = value;
             }
         }
 

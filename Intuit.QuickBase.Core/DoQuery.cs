@@ -29,17 +29,20 @@ namespace Intuit.QuickBase.Core
         public class Builder
         {
             internal string Ticket { get; set; }
+            internal string UserToken { get; set; }
             internal string AppToken { get; set; }
             internal string AccountDomain { get; set; }
             internal string Dbid { get; set; }
 
-            public Builder(string ticket, string appToken, string accountDomain, string dbid)
+            public Builder(string ticket, string appToken, string accountDomain, string dbid, string userToken = "")
             {
                 Ticket = ticket;
+                UserToken = userToken;
                 AppToken = appToken;
                 AccountDomain = accountDomain;
                 Dbid = dbid;
             }
+
 
             internal string Query { get; private set; }
 
@@ -125,7 +128,15 @@ namespace Intuit.QuickBase.Core
                 .SetFmt(builder.Fmt)
                 .SetOptions(builder.Options)
                 .Build();
-            _doQueryPayload = new ApplicationTicket(_doQueryPayload, builder.Ticket);
+            //If a user token is provided, use it instead of a ticket
+            if (builder.UserToken.Length > 0)
+            {
+                _doQueryPayload = new ApplicationUserToken(_doQueryPayload, builder.UserToken);
+            }
+            else
+            {
+                _doQueryPayload = new ApplicationTicket(_doQueryPayload, builder.Ticket);
+            }
             _doQueryPayload = new ApplicationToken(_doQueryPayload, builder.AppToken);
             _doQueryPayload = new WrapPayload(_doQueryPayload);
             _uri = new QUriDbid(builder.AccountDomain, builder.Dbid);
