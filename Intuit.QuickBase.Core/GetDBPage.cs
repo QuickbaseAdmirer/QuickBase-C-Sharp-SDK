@@ -17,10 +17,18 @@ namespace Intuit.QuickBase.Core
         private readonly Payload.Payload _getDbPagePayload;
         private readonly IQUri _uri;
 
-        public GetDBPage(string ticket, string appToken, string accountDomain, string dbid, int pageId)
+        public GetDBPage(string ticket, string appToken, string accountDomain, string dbid, int pageId, string userToken = "")
         {
             _getDbPagePayload = new GetDBPagePayload(pageId);
-            _getDbPagePayload = new ApplicationTicket(_getDbPagePayload, ticket);
+            //If a user token is provided, use it instead of a ticket
+            if (userToken.Length > 0)
+            {
+                _getDbPagePayload = new ApplicationUserToken(_getDbPagePayload, userToken);
+            }
+            else
+            {
+                _getDbPagePayload = new ApplicationTicket(_getDbPagePayload, ticket);
+            }
             _getDbPagePayload = new ApplicationToken(_getDbPagePayload, appToken);
             _getDbPagePayload = new WrapPayload(_getDbPagePayload);
             _uri = new QUriDbid(accountDomain, dbid);

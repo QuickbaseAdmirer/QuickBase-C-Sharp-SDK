@@ -31,6 +31,7 @@ namespace Intuit.QuickBase.Core
             private List<IField> _fields;
 
             internal string Ticket { get; set; }
+            internal string UserToken { get; set; }
             internal string AppToken { get; set; }
             internal string AccountDomain { get; set; }
             internal string Dbid { get; set; }
@@ -47,14 +48,16 @@ namespace Intuit.QuickBase.Core
                 }
             }
 
-            public Builder(string ticket, string appToken, string accountDomain, string dbid, List<IField> fields)
+            public Builder(string ticket, string appToken, string accountDomain, string dbid, List<IField> fields, string userToken = "")
             {
                 Ticket = ticket;
+                UserToken = userToken;
                 AppToken = appToken;
                 AccountDomain = accountDomain;
                 Dbid = dbid;
                 Fields = fields;
             }
+
 
             internal bool Disprec { get; private set; }
 
@@ -84,7 +87,14 @@ namespace Intuit.QuickBase.Core
                 .SetDisprec(builder.Disprec)
                 .SetFform(builder.Fform)
                 .Build();
-            _addRecordPayload = new ApplicationTicket(_addRecordPayload, builder.Ticket);
+            if (builder.UserToken.Length > 0)
+            {
+                _addRecordPayload = new ApplicationUserToken(_addRecordPayload, builder.UserToken);
+            }
+            else
+            {
+                _addRecordPayload = new ApplicationTicket(_addRecordPayload, builder.Ticket);
+            }
             _addRecordPayload = new ApplicationToken(_addRecordPayload, builder.AppToken);
             _addRecordPayload = new WrapPayload(_addRecordPayload);
             _uri = new QUriDbid(builder.AccountDomain, builder.Dbid);
