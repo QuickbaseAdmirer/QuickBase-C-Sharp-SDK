@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Xml.Linq;
 using System.Linq;
 using Intuit.QuickBase.Client;
 using Intuit.QuickBase.Core;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using QBFunctionTest.Properties;
 
 namespace QBFunctionTest
 {
@@ -12,11 +12,31 @@ namespace QBFunctionTest
     public class UnitTest1
     {
         private IQApplication qbApp;
+        private Dictionary<string, string> qbSettings = new Dictionary<string, string>();
+
+
+        private void LoadSettings()
+        {
+            try
+            {
+                XDocument setDoc = XDocument.Load("TestConfigs.xml");
+                foreach (XElement xNod in setDoc.Root.Descendants())
+                {
+                    qbSettings.Add(xNod.Attribute("name").Value, xNod.Value);
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException("Can't load TestConfigs.xml file: " + ex.Message, ex);
+            }
+        }
 
         public void InitConnection()
         {
-            var client = QuickBase.Login(Settings.Default.qbUser, Settings.Default.qbPass, Settings.Default.qbSiteURL);
-            qbApp = client.Connect(Settings.Default.qbAppDBID, Settings.Default.qbAppToken);
+            LoadSettings();
+            var client = QuickBase.Login(qbSettings["qbUser"], qbSettings["qbPass"], qbSettings["qbSiteURL"]);
+            qbApp = client.Connect(qbSettings["qbAppDBID"], qbSettings["qbAppToken"]);
 
         }
 
@@ -71,6 +91,29 @@ namespace QBFunctionTest
                 urlVal = "http://www.sample.com";
             }
 
+        }
+
+       [TestMethod]
+       public void LargeTableHandling()
+       {
+            InitConnection();
+            IQTable orderTable = qbApp.GetTable(qbSettings["qbBigTable"]);
+            Query qry = new Query();
+            QueryStrings lstQry = new QueryStrings(1, ComparisonOperator.IR, "last 60 d",
+                LogicalOperator.NONE);
+            qry.Add(lstQry);
+            int maxRec = 100000;
+            orderTable.Query(qry, $"skp-10.num-{maxRec}");
+            Assert.AreEqual(maxRec, orderTable.Records.Count);
+            List<string> idLst = new List<string>();
+           foreach (QRecord rec in orderTable.Records)
+           {
+               string id = (string) rec["Record ID#"];
+               if (idLst.Contains(id))
+                    Assert.Fail("Duplicate ID found!");
+               else
+                   idLst.Add(id);
+           }
         }
 
         [TestMethod]

@@ -1,0 +1,8 @@
+; Top-most EditorConfig file
+root = true
+
+; 4-column space indentation
+[*.cs]
+indent_style = space
+indent_size = 4
+tab_width = 4

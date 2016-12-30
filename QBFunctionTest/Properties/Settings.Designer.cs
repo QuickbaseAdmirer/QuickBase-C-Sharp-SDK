@@ -22,50 +22,5 @@ namespace QBFunctionTest.Properties {
                 return defaultInstance;
             }
         }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("***REMOVED***")]
-        public string qbUser {
-            get {
-                return ((string)(this["qbUser"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("***REMOVED***")]
-        public string qbPass {
-            get {
-                return ((string)(this["qbPass"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("***REMOVED***")]
-        public string qbAppToken {
-            get {
-                return ((string)(this["qbAppToken"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("***REMOVED***")]
-        public string qbSiteURL {
-            get {
-                return ((string)(this["qbSiteURL"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("***REMOVED***")]
-        public string qbAppDBID {
-            get {
-                return ((string)(this["qbAppDBID"]));
-            }
-        }
     }
 }

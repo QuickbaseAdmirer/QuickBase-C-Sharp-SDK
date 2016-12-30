@@ -212,9 +212,9 @@ namespace Intuit.QuickBase.Client
 
         private string CSVQuoter(string inStr)
         {
-            //if the string contains quote character(s), newlines or commas, surround the string with quotes
+            //if the string contains quote character(s), newlines or commas, surround the string with quotes, and double quotes if present
             if (inStr.Contains("\"") || inStr.Contains(",") || inStr.Contains("\n") || inStr.Contains("\r"))
-                return "\"" + inStr + "\"";
+                return "\"" + inStr.Replace("\"","\"\"") + "\"";
             else
                 return inStr;
         }

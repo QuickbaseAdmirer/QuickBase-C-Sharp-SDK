@@ -1,0 +1,8 @@
+<Settings>
+    <setting name="qbUser" serializeAs="String">user@example.com</setting>
+    <setting name="qbPass" serializeAs="String">examplePassword</setting>
+    <setting name="qbAppToken" serializeAs="String">qbExampleAppToken</setting>
+    <setting name="qbSiteURL" serializeAs="String">example.quickbase.com</setting>
+    <setting name="qbAppDBID" serializeAs="String">exampleAppId</setting>
+    <setting name="qbBigTable" serializeAs="String">exampleTableId</setting>
+</Settings>

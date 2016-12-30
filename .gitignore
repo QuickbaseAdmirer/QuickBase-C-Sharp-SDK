@@ -1,8 +1,11 @@
 .svn
 Intuit.QuickBase.Client/obj/
+Intuit.QuickBase.Client/bin/
 Intuit.QuickBase.Core/obj/
+Intuit.QuickBase.Core/bin/
 QBFunctionTest/obj/
-QBFunctionTest/*.config
+QBFunctionTest/bin/
+QBFunctionTest/TestConfigs.xml
 TestResults/
 *.CodeAnalysisLog.xml
 *.ruleset
