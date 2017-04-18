@@ -38,6 +38,17 @@ namespace Intuit.QuickBase.Client
             return base.Remove(record);
         }
 
+        public new void RemoveAt(int index)
+        {
+            IQRecord record = this[index];
+            if (record.IsOnServer)
+            {
+                if (Table.KeyFID == -1) _recordsToRemove.Add(record.RecordId);
+                else _recordsToRemove.Add(record[Table.KeyFID]);
+            }
+            base.RemoveAt(index);
+        }
+
         internal void RemoveRecords()
         {
             if (_recordsToRemove.Count > 0)
