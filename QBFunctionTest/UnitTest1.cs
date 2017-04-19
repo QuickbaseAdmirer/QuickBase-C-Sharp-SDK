@@ -93,9 +93,9 @@ namespace QBFunctionTest
 
         }
 
-       [TestMethod]
-       public void LargeTableHandling()
-       {
+        [TestMethod]
+        public void LargeTableHandling()
+        {
             InitConnection();
             IQTable orderTable = qbApp.GetTable(qbSettings["qbBigTable"]);
             Query qry = new Query();
@@ -103,17 +103,17 @@ namespace QBFunctionTest
                 LogicalOperator.NONE);
             qry.Add(lstQry);
             int maxRec = 100000;
-            orderTable.Query(qry, $"skp-10.num-{maxRec}");
+            orderTable.Query(qry, string.Format("skp-10.num-{0}", maxRec));
             Assert.AreEqual(maxRec, orderTable.Records.Count);
-            List<string> idLst = new List<string>();
-           foreach (QRecord rec in orderTable.Records)
-           {
-               string id = (string) rec["Record ID#"];
-               if (idLst.Contains(id))
+            HashSet<string> idLst = new HashSet<string>();
+            foreach (QRecord rec in orderTable.Records)
+            {
+                string id = (string)rec["Record ID#"];
+                if (idLst.Contains(id))
                     Assert.Fail("Duplicate ID found!");
-               else
-                   idLst.Add(id);
-           }
+                else
+                    idLst.Add(id);
+            }
         }
 
         [TestMethod]

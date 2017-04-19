@@ -99,6 +99,9 @@ namespace Intuit.QuickBase.Client
                     case FieldType.currency:
                         _value = String.IsNullOrEmpty(value) ? new decimal?() : decimal.Parse(value);
                         break;
+                    case FieldType.recordid:
+                        _value = String.IsNullOrEmpty(value) ? new int?() : int.Parse(value);
+                        break;
                     default:
                         _value = value;
                         break;
@@ -196,6 +199,12 @@ namespace Intuit.QuickBase.Client
                                 if (value.GetType() != typeof(bool))
                                     throw new ArgumentException("Can't supply type of " + value.GetType() + " to a " +
                                                                 this.Type.ToString() + " field.");
+                                _value = value;
+                                break;
+                            case FieldType.recordid:
+                                if (value.GetType() != typeof(int?))
+                                   throw new ArgumentException("Can't supply type of " + value.GetType() + " to a " +
+                                                               this.Type.ToString() + " field.");
                                 _value = value;
                                 break;
                             default:
