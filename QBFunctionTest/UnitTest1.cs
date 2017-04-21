@@ -183,9 +183,9 @@ namespace QBFunctionTest
                 LogicalOperator.NONE);
             qry.Add(lstQry);
             int maxRec = 100000;
-            orderTable.Query(qry, $"skp-10.num-{maxRec}");
+            orderTable.Query(qry, string.Format("skp-10.num-{0}", maxRec));
             Assert.AreEqual(maxRec, orderTable.Records.Count);
-            List<string> idLst = new List<string>();
+            HashSet<string> idLst = new HashSet<string>();
             foreach (QRecord rec in orderTable.Records)
             {
                 string id = (string)rec["Record ID#"];

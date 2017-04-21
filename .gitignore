@@ -10,3 +10,4 @@ TestResults/
 *.CodeAnalysisLog.xml
 *.ruleset
 *.lastcodeanalysissucceeded
+*.suo
