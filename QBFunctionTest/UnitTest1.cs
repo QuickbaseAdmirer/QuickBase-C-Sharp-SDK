@@ -93,9 +93,89 @@ namespace QBFunctionTest
 
         }
 
-       [TestMethod]
-       public void LargeTableHandling()
-       {
+        [TestMethod]
+        public void DeletionTest()
+        {
+            InitConnection();
+            List<GrantedAppsInfo> appsLst = qbApp.GrantedDBs();
+            foreach (var app in appsLst)
+            {
+                foreach (var tab in app.GrantedTables)
+                {
+                    if (tab.Name == "APITestApp: APIDelTestTable")
+                    {
+                        IQTable tbl = qbApp.GetTable(tab.Dbid);
+                        qbApp.DeleteTable(tbl);
+                        break;
+                    }
+                }
+            }
+            IQTable testTable = qbApp.NewTable("APIDelTestTable", "dummyRec");
+            testTable.Columns.Add(new QColumn("NumberValue", FieldType.@float));
+            testTable.Columns.Add(new QColumn("TextValue", FieldType.text));
+
+            IQRecord newRec = testTable.NewRecord();
+            newRec["NumberValue"] = 0;
+            newRec["TextValue"] = "Zeroeth";
+            testTable.Records.Add(newRec);
+            newRec = testTable.NewRecord();
+            newRec["NumberValue"] = 1;
+            newRec["TextValue"] = "First";
+            testTable.Records.Add(newRec);
+            newRec = testTable.NewRecord();
+            newRec["NumberValue"] = 2;
+            newRec["TextValue"] = "Second";
+            testTable.Records.Add(newRec);
+            newRec = testTable.NewRecord();
+            newRec["NumberValue"] = 3;
+            newRec["TextValue"] = "Third";
+            testTable.Records.Add(newRec);
+            newRec = testTable.NewRecord();
+            newRec["NumberValue"] = 4;
+            newRec["TextValue"] = "Fourth";
+            testTable.Records.Add(newRec);
+            newRec = testTable.NewRecord();
+            newRec["NumberValue"] = 5;
+            newRec["TextValue"] = "Fifth";
+            testTable.Records.Add(newRec);
+            newRec = testTable.NewRecord();
+            newRec["NumberValue"] = 6;
+            newRec["TextValue"] = "Sixth";
+            testTable.Records.Add(newRec);
+            newRec = testTable.NewRecord();
+            newRec["NumberValue"] = 7;
+            newRec["TextValue"] = "Seventh";
+            testTable.Records.Add(newRec);
+            newRec = testTable.NewRecord();
+            newRec["NumberValue"] = 8;
+            newRec["TextValue"] = "Eighth";
+            testTable.Records.Add(newRec);
+            newRec = testTable.NewRecord();
+            newRec["NumberValue"] = 9;
+            newRec["TextValue"] = "Ninth";
+            testTable.Records.Add(newRec);
+            newRec = testTable.NewRecord();
+            newRec["NumberValue"] = 10;
+            newRec["TextValue"] = "Tenth";
+            testTable.Records.Add(newRec);
+            testTable.AcceptChanges();
+
+            testTable.Query();
+            testTable.Records.RemoveAt(10);
+            testTable.Records.RemoveAt(8);
+            testTable.Records.RemoveAt(7);
+            testTable.Records.RemoveAt(6);
+            testTable.Records.RemoveAt(3);
+            testTable.Records.RemoveAt(1);
+            testTable.AcceptChanges();
+
+            testTable.Query();
+            Assert.AreEqual(testTable.Records.Count, 5, "Record deletion fails");
+        }
+
+        [TestMethod]
+        public void LargeTableHandling()
+        {
             InitConnection();
             IQTable orderTable = qbApp.GetTable(qbSettings["qbBigTable"]);
             Query qry = new Query();
@@ -106,14 +186,14 @@ namespace QBFunctionTest
             orderTable.Query(qry, $"skp-10.num-{maxRec}");
             Assert.AreEqual(maxRec, orderTable.Records.Count);
             List<string> idLst = new List<string>();
-           foreach (QRecord rec in orderTable.Records)
-           {
-               string id = (string) rec["Record ID#"];
-               if (idLst.Contains(id))
+            foreach (QRecord rec in orderTable.Records)
+            {
+                string id = (string)rec["Record ID#"];
+                if (idLst.Contains(id))
                     Assert.Fail("Duplicate ID found!");
-               else
-                   idLst.Add(id);
-           }
+                else
+                    idLst.Add(id);
+            }
         }
 
         [TestMethod]

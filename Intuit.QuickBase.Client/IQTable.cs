@@ -14,6 +14,7 @@ namespace Intuit.QuickBase.Client
         string TableName { get; }
         string TableId { get; }
         int KeyFID { get; }
+        int KeyCIdx { get; }
         QRecordCollection Records { get; }
         QColumnCollection Columns { get; }
         void Clear();

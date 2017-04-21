@@ -44,9 +44,10 @@ namespace Intuit.QuickBase.Client
             RecordFactory = recordFactory;
             Application = application;
             TableId = tableId;
-            KeyFID = -1;
             Records = new QRecordCollection(Application, this);
             Columns = new QColumnCollection(Application, this);
+            KeyFID = -1;
+            KeyCIdx = -1;
         }
 
         // Properties
@@ -67,6 +68,8 @@ namespace Intuit.QuickBase.Client
         private QRecordFactoryBase RecordFactory { get; set; }
 
         public int KeyFID { get; private set; }
+
+        public int KeyCIdx { get; private set; }
 
         // Methods
         public void Clear()
@@ -506,8 +509,6 @@ namespace Intuit.QuickBase.Client
         private void LoadColumns(XPathNavigator xml)
         {
             Columns.Clear();
-            var keyFidNode = xml.SelectSingleNode("/qdbapi/table/original/key_fid");
-            if (keyFidNode != null) { KeyFID = keyFidNode.ValueAsInt; }
             var columnNodes = xml.Select("/qdbapi/table/fields/field");
             foreach (XPathNavigator columnNode in columnNodes)
             {
@@ -542,6 +543,12 @@ namespace Intuit.QuickBase.Client
                 }
                 Columns.Add(col);
             }
+            var keyFidNode = xml.SelectSingleNode("/qdbapi/table/original/key_fid");
+            if (keyFidNode != null)
+                KeyFID = keyFidNode.ValueAsInt;
+            else
+                KeyFID = Columns.Find(c => c.ColumnType == FieldType.recordid).ColumnId;
+            KeyCIdx = Columns.FindIndex(c => c.ColumnId == KeyFID);
         }
 
         private static string GetColumnList(ICollection<int> clist)
