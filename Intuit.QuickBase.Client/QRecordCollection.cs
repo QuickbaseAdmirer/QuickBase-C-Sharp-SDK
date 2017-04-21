@@ -17,7 +17,7 @@ namespace Intuit.QuickBase.Client
     // TODO: May want to compose List<IQRecord> to hide the complexity of the List type.
     public sealed class QRecordCollection : List<IQRecord>
     {
-        private readonly HashSet<dynamic> _recordsToRemove = new HashSet<dynamic>();
+        private readonly List<int> _recordsToRemove = new List<int>();
 
         public QRecordCollection(IQApplication application, IQTable table)
         {
@@ -57,8 +57,7 @@ namespace Intuit.QuickBase.Client
                 IQRecord record = this[idx];
                 if (record.IsOnServer)
                 {
-                    if (Table.KeyFID == -1) _recordsToRemove.Add(record.RecordId);
-                    else _recordsToRemove.Add(record[Table.KeyFID]);
+                    _recordsToRemove.Add(record.RecordId);
                 }
                 startIdx = idx + 1;
             }
