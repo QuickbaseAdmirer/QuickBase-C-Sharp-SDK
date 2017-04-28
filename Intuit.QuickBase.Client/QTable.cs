@@ -427,14 +427,13 @@ namespace Intuit.QuickBase.Client
         {
             Records.RemoveRecords();
             //optimize record uploads
-            List<IQRecord> addList = Records.Where(record => record.RecordState == RecordState.New).ToList();
-            List<IQRecord> modList = Records.Where(record => record.RecordState == RecordState.Modified).ToList();
+            List<IQRecord> addList = Records.Where(record => record.RecordState == RecordState.New && record.UncleanState == false).ToList();
+            List<IQRecord> modList = Records.Where(record => record.RecordState == RecordState.Modified && record.UncleanState == false).ToList();
+            List<IQRecord> uncleanList = Records.Where(record => record.UncleanState == true).ToList();
             int acnt = addList.Count;
             int mcnt = modList.Count;
-            bool hasFileColumn = false;
-            foreach (var col in Columns)
-                if (col.ColumnType == FieldType.file) hasFileColumn = true;
-            if (acnt + mcnt > 5 && !hasFileColumn)  // if greater than 5 and no file-type columns involved, use csv upload method for reducing API calls
+            bool hasFileColumn = Columns.Any(c => c.ColumnType == FieldType.file);
+            if (!hasFileColumn)  // if no file-type columns involved, use csv upload method for reducing API calls
             {
                 List<String> csvLines = new List<string>(acnt + mcnt);
                 String clist = String.Join(".", KeyFID == -1 ? Columns.Where(col => (col.ColumnVirtual == false && col.ColumnLookup == false) || col.ColumnName == "Record ID#").Select(col => col.ColumnId.ToString())
@@ -473,6 +472,8 @@ namespace Intuit.QuickBase.Client
                 foreach (IQRecord rec in modList)
                     rec.AcceptChanges();
             }
+            foreach (IQRecord rec in uncleanList)
+                rec.AcceptChanges();
         }
 
         public IQRecord NewRecord()

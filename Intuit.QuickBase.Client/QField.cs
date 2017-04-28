@@ -9,12 +9,14 @@ using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using Intuit.QuickBase.Core;
 
 namespace Intuit.QuickBase.Client
 {
     internal class QField
     {
+        private static readonly Regex CSVUncleanRegEx = new Regex(@"[\r\n]");
         private static readonly DateTime qbTSOffset = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
         // Instance fields
         private object _value;
@@ -43,10 +45,17 @@ namespace Intuit.QuickBase.Client
             {
                 Value = value;
             }
+            if (type == FieldType.text)
+                UncleanText = CSVUncleanRegEx.IsMatch((string)value);
+            else
+                UncleanText = false;
         }
 
         // Properties
         internal int FieldId { get; private set; }
+
+        //This gets around a bug in QB's uploadCSV api that will interpret certain characters as EndOfRecord even when surrouned by quotes
+        internal bool UncleanText { get; private set; }
 
         internal string QBValue
         {
@@ -71,6 +80,7 @@ namespace Intuit.QuickBase.Client
             }
             set
             {
+                UncleanText = false;
                 switch (Type)
                 {
                     case FieldType.address:
@@ -101,6 +111,10 @@ namespace Intuit.QuickBase.Client
                         break;
                     case FieldType.recordid:
                         _value = String.IsNullOrEmpty(value) ? new int?() : int.Parse(value);
+                        break;
+                    case FieldType.text:
+                        _value = value;
+                        UncleanText = CSVUncleanRegEx.IsMatch((string)value);
                         break;
                     default:
                         _value = value;
@@ -135,6 +149,7 @@ namespace Intuit.QuickBase.Client
                 {
                     if (_value != null)
                     {
+                        UncleanText = false;
                         _value = null;
                         Update = true;
                     }
@@ -143,6 +158,7 @@ namespace Intuit.QuickBase.Client
                 {
                     if (_value == null || !_value.Equals(value))
                     {
+                        UncleanText = false;
                         Update = true;
                         switch (Type)
                         {
@@ -211,6 +227,8 @@ namespace Intuit.QuickBase.Client
                                 if (value.GetType() != typeof(string))
                                     throw new ArgumentException("Can't supply type of " + value.GetType() + " to a " +
                                                                 this.Type.ToString() + " field.");
+                                if (Type == FieldType.text)
+                                    UncleanText = CSVUncleanRegEx.IsMatch((string)value);
                                 _value = value;
                                 break;
                         }

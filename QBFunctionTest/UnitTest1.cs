@@ -77,7 +77,7 @@ namespace QBFunctionTest
 
             public void Setup2ndValues()
             {
-                textVal = "Test string #2 & an ampersand";
+                textVal = "Test string #2 & an ampersand\n\n...and two linefeeds.";
                 floatVal = 1234.56m;
                 checkboxVal = false;
                 dateVal = new DateTime(2010, 01, 12);

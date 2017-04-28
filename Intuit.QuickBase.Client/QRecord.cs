@@ -22,6 +22,7 @@ namespace Intuit.QuickBase.Client
         // Instance fields
         private readonly List<QField> _fields;
         private RecordState _recordState = RecordState.New;
+        private bool _unclean;
 
         // Constructors
         internal QRecord(IQApplication application, IQTable table, QColumnCollection columns)
@@ -45,6 +46,18 @@ namespace Intuit.QuickBase.Client
 
         public bool IsOnServer { get; private set; }
         public int RecordId { get; private set; }
+
+        public bool UncleanState
+        {
+            get
+            {
+                return _unclean;
+            }
+            internal set
+            {
+                _unclean = value;
+            }
+        }
 
         public RecordState RecordState
         {
@@ -329,6 +342,7 @@ namespace Intuit.QuickBase.Client
                 var field = new QField(Columns[index].ColumnId, value, Columns[index].ColumnType, this, Columns[index], QBInternal);
                 _fields.Add(field);
             }
+            UncleanState = _fields.Any(f => f.UncleanText == true);
         }
 
         private void SetExistingField(int index, int fieldIndex, object value)
@@ -354,7 +368,7 @@ namespace Intuit.QuickBase.Client
                     }
                 }
             }
-
+            UncleanState = _fields.Any(f => f.UncleanText == true);
         }
 
         public int GetColumnIndex(string columnName)

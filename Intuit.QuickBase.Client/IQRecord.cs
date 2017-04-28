@@ -11,6 +11,7 @@ namespace Intuit.QuickBase.Client
     {
         int RecordId { get; }
         RecordState RecordState { get; }
+        bool UncleanState { get; }
         bool IsOnServer { get; }
         object this[int index] { get; set; }
         object this[string columnName] { get; set; }
