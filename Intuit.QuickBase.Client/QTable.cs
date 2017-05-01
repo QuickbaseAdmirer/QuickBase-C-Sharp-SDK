@@ -433,10 +433,10 @@ namespace Intuit.QuickBase.Client
             int acnt = addList.Count;
             int mcnt = modList.Count;
             bool hasFileColumn = Columns.Any(c => c.ColumnType == FieldType.file);
-            if (!hasFileColumn)  // if no file-type columns involved, use csv upload method for reducing API calls
+            if (!hasFileColumn && (acnt + mcnt > 0))  // if no file-type columns involved, use csv upload method for reducing API calls and speeding processing.
             {
                 List<String> csvLines = new List<string>(acnt + mcnt);
-                String clist = String.Join(".", KeyFID == -1 ? Columns.Where(col => (col.ColumnVirtual == false && col.ColumnLookup == false) || col.ColumnName == "Record ID#").Select(col => col.ColumnId.ToString())
+                String clist = String.Join(".", KeyFID == -1 ? Columns.Where(col => (col.ColumnVirtual == false && col.ColumnLookup == false) || col.ColumnType == FieldType.recordid).Select(col => col.ColumnId.ToString())
                                                              : Columns.Where(col => (col.ColumnVirtual == false && col.ColumnLookup == false) || col.ColumnId == KeyFID).Select(col => col.ColumnId.ToString()));
                 if (acnt > 0)
                 {
