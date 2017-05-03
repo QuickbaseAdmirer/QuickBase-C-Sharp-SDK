@@ -251,7 +251,12 @@ namespace Intuit.QuickBase.Client
                     }
                     catch (ViewTooLargeException)
                     {
-                        stride = stride/2;
+                        stride = stride / 2;
+                    }
+                    catch (ApiRequestLimitExceededException ex)
+                    {
+                        TimeSpan waitTime = ex.WaitUntil - DateTime.Now;
+                        System.Threading.Thread.Sleep(waitTime);
                     }
                 }
             }
