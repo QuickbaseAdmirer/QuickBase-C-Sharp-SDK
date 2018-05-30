@@ -160,7 +160,6 @@ namespace QBFunctionTest
             testTable.Records.Add(newRec);
             testTable.AcceptChanges();
 
-            testTable.Query();
             testTable.Records.RemoveAt(10);
             testTable.Records.RemoveAt(8);
             testTable.Records.RemoveAt(7);
@@ -171,6 +170,59 @@ namespace QBFunctionTest
 
             testTable.Query();
             Assert.AreEqual(testTable.Records.Count, 5, "Record deletion fails");
+        }
+
+        [TestMethod]
+        public void LargeDeleteHandling()
+        {
+            InitConnection();
+            List<GrantedAppsInfo> appsLst = qbApp.GrantedDBs();
+            foreach (var app in appsLst)
+            {
+                foreach (var tab in app.GrantedTables)
+                {
+                    if (tab.Name == "APITestApp: APIBigDelTestTable")
+                    {
+                        IQTable tbl = qbApp.GetTable(tab.Dbid);
+                        qbApp.DeleteTable(tbl);
+                        break;
+                    }
+                }
+            }
+            IQTable testTable = qbApp.NewTable("APIBigDelTestTable", "dummyRec");
+            testTable.Columns.Add(new QColumn("NumberValue", FieldType.@float));
+            testTable.Columns.Add(new QColumn("TextValue", FieldType.text));
+
+            for (int i = 1; i <= 500; i++)
+            {
+                IQRecord newRec = testTable.NewRecord();
+                newRec["NumberValue"] = i;
+                newRec["TextValue"] = "Record " + i;
+                testTable.Records.Add(newRec);
+            }
+            testTable.AcceptChanges();
+
+            List<int> delList = new List<int>();
+            delList.Add(5);
+            delList.Add(6);
+            delList.Add(7);
+            delList.Add(8);
+            delList.Add(9);
+            delList.Add(10);
+            Random rndSrc = new Random();
+            while (delList.Count < 120)
+            {
+                int addVal = rndSrc.Next(500);
+                if (!delList.Contains(addVal)) delList.Add(addVal);
+            }
+            foreach (int i in delList.OrderByDescending(x => x))
+            {
+                testTable.Records.RemoveAt(i);
+            }
+            testTable.AcceptChanges();
+
+            testTable.Query();
+            Assert.AreEqual(testTable.Records.Count, 380, "Big Record deletion fails");
         }
 
         [TestMethod]

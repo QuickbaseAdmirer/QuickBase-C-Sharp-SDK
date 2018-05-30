@@ -234,6 +234,8 @@ namespace Intuit.QuickBase.Client
 
         public void ForceUpdateState(int recId)
         {
+            RecordState = RecordState.Unchanged;
+            IsOnServer = true;
             RecordId = recId;
         }
 

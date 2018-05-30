@@ -12,6 +12,7 @@ using System.Linq;
 using System.Xml.XPath;
 using Intuit.QuickBase.Core;
 using Intuit.QuickBase.Core.Exceptions;
+using System.Text.RegularExpressions;
 
 namespace Intuit.QuickBase.Client
 {
@@ -36,6 +37,7 @@ namespace Intuit.QuickBase.Client
             TableName = tableName;
             RecordNames = pNoun;
             CommonConstruction(columnFactory, recordFactory, application, tableId);
+            RefreshColumns(); //grab basic columns that QB automatically makes
         }
 
         private void CommonConstruction(QColumnFactoryBase columnFactory, QRecordFactoryBase recordFactory, IQApplication application, string tableId)
@@ -70,6 +72,9 @@ namespace Intuit.QuickBase.Client
         public int KeyFID { get; private set; }
 
         public int KeyCIdx { get; private set; }
+
+        private static readonly string[] QuerySeparator = {"}OR{"};
+        private static readonly Regex QueryCheckRegex = new Regex(@"[\)}]AND[\({]");
 
         // Methods
         public void Clear()
@@ -176,8 +181,38 @@ namespace Intuit.QuickBase.Client
             try
             {
                 XPathNavigator xml = qry.Post().CreateNavigator();
-                LoadColumns(xml); //Must be done each time, incase the schema changes due to another user, or from a previous query that has a differing subset of columns
+                LoadColumns(xml); //In case the schema changes due to another user, or from a previous query that has a differing subset of columns TODO: remove this requirement
                 LoadRecords(xml);
+            }
+            catch (TooManyCriteriaInQueryException)
+            {
+                //If and only if all elements of a query are OR operations, we can split the query in 99 element chunks
+                string query = qry.Query;
+                if (string.IsNullOrEmpty(query) || QueryCheckRegex.IsMatch(query))
+                    throw;
+                string[] args = query.Split(QuerySeparator, StringSplitOptions.None);
+                int argCnt = args.Length;
+                if (argCnt < 100) //We've no idea how to split this, apparently...
+                    throw;
+                if (args[0].StartsWith("{")) args[0] = args[0].Substring(1); //remove leading {
+                if (args[argCnt = 1].EndsWith("}")) args[argCnt - 1] = args[argCnt - 1].Substring(0, args[argCnt - 1].Length - 1); // remove trailing }
+                int sentArgs = 0;
+                while (sentArgs < argCnt)
+                {
+                    int useArgs = Math.Min(99, argCnt - sentArgs);
+                    string[] argsToSend = args.Skip(sentArgs).Take(useArgs).ToArray();
+                    string sendQuery = "{" + string.Join("}OR{", argsToSend) + "}";
+                    DoQuery dqry = new DoQuery.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
+                        .SetQuery(sendQuery)
+                        .SetCList(qry.Collist)
+                        .SetOptions(qry.Options)
+                        .SetFmt(true)
+                        .Build();
+                    XPathNavigator xml = dqry.Post().CreateNavigator();
+                    if (sentArgs == 0) LoadColumns(xml);
+                    LoadRecords(xml);
+                    sentArgs += useArgs;
+                }
             }
             catch (ViewTooLargeException)
             {
@@ -219,7 +254,7 @@ namespace Intuit.QuickBase.Client
                     var cntXml = dqryCnt.Post().CreateNavigator();
                     maxCount = int.Parse(cntXml.SelectSingleNode("/qdbapi/numMatches").Value);
                 }
-                int stride = maxCount/2;
+                int stride = maxCount / 2;
                 int fetched = 0;
                 while (fetched < maxCount)
                 {
@@ -227,21 +262,21 @@ namespace Intuit.QuickBase.Client
                     optLst.AddRange(optionsList);
                     optLst.Add("skp-" + (fetched + baseSkip));
                     optLst.Add("num-" + stride);
-                    string options = string.Join(".",optLst);
+                    string options = string.Join(".", optLst);
                     DoQuery dqry;
                     if (string.IsNullOrEmpty(query))
-                       dqry = new DoQuery.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
-                           .SetCList(collist)
-                           .SetOptions(options)
-                           .SetFmt(true)
-                           .Build();
+                        dqry = new DoQuery.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
+                            .SetCList(collist)
+                            .SetOptions(options)
+                            .SetFmt(true)
+                            .Build();
                     else
-                       dqry = new DoQuery.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
-                           .SetQuery(query)
-                           .SetCList(collist)
-                           .SetOptions(options)
-                           .SetFmt(true)
-                           .Build();
+                        dqry = new DoQuery.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
+                            .SetQuery(query)
+                            .SetCList(collist)
+                            .SetOptions(options)
+                            .SetFmt(true)
+                            .Build();
                     try
                     {
                         XPathNavigator xml = dqry.Post().CreateNavigator();
@@ -434,7 +469,7 @@ namespace Intuit.QuickBase.Client
             //optimize record uploads
             List<IQRecord> addList = Records.Where(record => record.RecordState == RecordState.New && record.UncleanState == false).ToList();
             List<IQRecord> modList = Records.Where(record => record.RecordState == RecordState.Modified && record.UncleanState == false).ToList();
-            List<IQRecord> uncleanList = Records.Where(record => record.UncleanState == true).ToList();
+            List<IQRecord> uncleanList = Records.Where(record => record.UncleanState).ToList();
             int acnt = addList.Count;
             int mcnt = modList.Count;
             bool hasFileColumn = Columns.Any(c => c.ColumnType == FieldType.file);

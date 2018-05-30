@@ -30,7 +30,7 @@ namespace Intuit.QuickBase.Core
             {
                 var request = (HttpWebRequest)WebRequest.Create(qObject.Uri);
                 request.Method = METHOD;
-                request.ProtocolVersion = HttpVersion.Version10;
+                request.ProtocolVersion = HttpVersion.Version11;
                 request.ContentType = CONTENT_TYPE;
                 request.ContentLength = bytes.Length;
                 request.KeepAlive = false;
@@ -46,9 +46,9 @@ namespace Intuit.QuickBase.Core
             }
             finally
             {
-                if (requestStream != null) requestStream.Close();
-                if (responseStream != null) responseStream.Close();
-                if (webResponse != null) webResponse.Close();
+                requestStream?.Close();
+                responseStream?.Close();
+                webResponse?.Close();
             }
         
             Http.CheckForException(xml);
