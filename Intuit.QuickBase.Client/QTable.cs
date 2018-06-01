@@ -489,6 +489,7 @@ namespace Intuit.QuickBase.Client
                 var csvBuilder = new ImportFromCSV.Builder(Application.Client.Ticket, Application.Token,
                     Application.Client.AccountDomain, TableId, String.Join("\r\n", csvLines.ToArray()));
                 csvBuilder.SetCList(clist);
+                csvBuilder.SetTimeInUtc(true);
                 var csvUpload = csvBuilder.Build();
 
                 var xml = csvUpload.Post().CreateNavigator();

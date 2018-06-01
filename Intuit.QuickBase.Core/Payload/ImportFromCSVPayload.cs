@@ -16,6 +16,7 @@ namespace Intuit.QuickBase.Core.Payload
         private readonly string _recordsCsv;
         private readonly string _cList;
         private readonly bool _skipFirst;
+        private readonly bool _timeInUtc;
 
         internal class Builder
         {
@@ -40,6 +41,13 @@ namespace Intuit.QuickBase.Core.Payload
                 return this;
             }
 
+            internal bool TimeInUtc { get; private set; }
+            internal Builder SetTimeInUtc(bool val)
+            {
+                TimeInUtc = val;
+                return this;
+            }
+
             internal ImportFromCSVPayload Build()
             {
                 return new ImportFromCSVPayload(this);
@@ -51,6 +59,7 @@ namespace Intuit.QuickBase.Core.Payload
             _recordsCsv = builder.RecordsCsv;
             _cList = builder.CList;
             _skipFirst = builder.SkipFirst;
+            _timeInUtc = builder.TimeInUtc;
         }
 
         internal override string GetXmlPayload()
@@ -59,6 +68,7 @@ namespace Intuit.QuickBase.Core.Payload
             sb.Append(new XElement("records_csv", new XCData(_recordsCsv)));
             if (!string.IsNullOrEmpty(_cList)) sb.Append(new XElement("clist", _cList));
             if (_skipFirst) sb.Append(new XElement("skipfirst", 1));
+            if (_timeInUtc) sb.Append(new XElement("msInUTC", 1));
             return sb.ToString();
         }
     }

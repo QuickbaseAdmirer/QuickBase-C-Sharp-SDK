@@ -21,6 +21,7 @@ namespace Intuit.QuickBase.Core
         internal override void Post(IQObject qObject)
         {
             var bytes = Encoding.UTF8.GetBytes(qObject.XmlPayload);
+            //File.AppendAllText(@"C:\Temp\QBDebugLog.txt", "**Sent->>" + qObject.Uri + " " + QUICKBASE_HEADER + qObject.Action + "\r\n" + qObject.XmlPayload + "\r\n");
             Stream requestStream = null;
             WebResponse webResponse = null;
             Stream responseStream = null;
@@ -43,6 +44,7 @@ namespace Intuit.QuickBase.Core
                 webResponse = request.GetResponse();
                 responseStream = webResponse.GetResponseStream();
                 xml = new XPathDocument(responseStream);
+                //File.AppendAllText(@"C:\Temp\QBDebugLog.txt", "**Received-<<\r\n" + xml.CreateNavigator().InnerXml + "\r\n");
             }
             finally
             {

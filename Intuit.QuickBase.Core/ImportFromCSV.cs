@@ -67,6 +67,14 @@ namespace Intuit.QuickBase.Core
                 return this;
             }
 
+            internal bool TimeInUtc { get; private set; }
+
+            public Builder SetTimeInUtc(bool val)
+            {
+                TimeInUtc = val;
+                return this;
+            }
+
             public ImportFromCSV Build()
             {
                 return new ImportFromCSV(this);
@@ -78,6 +86,7 @@ namespace Intuit.QuickBase.Core
             _importFromCSVPayload = new ImportFromCSVPayload.Builder(builder.RecordsCsv)
                 .SetCList(builder.CList)
                 .SetSkipFirst(builder.SkipFirst)
+                .SetTimeInUtc(builder.TimeInUtc)
                 .Build();
             _importFromCSVPayload = new ApplicationTicket(_importFromCSVPayload, builder.Ticket);
             _importFromCSVPayload = new ApplicationToken(_importFromCSVPayload, builder.AppToken);

@@ -177,7 +177,9 @@ namespace Intuit.QuickBase.Client
                         field.Update = false;
                     }
                 }
-                var editRecord = new EditRecord.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, Table.TableId, RecordId, fieldsToPost).Build();
+                var editBuilder = new EditRecord.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, Table.TableId, RecordId, fieldsToPost);
+                editBuilder.SetTimeInUtc(true);
+                var editRecord = editBuilder.Build();
                 editRecord.Post();
                 RecordState = RecordState.Unchanged;
             }
@@ -193,7 +195,9 @@ namespace Intuit.QuickBase.Client
                     }
                     fieldsToPost.Add(qField);
                 }
-                var addRecord = new AddRecord.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, Table.TableId, fieldsToPost).Build();
+                var addBuilder = new AddRecord.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, Table.TableId, fieldsToPost);
+                addBuilder.SetTimeInUtc(true);
+                var addRecord = addBuilder.Build();
                 RecordState = RecordState.Unchanged;
 
                 var xml = addRecord.Post().CreateNavigator();
