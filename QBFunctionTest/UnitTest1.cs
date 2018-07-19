@@ -379,5 +379,22 @@ namespace QBFunctionTest
             Assert.AreEqual(exemplar.urlVal, outRec2["UrlTest"], "Url don't update");
 
         }
+
+        [TestMethod]
+        public void TestDuration()
+        {
+            InitConnection();
+
+            IQTable testTable = qbApp.GetTable("bnrmadvx3");
+
+            TimeSpan tstVal = new TimeSpan(1, 23, 55, 11);
+            IQRecord newRec = testTable.NewRecord();
+            newRec["DurationTest"] = tstVal;
+            testTable.Records.Add(newRec);
+            testTable.AcceptChanges();
+            testTable.Query();
+            IQRecord loopRec = testTable.Records[0];
+            Assert.AreEqual(tstVal, loopRec["DurationTest"], "Date doesn't round trip");
+        }
     }
 }
