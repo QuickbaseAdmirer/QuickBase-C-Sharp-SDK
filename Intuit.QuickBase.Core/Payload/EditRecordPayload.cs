@@ -20,6 +20,7 @@ namespace Intuit.QuickBase.Core.Payload
         private readonly string _updateId;
         private readonly List<IField> _fields;
         private readonly bool _disprec;
+        private readonly bool _timeInUtc;
         private readonly bool _fform;
 
         internal class Builder
@@ -47,6 +48,13 @@ namespace Intuit.QuickBase.Core.Payload
                 return this;
             }
 
+            internal bool TimeInUtc { get; private set; }
+            internal Builder SetTimeInUtc(bool val)
+            {
+                TimeInUtc = val;
+                return this;
+            }
+
             internal bool Fform { get; private set; }
             internal Builder SetFform(bool val)
             {
@@ -66,6 +74,7 @@ namespace Intuit.QuickBase.Core.Payload
             _updateId = builder.UpdateId;
             _fields = builder.Fields;
             _disprec = builder.Disprec;
+            _timeInUtc = builder.TimeInUtc;
             _fform = builder.Fform;
         }
 
@@ -90,6 +99,7 @@ namespace Intuit.QuickBase.Core.Payload
                 }
             }
             if (_disprec) parent.Add(new XElement("disprec"));
+            if (_timeInUtc) parent.Add(new XElement("msInUtc", 1));
             if (_fform) parent.Add(new XElement("fform"));
         }
 

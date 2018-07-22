@@ -85,6 +85,14 @@ namespace Intuit.QuickBase.Core
                 return this;
             }
 
+            internal bool TimeInUtc { get; private set; }
+
+            public Builder SetTimeInUtc(bool val)
+            {
+                TimeInUtc = val;
+                return this;
+            }
+
             internal bool Fform { get; private set; }
 
             public Builder SetFform(bool val)
@@ -104,6 +112,7 @@ namespace Intuit.QuickBase.Core
             _editRecordPayload = new EditRecordPayload.Builder(builder.Rid, builder.Fields)
                 .SetUpdateId(builder.UpdateId)
                 .SetDisprec(builder.Disprec)
+                .SetTimeInUtc(builder.TimeInUtc)
                 .SetFform(builder.Fform)
                 .Build();
             _editRecordPayload = new ApplicationTicket(_editRecordPayload, builder.Ticket);

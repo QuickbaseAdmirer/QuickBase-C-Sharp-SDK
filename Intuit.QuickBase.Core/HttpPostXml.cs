@@ -23,6 +23,7 @@ namespace Intuit.QuickBase.Core
             XElement parent = new XElement("qdbapi"); ;
             qObject.BuildXmlPayload(ref parent);
             var bytes = Encoding.UTF8.GetBytes(parent.ToString());
+            //File.AppendAllText(@"C:\Temp\QBDebugLog.txt", "**Sent->>" + qObject.Uri + " " + QUICKBASE_HEADER + qObject.Action + "\r\n" + qObject.XmlPayload + "\r\n");
             Stream requestStream = null;
             WebResponse webResponse = null;
             Stream responseStream = null;
@@ -32,7 +33,7 @@ namespace Intuit.QuickBase.Core
             {
                 var request = (HttpWebRequest)WebRequest.Create(qObject.Uri);
                 request.Method = METHOD;
-                request.ProtocolVersion = HttpVersion.Version10;
+                request.ProtocolVersion = HttpVersion.Version11;
                 request.ContentType = CONTENT_TYPE;
                 request.ContentLength = bytes.Length;
                 request.KeepAlive = false;
@@ -45,12 +46,13 @@ namespace Intuit.QuickBase.Core
                 webResponse = request.GetResponse();
                 responseStream = webResponse.GetResponseStream();
                 xml = XElement.Load(responseStream);
+                //File.AppendAllText(@"C:\Temp\QBDebugLog.txt", "**Received-<<\r\n" + xml.CreateNavigator().InnerXml + "\r\n");
             }
             finally
             {
-                if (requestStream != null) requestStream.Close();
-                if (responseStream != null) responseStream.Close();
-                if (webResponse != null) webResponse.Close();
+                requestStream?.Close();
+                responseStream?.Close();
+                webResponse?.Close();
             }
         
             Http.CheckForException(xml);

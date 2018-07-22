@@ -70,8 +70,9 @@ namespace Intuit.QuickBase.Client
                     case FieldType.date:
                         return ConvertDateTimeToQBMilliseconds((DateTime)_value);
                     case FieldType.timeofday:
+                        return ConvertTimeSpanToQBTimeOfDay((TimeSpan)_value);
                     case FieldType.duration:
-                        return ((TimeSpan)_value).ToString();
+                        return ConvertTimeSpanToQBDuration((TimeSpan)_value);
                     case FieldType.checkbox:
                         return (bool)_value == true ? "1" : "0";
                     default:
@@ -90,8 +91,10 @@ namespace Intuit.QuickBase.Client
                         _value = String.IsNullOrEmpty(value) ? new DateTime?() : ConvertQBMillisecondsToDate(value);
                         break;
                     case FieldType.timeofday:
+                        _value = String.IsNullOrEmpty(value) ? new TimeSpan?() : ConvertQBTimeOfDayToTime(value);
+                        break;
                     case FieldType.duration:
-                        _value = String.IsNullOrEmpty(value) ? new TimeSpan?() : ConvertQBMillisecondsToTime(value);
+                        _value = String.IsNullOrEmpty(value) ? new TimeSpan?() : ConvertQBDurationToTimeSpan(value);
                         break;
                     case FieldType.timestamp:
                         _value = String.IsNullOrEmpty(value) ? new DateTime?() : ConvertQBMillisecondsToDateTime(value);
@@ -269,25 +272,39 @@ namespace Intuit.QuickBase.Client
 
         private static DateTime ConvertQBMillisecondsToDateTime(string milliseconds)
         {
-            return qbTSOffset.AddMilliseconds(double.Parse(milliseconds)).ToLocalTime();
+            DateTime dtu = new DateTime(long.Parse(milliseconds) * TimeSpan.TicksPerMillisecond + qbTSOffset.Ticks, DateTimeKind.Utc);
+            return dtu.ToLocalTime();
         }
         private static DateTime ConvertQBMillisecondsToDate(string milliseconds)
         {
-            return qbTSOffset.AddMilliseconds(double.Parse(milliseconds)).Date;
+            DateTime dtu = new DateTime(long.Parse(milliseconds) * TimeSpan.TicksPerMillisecond + qbTSOffset.Ticks, DateTimeKind.Utc);
+            return dtu.ToLocalTime().Date;
         }
-        private static TimeSpan ConvertQBMillisecondsToTime(string milliseconds)
+        private static TimeSpan ConvertQBDurationToTimeSpan(string milliseconds)
         {
-            return qbTSOffset.AddMilliseconds(double.Parse(milliseconds)).TimeOfDay;
+            return new TimeSpan(long.Parse(milliseconds) * TimeSpan.TicksPerMillisecond);
+        }
+
+        private static TimeSpan ConvertQBTimeOfDayToTime(string milliseconds)
+        {
+            return new TimeSpan(long.Parse(milliseconds) * TimeSpan.TicksPerMillisecond);
         }
 
         private static string ConvertDateTimeToQBMilliseconds(DateTime inDT)
         {
-            return ((inDT.Ticks - qbTSOffset.Ticks) / TimeSpan.TicksPerMillisecond).ToString();
+            DateTime dte = inDT.ToUniversalTime();
+            return ((dte.Ticks - qbTSOffset.Ticks) / TimeSpan.TicksPerMillisecond).ToString();
         }
 
-        private static string ConvertTimeSpanToQBMilliseconds(TimeSpan inTime)
+        private static string ConvertTimeSpanToQBTimeOfDay(TimeSpan inTime)
         {
-            return (inTime.Ticks / TimeSpan.TicksPerMillisecond).ToString();
+            DateTime dt = new DateTime() + inTime;
+            return dt.ToString("h:mm tt");
+        }
+
+        private static string ConvertTimeSpanToQBDuration(TimeSpan inTime)
+        {
+            return (inTime.TotalSeconds).ToString();
         }
     }
 }

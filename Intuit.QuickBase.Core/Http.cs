@@ -278,7 +278,8 @@ namespace Intuit.QuickBase.Core
 
             if ("77".Equals(errorcode))
             {
-                throw new ApiRequestLimitExceededException(errortext);
+                System.DateTime waitUntil = System.DateTime.Now.AddSeconds(5); //I can't find any examples of where the 'wait time' is supposedly included in the error message, so just putting in a 5 sec wait time
+                throw new ApiRequestLimitExceededException(errortext, waitUntil);
             }
 
             if ("80".Equals(errorcode))

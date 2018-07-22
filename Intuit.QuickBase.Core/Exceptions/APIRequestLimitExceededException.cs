@@ -15,12 +15,15 @@ namespace Intuit.QuickBase.Core.Exceptions
     {
         public ApiRequestLimitExceededException() { }
 
-        public ApiRequestLimitExceededException(string message)
+        public ApiRequestLimitExceededException(string message, DateTime waitUntil)
         {
             Message = message;
+            WaitUntil = waitUntil;
         }
 
-        public new string Message { get; set; }
+        public new string Message { get; private set; }
+
+        public DateTime WaitUntil { get; private set; }
 
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
