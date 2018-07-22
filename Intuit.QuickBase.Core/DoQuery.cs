@@ -6,7 +6,7 @@
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
 using System;
-using System.Xml.XPath;
+using System.Xml.Linq;
 using Intuit.QuickBase.Core.Payload;
 using Intuit.QuickBase.Core.Uri;
 
@@ -152,12 +152,9 @@ namespace Intuit.QuickBase.Core
            get { return _collist; }
         }
 
-        public string XmlPayload
+        public void BuildXmlPayload(ref XElement parent)
         {
-            get
-            {
-                return _doQueryPayload.GetXmlPayload();
-            }
+            _doQueryPayload.GetXmlPayload(ref parent);
         }
 
         public System.Uri Uri
@@ -176,7 +173,7 @@ namespace Intuit.QuickBase.Core
             }
         }
 
-        public XPathDocument Post()
+        public XElement Post()
         {
             HttpPost httpXml = new HttpPostXml();
             httpXml.Post(this);

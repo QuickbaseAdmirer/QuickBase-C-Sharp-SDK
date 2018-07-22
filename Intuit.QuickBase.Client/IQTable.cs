@@ -5,7 +5,7 @@
  * which accompanies this distribution, and is available at
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
-using System.Xml.XPath;
+using System.Xml.Linq;
 
 namespace Intuit.QuickBase.Client
 {
@@ -24,7 +24,7 @@ namespace Intuit.QuickBase.Client
         string GenHtml(string options = "", string clist = "a");
         string GenHtml(int queryId, string options = "", string clist = "a");
         string GenHtml(Query query, string options = "", string clist = "a");
-        XPathDocument GetTableSchema();
+        XElement GetTableSchema();
         TableInfo GetTableInfo();
         int GetServerRecordCount();
         void Query();

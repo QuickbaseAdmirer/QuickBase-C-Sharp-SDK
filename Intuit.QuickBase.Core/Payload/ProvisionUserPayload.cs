@@ -74,14 +74,12 @@ namespace Intuit.QuickBase.Core.Payload
             }
         }
 
-        internal override string GetXmlPayload()
+        internal override void GetXmlPayload(ref XElement parent)
         {
-            var sb = new StringBuilder();
-            sb.Append(new XElement("email", Email));
-            sb.Append(new XElement("fname", FirstName));
-            sb.Append(new XElement("lname", LastName));
-            if (RoleId > 0) sb.Append(new XElement("roleid", RoleId));
-            return sb.ToString();
+            parent.Add(new XElement("email", Email));
+            parent.Add(new XElement("fname", FirstName));
+            parent.Add(new XElement("lname", LastName));
+            if (RoleId > 0) parent.Add(new XElement("roleid", RoleId));
         }
     }
 }

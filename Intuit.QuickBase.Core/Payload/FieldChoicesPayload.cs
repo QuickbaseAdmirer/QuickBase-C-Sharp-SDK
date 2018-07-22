@@ -43,15 +43,13 @@ namespace Intuit.QuickBase.Core.Payload
             }
         }
 
-        internal override string GetXmlPayload()
+        internal override void GetXmlPayload(ref XElement parent)
         {
-            var sb = new StringBuilder();
-            sb.Append(new XElement("fid", Fid));
+            parent.Add(new XElement("fid", Fid));
             foreach(var choice in Choices)
             {
-                sb.Append(new XElement("choice", choice));
+                parent.Add(new XElement("choice", choice));
             }
-            return sb.ToString();
         }
     }
 }

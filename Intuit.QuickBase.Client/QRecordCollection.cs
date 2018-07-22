@@ -133,11 +133,11 @@ namespace Intuit.QuickBase.Client
             var prBuild = new PurgeRecords.Builder(Application.Client.Ticket, Application.Token,
                 Application.Client.AccountDomain, Table.TableId);
             prBuild.SetQuery(qry.ToString());
-            var xml = prBuild.Build().Post().CreateNavigator();
-            int result = int.Parse(xml.SelectSingleNode("/qdbapi/errcode").Value);
+            var xml = prBuild.Build().Post();
+            int result = int.Parse(xml.Element("errcode").Value);
             if (result != 0)
             {
-                string errmsg = xml.SelectSingleNode("/qdbapi/errtxt").Value;
+                string errmsg = xml.Element("errtxt").Value;
                 throw new ApplicationException("Error in RemoveRecords: '" + errmsg + "'");
             }
         }

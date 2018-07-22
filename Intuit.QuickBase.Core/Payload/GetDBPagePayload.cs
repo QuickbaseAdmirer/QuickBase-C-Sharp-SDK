@@ -29,9 +29,9 @@ namespace Intuit.QuickBase.Core.Payload
             }
         }
 
-        internal override string GetXmlPayload()
+        internal override void GetXmlPayload(ref XElement parent)
         {
-            return new XElement("pageID", PageId).ToString();
+            parent.Add(new XElement("pageID", PageId));
         }
     }
 }

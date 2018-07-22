@@ -55,9 +55,8 @@ namespace Intuit.QuickBase.Core.Payload
             _fform = builder.Fform;
         }
 
-        internal override string GetXmlPayload()
+        internal override void GetXmlPayload(ref XElement parent)
         {
-            var sb = new StringBuilder();
             foreach (var field in _fields)
             {
                 if (field.Type == FieldType.file)
@@ -65,18 +64,17 @@ namespace Intuit.QuickBase.Core.Payload
                     XElement xelm = new XElement("field", EncodeFile(field.File));
                     xelm.SetAttributeValue("fid", field.Fid);
                     xelm.SetAttributeValue("filename", field.Value);
-                    sb.Append(xelm);
+                    parent.Add(xelm);
                 }
                 else
                 {
                     XElement xelm = new XElement("field", field.Value);
                     xelm.SetAttributeValue("fid", field.Fid);
-                    sb.Append(xelm);
+                    parent.Add(xelm);
                 }
             }
-            if (_disprec) sb.Append(new XElement("disprec"));
-            if (_fform) sb.Append(new XElement("fform"));
-            return sb.ToString();
+            if (_disprec) parent.Add(new XElement("disprec"));
+            if (_fform) parent.Add(new XElement("fform"));
         }
 
         private static string EncodeFile(string file)

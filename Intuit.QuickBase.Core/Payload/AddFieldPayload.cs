@@ -42,13 +42,11 @@ namespace Intuit.QuickBase.Core.Payload
 
         private Mode Mode { get; set; }
 
-        internal override string GetXmlPayload()
+        internal override void GetXmlPayload(ref XElement parent)
         {
-            var sb = new StringBuilder();
-            sb.Append(new XElement("label", Label));
-            sb.Append(new XElement("type", Type));
-            if (Mode != Mode.none) sb.Append(new XElement("mode", Mode));
-            return sb.ToString();
+            parent.Add(new XElement("label", Label));
+            parent.Add(new XElement("type", Type));
+            if (Mode != Mode.none) parent.Add(new XElement("mode", Mode));
         }
     }
 }

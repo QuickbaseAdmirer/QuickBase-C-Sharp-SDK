@@ -96,17 +96,15 @@ namespace Intuit.QuickBase.Core.Payload
             set { _options = value; }
         }
 
-        internal override string GetXmlPayload()
+        internal override void GetXmlPayload(ref XElement parent)
         {
-            var sb = new StringBuilder();
-            if (!string.IsNullOrEmpty(_query)) sb.Append(new XElement("query", _query));
-            if (_qid > 0) sb.Append(new XElement("qid", _qid));
-            if (!string.IsNullOrEmpty(_qName)) sb.Append(new XElement("qname", _qName));
-            if (!string.IsNullOrEmpty(_cList)) sb.Append(new XElement("clist", _cList));
-            if (!string.IsNullOrEmpty(_sList)) sb.Append(new XElement("slist", _sList));
-            if (!string.IsNullOrEmpty(_options)) sb.Append(new XElement("options", _options));
-            sb.Append(new XElement("fmt", "structured"));
-            return sb.ToString();
+            if (!string.IsNullOrEmpty(_query)) parent.Add(new XElement("query", _query));
+            if (_qid > 0) parent.Add(new XElement("qid", _qid));
+            if (!string.IsNullOrEmpty(_qName)) parent.Add(new XElement("qname", _qName));
+            if (!string.IsNullOrEmpty(_cList)) parent.Add(new XElement("clist", _cList));
+            if (!string.IsNullOrEmpty(_sList)) parent.Add(new XElement("slist", _sList));
+            if (!string.IsNullOrEmpty(_options)) parent.Add(new XElement("options", _options));
+            parent.Add(new XElement("fmt", "structured"));
         }
     }
 }

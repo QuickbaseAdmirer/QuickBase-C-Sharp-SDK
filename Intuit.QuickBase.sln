@@ -1,6 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 15
+VisualStudioVersion = 15.0.26430.14
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Library", "Library", "{2E052995-62F2-44FD-BD11-D481FB2C687C}"
 	ProjectSection(SolutionItems) = preProject
 		Library\nunit.framework.dll = Library\nunit.framework.dll
@@ -12,6 +14,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Intuit.QuickBase.Core", "Intuit.QuickBase.Core\Intuit.QuickBase.Core.csproj", "{72AE7ED2-1321-499E-8E0E-ECFD91B8C850}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QBFunctionTest", "QBFunctionTest\QBFunctionTest.csproj", "{0ECE8A75-198C-4DBA-83D8-E12CE882E6BC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QB_HeaderMaker", "QB_HeaderMaker\QB_HeaderMaker.csproj", "{D618C27A-C275-4956-B77D-AC399B395EDA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +35,10 @@ Global
 		{0ECE8A75-198C-4DBA-83D8-E12CE882E6BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0ECE8A75-198C-4DBA-83D8-E12CE882E6BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0ECE8A75-198C-4DBA-83D8-E12CE882E6BC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D618C27A-C275-4956-B77D-AC399B395EDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D618C27A-C275-4956-B77D-AC399B395EDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D618C27A-C275-4956-B77D-AC399B395EDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D618C27A-C275-4956-B77D-AC399B395EDA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

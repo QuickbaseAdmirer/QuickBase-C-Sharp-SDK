@@ -9,9 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Xml;
-using System.Xml.XPath;
+using System.Xml.Linq;
 using Intuit.QuickBase.Core;
 using Intuit.QuickBase.Core.Exceptions;
 
@@ -33,7 +31,7 @@ namespace Intuit.QuickBase.Client
             _fields = new List<QField>();
         }
 
-        internal QRecord(IQApplication application, IQTable table, QColumnCollection columns, XPathNavigator recordNode)
+        internal QRecord(IQApplication application, IQTable table, QColumnCollection columns, XElement recordNode)
             : this(application, table, columns)
         {
             FillRecord(recordNode);
@@ -196,8 +194,8 @@ namespace Intuit.QuickBase.Client
                 var addRecord = new AddRecord.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, Table.TableId, fieldsToPost).Build();
                 RecordState = RecordState.Unchanged;
 
-                var xml = addRecord.Post().CreateNavigator();
-                RecordId = int.Parse(xml.SelectSingleNode("/qdbapi/rid").Value);
+                var xml = addRecord.Post();
+                RecordId = int.Parse(xml.Element("rid").Value);
                 RecordState = RecordState.Unchanged;
                 IsOnServer = true;
             }
@@ -243,26 +241,25 @@ namespace Intuit.QuickBase.Client
             IsOnServer = true;
         }
 
-        private void FillRecord(XPathNavigator recordNode)
+        private void FillRecord(XElement recordNode)
         {
             IsOnServer = true;
-            var fieldNodes = recordNode.Select("f");
             var colIndex = 0;
-            foreach (XPathNavigator fieldNode in fieldNodes)
+            foreach (XElement fieldNode in recordNode.Elements("f"))
             {
-                if (fieldNode.HasChildren && fieldNode.MoveToChild("url", String.Empty))
+                if (fieldNode.HasElements && fieldNode.Element("url") != null)
                 {
-                    fieldNode.MoveToFirst();
-                    FieldLoad(colIndex, fieldNode.TypedValue as string);
+                    XElement childNode = fieldNode.Descendants().First();
+                    FieldLoad(colIndex, childNode.Value);
                 }
                 else
                 {
-                    FieldLoad(colIndex, fieldNode.TypedValue as string);
+                    FieldLoad(colIndex, fieldNode.Value);
                 }
 
-                if (fieldNode.GetAttribute("id", String.Empty).Equals("3"))
+                if (fieldNode.Attribute("id").Value.Equals("3"))
                 {
-                    RecordId = fieldNode.ValueAsInt;
+                    RecordId = int.Parse(fieldNode.Value);
                 }
                 colIndex++;
             }

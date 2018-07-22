@@ -47,13 +47,11 @@ namespace Intuit.QuickBase.Core.Payload
 
         private bool CreateAppToken { get; set; }
 
-        internal override string GetXmlPayload()
+        internal override void GetXmlPayload(ref XElement parent)
         {
-            var sb = new StringBuilder();
-            sb.Append(new XElement("dbname", DbName));
-            sb.Append(new XElement("dbdesc", DBDesc));
-            if (CreateAppToken) sb.Append(new XElement("createapptoken", 1));
-            return sb.ToString();
+            parent.Add(new XElement("dbname", DbName));
+            parent.Add(new XElement("dbdesc", DBDesc));
+            if (CreateAppToken) parent.Add(new XElement("createapptoken", 1));
         }
     }
 }

@@ -6,6 +6,7 @@
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
 using System.Collections.Generic;
+using System.Net;
 using Intuit.QuickBase.Core;
 
 namespace Intuit.QuickBase.Client
@@ -27,9 +28,9 @@ namespace Intuit.QuickBase.Client
             if (column.ColumnId == 0)
             {
                 var addCol = new AddField(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, Table.TableId, column.ColumnName, column.ColumnType);
-                var xml = addCol.Post().CreateNavigator();
-                //todo: need to put in error checking here
-                var columnId = int.Parse(xml.SelectSingleNode("/qdbapi/fid").Value);
+                var xml = addCol.Post();
+                Http.CheckForException(xml);
+                var columnId = int.Parse(xml.Element("fid").Value);
                 column.ColumnId = columnId;
             }
             base.Add(column);

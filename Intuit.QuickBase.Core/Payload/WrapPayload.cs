@@ -17,9 +17,9 @@ namespace Intuit.QuickBase.Core.Payload
             Payload = payload;
         }
 
-        internal override string GetXmlPayload()
+        internal override void GetXmlPayload(ref XElement parent)
         {
-            return "<qdbapi>" + Payload.GetXmlPayload() + "</qdbapi>";
+            Payload.GetXmlPayload(ref parent);
         }
     }
 }

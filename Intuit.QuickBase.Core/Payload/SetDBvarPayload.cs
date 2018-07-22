@@ -44,12 +44,10 @@ namespace Intuit.QuickBase.Core.Payload
             }
         }
 
-        internal override string GetXmlPayload()
+        internal override void GetXmlPayload(ref XElement parent)
         {
-            StringBuilder sb = new StringBuilder();
-            sb.Append(new XElement("varname", VarName));
-            sb.Append(new XElement("value", Value));
-            return sb.ToString();
+            parent.Add(new XElement("varname", VarName));
+            parent.Add(new XElement("value", Value));
         }
     }
 }

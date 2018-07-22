@@ -20,10 +20,10 @@ namespace Intuit.QuickBase.Core.Payload
 
         private string Token { get; set; }
 
-        internal override string GetXmlPayload()
+        internal override void GetXmlPayload(ref XElement parent)
         {
-            return Payload.GetXmlPayload() +
-                   (!string.IsNullOrEmpty(Token) ? new XElement("apptoken", Token).ToString() : string.Empty);
+            Payload.GetXmlPayload(ref parent);
+            if (!string.IsNullOrEmpty(Token)) parent.Add(new XElement("apptoken", Token));
         }
     }
 }

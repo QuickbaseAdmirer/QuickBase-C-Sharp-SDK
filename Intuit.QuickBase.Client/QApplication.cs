@@ -7,7 +7,7 @@
  */
 using System;
 using System.Collections.Generic;
-using System.Xml.XPath;
+using System.Xml.Linq;
 using Intuit.QuickBase.Core;
 using Intuit.QuickBase.Core.Exceptions;
 
@@ -57,31 +57,31 @@ namespace Intuit.QuickBase.Client
         public AppInfo GetApplicationInfo()
         {
             var getDbInfo = new GetDbInfo(Client.Ticket, Token, Client.AccountDomain, ApplicationId);
-            var xml = getDbInfo.Post().CreateNavigator();
+            var xml = getDbInfo.Post();
 
-            var dbName = xml.SelectSingleNode("/qdbapi/dbname").Value;
-            var lastRecModTime = long.Parse(xml.SelectSingleNode("/qdbapi/lastRecModTime").Value);
-            var lastModifiedTime = long.Parse(xml.SelectSingleNode("/qdbapi/lastModifiedTime").Value);
-            var createTime = long.Parse(xml.SelectSingleNode("/qdbapi/createdTime").Value);
-            var numRecords = int.Parse(xml.SelectSingleNode("/qdbapi/numRecords").Value);
-            var mgrId = xml.SelectSingleNode("/qdbapi/mgrID").Value;
-            var mgrName = xml.SelectSingleNode("/qdbapi/mgrName").Value;
-            var version = xml.SelectSingleNode("/qdbapi/version").Value;
+            var dbName = xml.Element("dbname").Value;
+            var lastRecModTime = long.Parse(xml.Element("lastRecModTime").Value);
+            var lastModifiedTime = long.Parse(xml.Element("lastModifiedTime").Value);
+            var createTime = long.Parse(xml.Element("createdTime").Value);
+            var numRecords = int.Parse(xml.Element("numRecords").Value);
+            var mgrId = xml.Element("mgrID").Value;
+            var mgrName = xml.Element("mgrName").Value;
+            var version = xml.Element("version").Value;
 
             return new AppInfo(dbName, lastRecModTime, lastModifiedTime, createTime, numRecords, mgrId, mgrName,
                                     version);
         }
 
-        public XPathDocument GetApplicationSchema()
+        public XElement GetApplicationSchema()
         {
             return GetApplicationSchema(Client.ClientUserName, Client.ClientPassword, Client.AccountDomain);
         }
 
-        private XPathDocument GetApplicationSchema(string username, string password, string accountDomain)
+        private XElement GetApplicationSchema(string username, string password, string accountDomain)
         {
             var signin = new Authenticate(username, password, accountDomain, 1);
-            var xml = signin.Post().CreateNavigator();
-            var adminTicket = xml.SelectSingleNode("/qdbapi/ticket").Value;
+            var xml = signin.Post();
+            var adminTicket = xml.Element("ticket").Value;
 
             var appSchema = new GetSchema(adminTicket, Token, accountDomain, ApplicationId);
             var xmlSchema = appSchema.Post();
@@ -97,9 +97,9 @@ namespace Intuit.QuickBase.Client
             var cloneApp = new CloneDatabase.Builder(Client.Ticket, Token, Client.AccountDomain, ApplicationId, qbNewName, qbNewDescription)
                 .SetKeepData(Convert.ToBoolean(cloneData))
                 .Build();
-            var xml = cloneApp.Post().CreateNavigator();
+            var xml = cloneApp.Post();
 
-            return xml.SelectSingleNode("/qdbapi/newdbid").Value;
+            return xml.Element("newdbid").Value;
         }
 
         public void RenameApplication(string qbNewName)
@@ -124,34 +124,34 @@ namespace Intuit.QuickBase.Client
         public UserInfo GetUserInfo(string email)
         {
             var getUserInfo = new GetUserInfo(Client.Ticket, Token, Client.AccountDomain, email);
-            var xml = getUserInfo.Post().CreateNavigator();
-            var userId = xml.SelectSingleNode("/qdbapi/user").GetAttribute("id", String.Empty);
-            var firstName = xml.SelectSingleNode("/qdbapi/user/firstName").Value;
-            var lastName = xml.SelectSingleNode("/qdbapi/user/lastName").Value;
-            var login = xml.SelectSingleNode("/qdbapi/user/login").Value;
-            var emailAddress = xml.SelectSingleNode("/qdbapi/user/email").Value;
-            var screenName = xml.SelectSingleNode("/qdbapi/user/screenName").Value;
+            var xml = getUserInfo.Post();
+            XElement userElm = xml.Element("user");
+            var userId = xml.Element("user").Attribute("id").Value;
+            var firstName = userElm.Element("firstName").Value;
+            var lastName = userElm.Element("lastName").Value;
+            var login = userElm.Element("login").Value;
+            var emailAddress = userElm.Element("email").Value;
+            var screenName = userElm.Element("screenName").Value;
             return new UserInfo(userId, firstName, lastName, login, emailAddress, screenName);
         }
 
         public UserRoleInfo GetUserRole(string userId)
         {
             var getUserRole = new GetUserRole(Client.Ticket, Token, Client.AccountDomain, ApplicationId, userId);
-            var xml = getUserRole.Post().CreateNavigator();
-
+            var xml = getUserRole.Post();
+            XElement userElm = xml.Element("user");
             // User info
-            var returnedUserId = xml.SelectSingleNode("/qdbapi/user").GetAttribute("id", String.Empty);
-            var name = xml.SelectSingleNode("/qdbapi/user/name").Value;
+            var returnedUserId = userElm.Attribute("id").Value;
+            var name = userElm.Element("name").Value;
             var userRoleInfo = new UserRoleInfo(returnedUserId, name);
 
             // Role info
-            var roleNodes = xml.Select("/qdbapi/user/roles/role");
-            foreach (XPathNavigator node in roleNodes)
+            foreach (XElement node in userElm.Element("roles").Elements("role"))
             {
-                var roleId = int.Parse(node.GetAttribute("id", String.Empty));
-                var roleName = node.SelectSingleNode("name").Value;
-                var accessNode = node.SelectSingleNode("access");
-                var roleAccessId = int.Parse(accessNode.GetAttribute("id", String.Empty));
+                var roleId = int.Parse(node.Attribute("id").Value);
+                var roleName = node.Element("name").Value;
+                var accessNode = node.Element("access");
+                var roleAccessId = int.Parse(accessNode.Attribute("id").Value);
                 var roleAccess = accessNode.Value;
                 userRoleInfo.AddRole(roleId, roleName, roleAccessId, roleAccess);
             }
@@ -161,25 +161,23 @@ namespace Intuit.QuickBase.Client
         public List<UserRoleInfo> UserRoles()
         {
             var userRoles = new UserRoles(Client.Ticket, Token, Client.AccountDomain, ApplicationId);
-            var xml = userRoles.Post().CreateNavigator();
+            var xml = userRoles.Post();
             var userRoleInfos = new List<UserRoleInfo>();
 
-            var userNodes = xml.Select("/qdbapi/users/user");
-            foreach (XPathNavigator user in userNodes)
+            foreach (XElement user in xml.Element("users").Elements("user"))
             {
                 // User info
-                var userId = user.GetAttribute("id", String.Empty);
-                var name = user.SelectSingleNode("name").Value;
+                var userId = user.Attribute("id").Value;
+                var name = user.Element("name").Value;
                 var userRoleInfo = new UserRoleInfo(userId, name);
 
                 // Role info
-                var roleNodes = user.Select("roles/role");
-                foreach (XPathNavigator node in roleNodes)
+                foreach (XElement node in user.Element("roles").Elements("role"))
                 {
-                    var roleId = int.Parse(node.GetAttribute("id", String.Empty));
-                    var roleName = node.SelectSingleNode("name").Value;
-                    var accessNode = node.SelectSingleNode("access");
-                    var roleAccessId = int.Parse(accessNode.GetAttribute("id", String.Empty));
+                    var roleId = int.Parse(node.Attribute("id").Value);
+                    var roleName = node.Element("name").Value;
+                    var accessNode = node.Element("access");
+                    var roleAccessId = int.Parse(accessNode.Attribute("id").Value);
                     var roleAccess = accessNode.Value;
                     userRoleInfo.AddRole(roleId, roleName, roleAccessId, roleAccess);
                 }
@@ -226,25 +224,24 @@ namespace Intuit.QuickBase.Client
         internal static AppDtm GetApplicationDataTimeInfo(string accountDomain, string applicationId)
         {
             var getAppDtmInfo = new GetAppDtmInfo(accountDomain, applicationId);
-            var xml = getAppDtmInfo.Get().CreateNavigator();
+            XElement xml = getAppDtmInfo.Get();
 
             // Request info
-            var requestTime = long.Parse(xml.SelectSingleNode("/qdbapi/RequestTime").Value);
-            var requestNextAllowedTime = long.Parse(xml.SelectSingleNode("/qdbapi/RequestNextAllowedTime").Value);
+            var requestTime = long.Parse(xml.Element("RequestTime").Value);
+            var requestNextAllowedTime = long.Parse(xml.Element("RequestNextAllowedTime").Value);
             // App info
-            var appNode = xml.SelectSingleNode("/qdbapi/app");
-            var appDbid = appNode.GetAttribute("id", String.Empty);
-            var appLastModifiedTime = long.Parse(appNode.SelectSingleNode("lastModifiedTime").Value);
-            var appLastRecModTime = long.Parse(appNode.SelectSingleNode("lastRecModTime").Value);
+            XElement appNode = xml.Element("app");
+            string appDbid = appNode.Attribute("id").Value;
+            long appLastModifiedTime = long.Parse(appNode.Element("lastModifiedTime").Value);
+            long appLastRecModTime = long.Parse(appNode.Element("lastRecModTime").Value);
             var appDtmInfo = new AppDtm(appDbid, appLastModifiedTime, appLastRecModTime, requestTime, requestNextAllowedTime);
 
             // Table info
-            var tableNodes = xml.Select("/qdbapi/tables/table");
-            foreach (XPathNavigator node in tableNodes)
+            foreach (XElement node in xml.Element("tables").Elements("table"))
             {
-                var tableId = node.GetAttribute("id", String.Empty);
-                var tableLastModifiedTime = long.Parse(node.SelectSingleNode("lastModifiedTime").Value);
-                var tableLastRecModTime = long.Parse(node.SelectSingleNode("lastRecModTime").Value);
+                var tableId = node.Attribute("id").Value;
+                var tableLastModifiedTime = long.Parse(node.Element("lastModifiedTime").Value);
+                var tableLastRecModTime = long.Parse(node.Element("lastRecModTime").Value);
                 appDtmInfo.AddTable(tableId, tableLastModifiedTime, tableLastRecModTime);
             }
             return appDtmInfo;
@@ -254,24 +251,23 @@ namespace Intuit.QuickBase.Client
         {
             var grantedDBs = new GrantedDBs.Builder(Client.Ticket, Token, Client.AccountDomain)
                 .SetWithEmbeddedTables(true).Build();
-            var xml = grantedDBs.Post().CreateNavigator();
+            var xml = grantedDBs.Post();
 
-            var dbinfoNodes = xml.Select("/qdbapi/databases/dbinfo");
             GrantedAppsInfo grantedApps = null;
             var grantedAppsInfos = new List<GrantedAppsInfo>();
-            foreach (XPathNavigator dbinfo in dbinfoNodes)
+            foreach (XElement dbinfo in xml.Element("databases").Elements("dbinfo"))
             {
-                if (!dbinfo.SelectSingleNode("dbname").Value.Contains(":"))
+                if (!dbinfo.Element("dbname").Value.Contains(":"))
                 {
-                    var appName = dbinfo.SelectSingleNode("dbname").Value;
-                    var appDbid = dbinfo.SelectSingleNode("dbid").Value;
+                    var appName = dbinfo.Element("dbname").Value;
+                    var appDbid = dbinfo.Element("dbid").Value;
                     grantedApps = new GrantedAppsInfo(appName, appDbid);
                     grantedAppsInfos.Add(grantedApps);
                 }
                 else
                 {
-                    var tableName = dbinfo.SelectSingleNode("dbname").Value;
-                    var tableDbid = dbinfo.SelectSingleNode("dbid").Value;
+                    var tableName = dbinfo.Element("dbname").Value;
+                    var tableDbid = dbinfo.Element("dbid").Value;
                     if (grantedApps != null) grantedApps.AddTable(tableName, tableDbid);
                 }
             }
@@ -285,9 +281,8 @@ namespace Intuit.QuickBase.Client
 
         internal void LoadTables()
         {
-            var xmlApp = GetApplicationSchema(Client.AdminUserName, Client.AdminPassword, Client.AccountDomain).CreateNavigator();
-            var nodes = xmlApp.Select("/qdbapi/table/chdbids/chdbid");
-            foreach (XPathNavigator node in nodes)
+            var xmlApp = GetApplicationSchema(Client.AdminUserName, Client.AdminPassword, Client.AccountDomain);
+            foreach (XElement node in xmlApp.Element("table").Element("chdbids").Elements("chdbid"))
             {
                 var dbid = node.Value;
 

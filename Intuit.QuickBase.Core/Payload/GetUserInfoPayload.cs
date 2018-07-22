@@ -32,9 +32,9 @@ namespace Intuit.QuickBase.Core.Payload
             }
         }
 
-        internal override string GetXmlPayload()
+        internal override void GetXmlPayload(ref XElement parent)
         {
-            return !String.IsNullOrEmpty(Email) ? new XElement("email", Email).ToString() : string.Empty;
+            if (!string.IsNullOrEmpty(Email)) parent.Add(new XElement("email", Email));
         }
     }
 }

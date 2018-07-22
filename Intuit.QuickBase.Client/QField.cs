@@ -45,7 +45,7 @@ namespace Intuit.QuickBase.Client
             {
                 Value = value;
             }
-            if (type == FieldType.text)
+            if (type == FieldType.text && value != null)
                 UncleanText = CSVUncleanRegEx.IsMatch((string)value);
             else
                 UncleanText = false;

@@ -9,7 +9,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.XPath;
+using System.Runtime.CompilerServices;
+using System.Xml.Linq;
 using Intuit.QuickBase.Core;
 using Intuit.QuickBase.Core.Exceptions;
 
@@ -30,8 +31,8 @@ namespace Intuit.QuickBase.Client
                 .SetTName(tableName)
                 .SetPNoun(pNoun)
                 .Build();
-            var xml = createTable.Post().CreateNavigator();
-            var tableId = xml.SelectSingleNode("/qdbapi/newdbid").Value;
+            var xml = createTable.Post();
+            var tableId = xml.Element("newdbid").Value;
 
             TableName = tableName;
             RecordNames = pNoun;
@@ -83,8 +84,8 @@ namespace Intuit.QuickBase.Client
             var genResultsTable = new GenResultsTable.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
                 .SetOptions("csv")
                 .Build();
-            var xml = genResultsTable.Post().CreateNavigator();
-            return xml.SelectSingleNode("/response_data").Value;
+            var xml = genResultsTable.Post();
+            return xml.Value;
         }
 
         public string GenCsv(int queryId)
@@ -93,8 +94,8 @@ namespace Intuit.QuickBase.Client
                 .SetQid(queryId)
                 .SetOptions("csv")
                 .Build();
-            var xml = genResultsTable.Post().CreateNavigator();
-            return xml.SelectSingleNode("/response_data").Value;
+            var xml = genResultsTable.Post();
+            return xml.Value;
         }
 
         public string GenCsv(Query query)
@@ -103,8 +104,8 @@ namespace Intuit.QuickBase.Client
                 .SetQuery(query.ToString())
                 .SetOptions("csv")
                 .Build();
-            var xml = genResultsTable.Post().CreateNavigator();
-            return xml.SelectSingleNode("/response_data").Value;
+            var xml = genResultsTable.Post();
+            return xml.Value;
         }
 
         public string GenHtml(string options = "", string clist = "a")
@@ -113,8 +114,8 @@ namespace Intuit.QuickBase.Client
                 .SetOptions(options)
                 .SetCList(clist)
                 .Build();
-            var xml = genResultsTable.Post().CreateNavigator();
-            return xml.SelectSingleNode("/response_data").Value;
+            var xml = genResultsTable.Post();
+            return xml.Value;
         }
 
         public string GenHtml(int queryId, string options = "", string clist = "a")
@@ -124,8 +125,8 @@ namespace Intuit.QuickBase.Client
                 .SetOptions(options)
                 .SetCList(clist)
                 .Build();
-            var xml = genResultsTable.Post().CreateNavigator();
-            return xml.SelectSingleNode("/response_data").Value;
+            var xml = genResultsTable.Post();
+            return xml.Value;
         }
 
         public string GenHtml(Query query, string options = "", string clist = "a")
@@ -135,11 +136,11 @@ namespace Intuit.QuickBase.Client
                 .SetOptions(options)
                 .SetCList(clist)
                 .Build();
-            var xml = genResultsTable.Post().CreateNavigator();
-            return xml.SelectSingleNode("/response_data").Value;
+            var xml = genResultsTable.Post();
+            return xml.Value;
         }
 
-        public XPathDocument GetTableSchema()
+        public XElement GetTableSchema()
         {
             var tblSchema = new GetSchema(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId);
             return tblSchema.Post();
@@ -148,16 +149,16 @@ namespace Intuit.QuickBase.Client
         public TableInfo GetTableInfo()
         {
             var getTblInfo = new GetDbInfo(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId);
-            var xml = getTblInfo.Post().CreateNavigator();
+            var xml = getTblInfo.Post();
 
-            var dbName = xml.SelectSingleNode("/qdbapi/dbname").Value;
-            var lastRecModTime = long.Parse(xml.SelectSingleNode("/qdbapi/lastRecModTime").Value);
-            var lastModifiedTime = long.Parse(xml.SelectSingleNode("/qdbapi/lastModifiedTime").Value);
-            var createTime = long.Parse(xml.SelectSingleNode("/qdbapi/createdTime").Value);
-            var numRecords = int.Parse(xml.SelectSingleNode("/qdbapi/numRecords").Value);
-            var mgrId = xml.SelectSingleNode("/qdbapi/mgrID").Value;
-            var mgrName = xml.SelectSingleNode("/qdbapi/mgrName").Value;
-            var version = xml.SelectSingleNode("/qdbapi/version").Value;
+            var dbName = xml.Element("dbname").Value;
+            var lastRecModTime = long.Parse(xml.Element("lastRecModTime").Value);
+            var lastModifiedTime = long.Parse(xml.Element("lastModifiedTime").Value);
+            var createTime = long.Parse(xml.Element("createdTime").Value);
+            var numRecords = int.Parse(xml.Element("numRecords").Value);
+            var mgrId = xml.Element("mgrID").Value;
+            var mgrName = xml.Element("mgrName").Value;
+            var version = xml.Element("version").Value;
 
             return new TableInfo(dbName, lastRecModTime, lastModifiedTime, createTime, numRecords, mgrId, mgrName,
                                     version);
@@ -166,8 +167,8 @@ namespace Intuit.QuickBase.Client
         public int GetServerRecordCount()
         {
             var tblRecordCount = new GetNumRecords(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId);
-            var xml = tblRecordCount.Post().CreateNavigator();
-            return int.Parse(xml.SelectSingleNode("/qdbapi/num_records").Value);
+            var xml = tblRecordCount.Post();
+            return int.Parse(xml.Element("num_records").Value);
         }
 
         private void _doQuery(DoQuery qry)
@@ -175,7 +176,7 @@ namespace Intuit.QuickBase.Client
             Records.Clear();
             try
             {
-                XPathNavigator xml = qry.Post().CreateNavigator();
+                XElement xml = qry.Post();
                 LoadColumns(xml); //Must be done each time, incase the schema changes due to another user, or from a previous query that has a differing subset of columns
                 LoadRecords(xml);
             }
@@ -216,8 +217,8 @@ namespace Intuit.QuickBase.Client
                         dqryCnt = new DoQueryCount.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
                             .SetQuery(query)
                             .Build();
-                    var cntXml = dqryCnt.Post().CreateNavigator();
-                    maxCount = int.Parse(cntXml.SelectSingleNode("/qdbapi/numMatches").Value);
+                    var cntXml = dqryCnt.Post();
+                    maxCount = int.Parse(cntXml.Element("numMatches").Value);
                 }
                 int stride = maxCount/2;
                 int fetched = 0;
@@ -244,7 +245,7 @@ namespace Intuit.QuickBase.Client
                            .Build();
                     try
                     {
-                        XPathNavigator xml = dqry.Post().CreateNavigator();
+                        XElement xml = dqry.Post();
                         if (fetched == 0) LoadColumns(xml);
                         LoadRecords(xml);
                         fetched += stride;
@@ -385,8 +386,8 @@ namespace Intuit.QuickBase.Client
             var doQuery = new DoQueryCount.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
                 .SetQuery(query.ToString())
                 .Build();
-            var xml = doQuery.Post().CreateNavigator();
-            return int.Parse(xml.SelectSingleNode("/qdbapi/numMatches").Value);
+            var xml = doQuery.Post();
+            return int.Parse(xml.Element("numMatches").Value);
         }
 
         public int QueryCount(int queryId)
@@ -394,8 +395,8 @@ namespace Intuit.QuickBase.Client
             var doQuery = new DoQueryCount.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
                 .SetQid(queryId)
                 .Build();
-            var xml = doQuery.Post().CreateNavigator();
-            return int.Parse(xml.SelectSingleNode("/qdbapi/numMatches").Value);
+            var xml = doQuery.Post();
+            return int.Parse(xml.Element("numMatches").Value);
         }
 
         public void PurgeRecords()
@@ -451,9 +452,9 @@ namespace Intuit.QuickBase.Client
                 csvBuilder.SetCList(clist);
                 var csvUpload = csvBuilder.Build();
 
-                var xml = csvUpload.Post().CreateNavigator();
+                var xml = csvUpload.Post();
 
-                XPathNodeIterator xNodes = xml.Select("/qdbapi/rids/rid");
+                IEnumerator<XElement> xNodes = xml.Element("rids").Elements("rid").GetEnumerator();
                 //set records as in server now
                 foreach (IQRecord rec in addList)
                 {
@@ -492,10 +493,9 @@ namespace Intuit.QuickBase.Client
             RefreshColumns();
         }
 
-        private void LoadRecords(XPathNavigator xml)
+        private void LoadRecords(XElement xml)
         {
-            var recordNodes = xml.Select("/qdbapi/table/records/record");
-            foreach (XPathNavigator recordNode in recordNodes)
+            foreach (XElement recordNode in xml.Element("table").Element("records").Elements("record"))
             {
                 var record = RecordFactory.CreateInstance(Application, this, Columns, recordNode);
                 Records.Add(record);
@@ -504,49 +504,61 @@ namespace Intuit.QuickBase.Client
 
         public void RefreshColumns()
         {
-            LoadColumns(GetTableSchema().CreateNavigator());
+            LoadColumns(GetTableSchema());
         }
 
-        private void LoadColumns(XPathNavigator xml)
+        private void LoadColumns(XElement xml)
         {
             Columns.Clear();
-            var columnNodes = xml.Select("/qdbapi/table/fields/field");
-            foreach (XPathNavigator columnNode in columnNodes)
+            var columnNodes = xml.Element("table").Element("fields").Elements("field");
+            foreach (XElement columnNode in columnNodes)
             {
-                var columnId = int.Parse(columnNode.GetAttribute("id", String.Empty));
+                var columnId = int.Parse(columnNode.Attribute("id").Value);
                 var type =
-                    (FieldType)Enum.Parse(typeof(FieldType), columnNode.GetAttribute("field_type", String.Empty), true);
-                var label = columnNode.SelectSingleNode("label").Value;
+                    (FieldType) Enum.Parse(typeof(FieldType), columnNode.Attribute("field_type").Value, true);
+                var label = columnNode.Element("label").Value;
                 bool hidden = false;
-                var hidNode = columnNode.SelectSingleNode("appears_by_default");
+                var hidNode = columnNode.Element("appears_by_default");
                 if (hidNode != null && hidNode.Value == "0") hidden = true;
-                bool virt = columnNode.GetAttribute("mode", String.Empty) == "virtual";
-                bool lookup = columnNode.GetAttribute("mode", String.Empty) == "lookup";
-                IQColumn col = ColumnFactory.CreateInstace(columnId, label, type, virt, lookup, hidden);
-                foreach (XPathNavigator choicenode in columnNode.Select("choices/choice"))
+                bool virt = false, lookup = false;
+                if (columnNode.Attribute("mode") != null)
                 {
-                    object value;
-                    switch (type)
+                    string mode = columnNode.Attribute("mode").Value;
+                    virt = mode == "virtual";
+                    lookup = mode == "lookup";
+                }
+                IQColumn col = ColumnFactory.CreateInstace(columnId, label, type, virt, lookup, hidden);
+                if (columnNode.Element("choices") != null)
+                {
+                    foreach (XElement choicenode in columnNode.Element("choices").Elements("choice"))
                     {
-                        case FieldType.rating:
-                            value = Int32.Parse(choicenode.Value);
-                            break;
-                        default:
-                            value = choicenode.Value;
-                            break;
+                        object value;
+                        switch (type)
+                        {
+                            case FieldType.rating:
+                                value = Int32.Parse(choicenode.Value);
+                                break;
+                            default:
+                                value = choicenode.Value;
+                                break;
+                        }
+                        ((IQColumn_int) col).AddChoice(value);
                     }
-                    ((IQColumn_int)col).AddChoice(value);
                 }
                 Dictionary<string, int> colComposites = ((IQColumn_int)col).GetComposites();
-                foreach (XPathNavigator compositenode in columnNode.Select("compositeFields/compositeField"))
+                if (columnNode.Element("compositeFields") != null)
                 {
-                    colComposites.Add(compositenode.GetAttribute("key", String.Empty), Int32.Parse(compositenode.GetAttribute("id", String.Empty)));
+                    foreach (XElement compositenode in columnNode.Element("compositeFields").Elements("compositeField"))
+                    {
+                        colComposites.Add(compositenode.Attribute("key").Value,
+                            Int32.Parse(compositenode.Attribute("id").Value));
+                    }
                 }
                 Columns.Add(col);
             }
-            var keyFidNode = xml.SelectSingleNode("/qdbapi/table/original/key_fid");
+            var keyFidNode = xml.Element("table").Element("original").Element("key_fid");
             if (keyFidNode != null)
-                KeyFID = keyFidNode.ValueAsInt;
+                KeyFID = Int32.Parse(keyFidNode.Value);
             else
                 KeyFID = Columns.Find(c => c.ColumnType == FieldType.recordid).ColumnId;
             KeyCIdx = Columns.FindIndex(c => c.ColumnId == KeyFID);

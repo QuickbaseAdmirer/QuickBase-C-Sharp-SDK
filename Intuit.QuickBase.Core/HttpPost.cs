@@ -5,13 +5,13 @@
  * which accompanies this distribution, and is available at
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
-using System.Xml.XPath;
+using System.Xml.Linq;
 
 namespace Intuit.QuickBase.Core
 {
     internal abstract class HttpPost
     {
         internal abstract void Post(IQObject qObject);
-        internal abstract XPathDocument Response { get; set; }
+        internal abstract XElement Response { get; set; }
     }
 }

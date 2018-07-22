@@ -53,13 +53,11 @@ namespace Intuit.QuickBase.Core.Payload
             _skipFirst = builder.SkipFirst;
         }
 
-        internal override string GetXmlPayload()
+        internal override void GetXmlPayload(ref XElement parent)
         {
-            var sb = new StringBuilder();
-            sb.Append(new XElement("records_csv", new XCData(_recordsCsv)));
-            if (!string.IsNullOrEmpty(_cList)) sb.Append(new XElement("clist", _cList));
-            if (_skipFirst) sb.Append(new XElement("skipfirst", 1));
-            return sb.ToString();
+            parent.Add(new XElement("records_csv", new XCData(_recordsCsv)));
+            if (!string.IsNullOrEmpty(_cList)) parent.Add(new XElement("clist", _cList));
+            if (_skipFirst) parent.Add(new XElement("skipfirst", 1));
         }
     }
 }

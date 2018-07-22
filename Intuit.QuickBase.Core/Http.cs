@@ -7,18 +7,18 @@
  */
 using System.Net;
 using System.IO;
-using System.Xml.XPath;
+using System.Xml.Linq;
 using Intuit.QuickBase.Core.Exceptions;
 
 namespace Intuit.QuickBase.Core
 {
-    internal class Http
+    public class Http
     {
-        internal XPathDocument Get(IQGetObject apiAction)
+        internal XElement Get(IQGetObject apiAction)
         {
             WebResponse response = null;
             Stream responseStream = null;
-            XPathDocument xml;
+            XElement xml;
 
             try
             {
@@ -30,14 +30,13 @@ namespace Intuit.QuickBase.Core
 
                 response = request.GetResponse();
                 responseStream = response.GetResponseStream();
-                xml = new XPathDocument(responseStream);
+                xml = XElement.Load(responseStream);
             }
             finally
             {
                 if (responseStream != null) responseStream.Close();
                 if (response != null) response.Close();
             }
-
             CheckForException(xml);
             return xml;
         }
@@ -82,12 +81,11 @@ namespace Intuit.QuickBase.Core
             }
         }
 
-        internal static void CheckForException(XPathDocument xml)
+        public static void CheckForException(XElement xmlNav)
         {
-            var xmlNav = xml.CreateNavigator();
-            string errorcode = xmlNav.SelectSingleNode("/qdbapi/errcode").Value;
-            string errortext = xmlNav.SelectSingleNode("/qdbapi/errtext").Value;
-            var errDetailNode = xmlNav.SelectSingleNode("/qdbapi/errdetail");
+            string errorcode = xmlNav.Element("errcode").Value;
+            string errortext = xmlNav.Element("errtext").Value;
+            var errDetailNode = xmlNav.Element("errdetail");
             if (errDetailNode != null)
             {
                 string errdetail = errDetailNode.Value;

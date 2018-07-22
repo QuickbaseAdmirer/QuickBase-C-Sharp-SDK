@@ -57,14 +57,12 @@ namespace Intuit.QuickBase.Core.Payload
             _excludeFiles = builder.ExcludeFiles;
         }
 
-        internal override string GetXmlPayload()
+        internal override void GetXmlPayload(ref XElement parent)
         {
-            var sb = new StringBuilder();
-            sb.Append(new XElement("newdbname", _newDBName));
-            sb.Append(new XElement("newdbdesc", _newDBDesc));
-            if (_keepData) sb.Append(new XElement("keepData", 1));
-            if (_excludeFiles) sb.Append(new XElement("excludefiles", 1));
-            return sb.ToString();
+            parent.Add(new XElement("newdbname", _newDBName));
+            parent.Add(new XElement("newdbdesc", _newDBDesc));
+            if (_keepData) parent.Add(new XElement("keepData", 1));
+            if (_excludeFiles) parent.Add(new XElement("excludefiles", 1));
         }
     }
 }

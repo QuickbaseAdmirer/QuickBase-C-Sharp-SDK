@@ -53,13 +53,11 @@ namespace Intuit.QuickBase.Core.Payload
             _adminOnly = builder.AdminOnly;
         }
 
-        internal override string GetXmlPayload()
+        internal override void GetXmlPayload(ref XElement parent)
         {
-            var sb = new StringBuilder();
-            sb.Append(new XElement("Excludeparents", _excludeParents ? 1 : 0));
-            sb.Append(new XElement("withembeddedtables", _withEmbeddedTables ? 1 : 0));
-            if (_adminOnly) sb.Append(new XElement("adminOnly"));
-            return sb.ToString();
+            parent.Add(new XElement("Excludeparents", _excludeParents ? 1 : 0));
+            parent.Add(new XElement("withembeddedtables", _withEmbeddedTables ? 1 : 0));
+            if (_adminOnly) parent.Add(new XElement("adminOnly"));
         }
     }
 }

@@ -8,7 +8,7 @@
 using System.IO;
 using System.Net;
 using System.Text;
-using System.Xml.XPath;
+using System.Xml.Linq;
 
 namespace Intuit.QuickBase.Core
 {
@@ -20,11 +20,13 @@ namespace Intuit.QuickBase.Core
 
         internal override void Post(IQObject qObject)
         {
-            var bytes = Encoding.UTF8.GetBytes(qObject.XmlPayload);
+            XElement parent = new XElement("qdbapi"); ;
+            qObject.BuildXmlPayload(ref parent);
+            var bytes = Encoding.UTF8.GetBytes(parent.ToString());
             Stream requestStream = null;
             WebResponse webResponse = null;
             Stream responseStream = null;
-            XPathDocument xml;
+            XElement xml;
 
             try
             {
@@ -42,7 +44,7 @@ namespace Intuit.QuickBase.Core
 
                 webResponse = request.GetResponse();
                 responseStream = webResponse.GetResponseStream();
-                xml = new XPathDocument(responseStream);
+                xml = XElement.Load(responseStream);
             }
             finally
             {
@@ -55,6 +57,6 @@ namespace Intuit.QuickBase.Core
             Response = xml;
         }
 
-        internal override XPathDocument Response { get; set; }
+        internal override XElement Response { get; set; }
     }
 }

@@ -38,12 +38,10 @@ namespace Intuit.QuickBase.Core.Payload
 
         private bool Jht { get; set; }
 
-        internal override string GetXmlPayload()
+        internal override void GetXmlPayload(ref XElement parent)
         {
-            var sb = new StringBuilder();
-            sb.Append(new XElement("rid", Rid));
-            if (Jht) sb.Append(new XElement("jht", 1));
-            return sb.ToString();
+            parent.Add(new XElement("rid", Rid));
+            if (Jht) parent.Add(new XElement("jht", 1));
         }
     }
 }
