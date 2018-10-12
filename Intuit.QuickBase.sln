@@ -1,14 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26430.14
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Library", "Library", "{2E052995-62F2-44FD-BD11-D481FB2C687C}"
-	ProjectSection(SolutionItems) = preProject
-		Library\nunit.framework.dll = Library\nunit.framework.dll
-		Library\Rhino.Mocks.dll = Library\Rhino.Mocks.dll
-	EndProjectSection
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Intuit.QuickBase.Client", "Intuit.QuickBase.Client\Intuit.QuickBase.Client.csproj", "{F25380B0-B55A-4567-941E-B938723F6E07}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Intuit.QuickBase.Core", "Intuit.QuickBase.Core\Intuit.QuickBase.Core.csproj", "{72AE7ED2-1321-499E-8E0E-ECFD91B8C850}"
