@@ -37,5 +37,11 @@ namespace Intuit.QuickBase.Client
             var recordFactory = QRecordFactory.GetInstance();
             return new QTable(columnFactory, recordFactory, application, tableId);
         }
+
+        internal override IQTable CreateInstanceLazy(IQApplication application, string tableId)
+        {
+            return new QTable(null, null, application, tableId);
+        }
+
     }
 }

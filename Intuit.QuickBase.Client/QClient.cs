@@ -40,7 +40,7 @@ namespace Intuit.QuickBase.Client
         public string AdminPassword { get; private set; }
         public string AccountDomain { get; private set; }
         public int Hours { get; private set; }
-        private QApplicationFactoryBase ApplicationFactory { get; set; }
+        private QApplicationFactoryBase ApplicationFactory { get; }
 
         private void Login()
         {

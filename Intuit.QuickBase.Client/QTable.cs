@@ -9,7 +9,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Xml.Linq;
 using Intuit.QuickBase.Core;
 using Intuit.QuickBase.Core.Exceptions;
@@ -19,11 +18,23 @@ namespace Intuit.QuickBase.Client
 {
     public class QTable : IQTable
     {
+        internal bool IsLoaded { get; private set; }
+
         // Constructors
         internal QTable(QColumnFactoryBase columnFactory, QRecordFactoryBase recordFactory, IQApplication application, string tableId)
         {
-            CommonConstruction(columnFactory, recordFactory, application, tableId);
-            Load();
+            if (columnFactory == null)
+            {
+                columnFactory = QColumnFactory.GetInstance();
+                recordFactory = QRecordFactory.GetInstance();
+                CommonConstruction(columnFactory, recordFactory, application, tableId);
+                IsLoaded = false;
+            }
+            else
+            {
+                CommonConstruction(columnFactory, recordFactory, application, tableId);
+                Load();
+            }
         }
 
         internal QTable(QColumnFactoryBase columnFactory, QRecordFactoryBase recordFactory, IQApplication application, string tableName, string pNoun)
@@ -39,6 +50,7 @@ namespace Intuit.QuickBase.Client
             RecordNames = pNoun;
             CommonConstruction(columnFactory, recordFactory, application, tableId);
             RefreshColumns(); //grab basic columns that QB automatically makes
+            IsLoaded = true;
         }
 
         private void CommonConstruction(QColumnFactoryBase columnFactory, QRecordFactoryBase recordFactory, IQApplication application, string tableId)
@@ -495,16 +507,20 @@ namespace Intuit.QuickBase.Client
 
                 var xml = csvUpload.Post();
 
-                IEnumerator<XElement> xNodes = xml.Element("rids").Elements("rid").GetEnumerator();
-                //set records as in server now
-                foreach (IQRecord rec in addList)
+                using (IEnumerator<XElement> xNodes = xml.Element("rids").Elements("rid").GetEnumerator())
                 {
-                    xNodes.MoveNext();
-                    ((IQRecord_int)rec).ForceUpdateState(Int32.Parse(xNodes.Current.Value)); //set in-memory recordid to new server value
-                }
-                foreach (IQRecord rec in modList)
-                {
-                    ((IQRecord_int)rec).ForceUpdateState();
+                    //set records as in server now
+                    foreach (IQRecord rec in addList)
+                    {
+                        xNodes.MoveNext();
+                        ((IQRecord_int) rec).ForceUpdateState(
+                            Int32.Parse(xNodes.Current.Value)); //set in-memory recordid to new server value
+                    }
+
+                    foreach (IQRecord rec in modList)
+                    {
+                        ((IQRecord_int) rec).ForceUpdateState();
+                    }
                 }
             }
             else
@@ -532,6 +548,7 @@ namespace Intuit.QuickBase.Client
         {
             TableName = GetTableInfo().DbName;
             RefreshColumns();
+            IsLoaded = true;
         }
 
         private void LoadRecords(XElement xml)
@@ -598,10 +615,7 @@ namespace Intuit.QuickBase.Client
                 Columns.Add(col);
             }
             var keyFidNode = xml.Element("table").Element("original").Element("key_fid");
-            if (keyFidNode != null)
-                KeyFID = Int32.Parse(keyFidNode.Value);
-            else
-                KeyFID = Columns.Find(c => c.ColumnType == FieldType.recordid).ColumnId;
+            KeyFID = keyFidNode != null ? Int32.Parse(keyFidNode.Value) : Columns.Find(c => c.ColumnType == FieldType.recordid).ColumnId;
             KeyCIdx = Columns.FindIndex(c => c.ColumnId == KeyFID);
         }
 

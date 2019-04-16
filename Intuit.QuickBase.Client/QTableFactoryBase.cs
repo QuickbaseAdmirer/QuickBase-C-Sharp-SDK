@@ -12,5 +12,7 @@ namespace Intuit.QuickBase.Client
         internal abstract IQTable CreateInstance(IQApplication application, string tableName, string pNoun);
 
         internal abstract IQTable CreateInstance(IQApplication application, string tableId);
+
+        internal abstract IQTable CreateInstanceLazy(IQApplication application, string tableId);
     }
 }

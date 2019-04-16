@@ -42,7 +42,7 @@ namespace Intuit.QuickBase.Client
         public string ApplicationId { get; private set; }
         public string ApplicationName { get; private set; }
         public string Token { get; private set; }
-        private QTableFactoryBase TableFactory { get; set; }
+        private QTableFactoryBase TableFactory { get; }
 
         // Methods
         public void Disconnect()
@@ -208,7 +208,9 @@ namespace Intuit.QuickBase.Client
 
         public IQTable GetTable(string dbid)
         {
-            return _qbDataTables.ContainsKey(dbid) ? _qbDataTables[dbid] : null;
+            QTable tbl = (QTable)(_qbDataTables.ContainsKey(dbid) ? _qbDataTables[dbid] : null);
+            if (!tbl.IsLoaded) tbl.Load();
+            return tbl;
         }
 
         public Dictionary<string, IQTable> GetTables()
@@ -268,7 +270,7 @@ namespace Intuit.QuickBase.Client
                 {
                     var tableName = dbinfo.Element("dbname").Value;
                     var tableDbid = dbinfo.Element("dbid").Value;
-                    if (grantedApps != null) grantedApps.AddTable(tableName, tableDbid);
+                    grantedApps?.AddTable(tableName, tableDbid);
                 }
             }
             return grantedAppsInfos;
@@ -288,7 +290,7 @@ namespace Intuit.QuickBase.Client
 
                 try
                 {
-                    var qDataTable = TableFactory.CreateInstance(this, dbid);
+                    var qDataTable = TableFactory.CreateInstanceLazy(this, dbid);
                     _qbDataTables.Add(qDataTable.TableId, qDataTable);
                 }
                 catch (InsufficientPermissionsException) { }
