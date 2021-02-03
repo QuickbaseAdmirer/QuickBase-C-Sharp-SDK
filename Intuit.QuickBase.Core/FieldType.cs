@@ -108,6 +108,11 @@ namespace Intuit.QuickBase.Core
         /// </summary>
         recordid,
 
+        /// <summary>
+        /// Multi-Select Text
+        /// </summary>
+        multitext,
+
         //TODO: not yet supported
         /// <summary>
         /// File Attachment

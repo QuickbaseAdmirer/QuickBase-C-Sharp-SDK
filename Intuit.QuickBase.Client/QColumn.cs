@@ -32,11 +32,12 @@ namespace Intuit.QuickBase.Client
             ColumnId = columnId;
         }
 
-        internal QColumn(int columnId, string columnName, FieldType columnType, bool columnVirtual, bool columnLookup, bool isHidden)
+        internal QColumn(int columnId, string columnName, FieldType columnType, bool columnVirtual, bool columnLookup, bool columnSummary, bool isHidden)
             : this(columnName, columnType)
         {
             ColumnVirtual = columnVirtual;
             ColumnLookup = columnLookup;
+            ColumnSummary = columnSummary;
             IsHidden = isHidden;
             ColumnId = columnId;
         }
@@ -46,6 +47,7 @@ namespace Intuit.QuickBase.Client
         public string ColumnName { get; set; }
         public FieldType ColumnType { get; set; }
         public bool ColumnVirtual { get; set; }
+        public bool ColumnSummary { get; set; }
         public bool IsHidden { get; set; }
         public bool ColumnLookup { get; set; }
         internal List<object> choices;

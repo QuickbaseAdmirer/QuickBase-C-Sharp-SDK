@@ -159,6 +159,8 @@ namespace Intuit.QuickBase.Client
                 }
                 else
                 {
+                    if (Column.ColumnSummary)
+                        throw new ArgumentException("Cannot set values of summary fields.");
                     if (_value == null || !_value.Equals(value))
                     {
                         UncleanText = false;

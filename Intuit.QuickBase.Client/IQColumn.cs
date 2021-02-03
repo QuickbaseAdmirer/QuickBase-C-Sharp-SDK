@@ -19,6 +19,7 @@ namespace Intuit.QuickBase.Client
         string ColumnName { get; set; }
         FieldType ColumnType { get; set; }
         bool ColumnVirtual { get; set; }
+        bool ColumnSummary { get; set; }
         bool IsHidden { get; set; }
         bool ColumnLookup { get; set; }
         string CurrencySymbol { get; set; }

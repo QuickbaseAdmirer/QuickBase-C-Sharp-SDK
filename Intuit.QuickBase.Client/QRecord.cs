@@ -239,6 +239,7 @@ namespace Intuit.QuickBase.Client
             RecordState = RecordState.Unchanged;
             IsOnServer = true;
             RecordId = recId;
+            //Todo: update 'Record ID#' field if it exists
         }
 
         public void ForceUpdateState()
