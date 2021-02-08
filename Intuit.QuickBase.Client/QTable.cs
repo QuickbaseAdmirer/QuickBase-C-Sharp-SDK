@@ -208,19 +208,18 @@ namespace Intuit.QuickBase.Client
                 if (argCnt < 100) //We've no idea how to split this, apparently...
                     throw;
                 if (args[0].StartsWith("{")) args[0] = args[0].Substring(1); //remove leading {
-                if (args[argCnt = 1].EndsWith("}")) args[argCnt - 1] = args[argCnt - 1].Substring(0, args[argCnt - 1].Length - 1); // remove trailing }
+                if (args[argCnt - 1].EndsWith("}")) args[argCnt - 1] = args[argCnt - 1].Substring(0, args[argCnt - 1].Length - 1); // remove trailing }
+                if (args[argCnt - 1].EndsWith("}OR")) args[argCnt - 1] = args[argCnt - 1].Substring(0, args[argCnt - 1].Length - 3); // remove trailing }OR
                 int sentArgs = 0;
                 while (sentArgs < argCnt)
                 {
                     int useArgs = Math.Min(99, argCnt - sentArgs);
                     string[] argsToSend = args.Skip(sentArgs).Take(useArgs).ToArray();
                     string sendQuery = "{" + string.Join("}OR{", argsToSend) + "}";
-                    DoQuery dqry = new DoQuery.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
-                        .SetQuery(sendQuery)
-                        .SetCList(qry.Collist)
-                        .SetOptions(qry.Options)
-                        .SetFmt(true)
-                        .Build();
+                    DoQuery.Builder qBuild = new DoQuery.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId).SetQuery(sendQuery).SetFmt(true);
+                    if (!string.IsNullOrEmpty(qry.Collist)) qBuild = qBuild.SetCList(qry.Collist);
+                    if (!string.IsNullOrEmpty(qry.Options)) qBuild = qBuild.SetOptions(qry.Options);
+                    DoQuery dqry = qBuild.Build();
                     var xml = dqry.Post();
                     if (sentArgs == 0) LoadColumns(xml);
                     LoadRecords(xml);
@@ -258,12 +257,9 @@ namespace Intuit.QuickBase.Client
                 {
                     DoQueryCount dqryCnt;
                     if (string.IsNullOrEmpty(query))
-                        dqryCnt = new DoQueryCount.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
-                            .Build();
+                        dqryCnt = new DoQueryCount.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId).Build();
                     else
-                        dqryCnt = new DoQueryCount.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
-                            .SetQuery(query)
-                            .Build();
+                        dqryCnt = new DoQueryCount.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId).SetQuery(query).Build();
                     var cntXml = dqryCnt.Post();
                     maxCount = int.Parse(cntXml.Element("numMatches").Value);
                 }
@@ -480,24 +476,24 @@ namespace Intuit.QuickBase.Client
         {
             Records.RemoveRecords();
             //optimize record uploads
-            List<IQRecord> addList = Records.Where(record => record.RecordState == RecordState.New && record.UncleanState == false).ToList();
-            List<IQRecord> modList = Records.Where(record => record.RecordState == RecordState.Modified && record.UncleanState == false).ToList();
-            List<IQRecord> uncleanList = Records.Where(record => record.UncleanState).ToList();
-            int acnt = addList.Count;
-            int mcnt = modList.Count;
+            List<IQRecord> addRecs = Records.Where(record => record.RecordState == RecordState.New && record.UncleanState == false).ToList();
+            List<IQRecord> modRecs = Records.Where(record => record.RecordState == RecordState.Modified && record.UncleanState == false).ToList();
+            List<IQRecord> uncleanRecs = Records.Where(record => record.UncleanState).ToList();
+            int acnt = addRecs.Count();
+            int mcnt = modRecs.Count();
             bool hasFileColumn = Columns.Any(c => c.ColumnType == FieldType.file);
             if (!hasFileColumn && ((acnt + mcnt) > 0))  // if no file-type columns involved, use csv upload method for reducing API calls and speeding processing.
             {
                 List<String> csvLines = new List<string>(acnt + mcnt);
-                String colList = String.Join(".", KeyFID == -1 ? Columns.Where(col => (col.ColumnVirtual == false && col.ColumnLookup == false) || col.ColumnType == FieldType.recordid).Select(col => col.ColumnId.ToString())
-                                                             : Columns.Where(col => (col.ColumnVirtual == false && col.ColumnLookup == false) || col.ColumnId == KeyFID).Select(col => col.ColumnId.ToString()));
+                String colList = String.Join(".", KeyFID == -1 ? Columns.Where(col => (col.ColumnVirtual == false && col.ColumnLookup == false && col.ColumnSummary == false) || col.ColumnType == FieldType.recordid).Select(col => col.ColumnId.ToString())
+                                                             : Columns.Where(col => (col.ColumnVirtual == false && col.ColumnLookup == false && col.ColumnSummary == false) || col.ColumnId == KeyFID).Select(col => col.ColumnId.ToString()));
                 if (acnt > 0)
                 {
-                    csvLines.AddRange(addList.Select(record => record.GetAsCSV(colList)));
+                    csvLines.AddRange(addRecs.Select(record => record.GetAsCSV(colList)));
                 }
                 if (mcnt > 0)
                 {
-                    csvLines.AddRange(modList.Select(record => record.GetAsCSV(colList)));
+                    csvLines.AddRange(modRecs.Select(record => record.GetAsCSV(colList)));
                 }
                 var csvBuilder = new ImportFromCSV.Builder(Application.Client.Ticket, Application.Token,
                     Application.Client.AccountDomain, TableId, String.Join("\r\n", csvLines.ToArray()));
@@ -507,20 +503,20 @@ namespace Intuit.QuickBase.Client
 
                 var xml = csvUpload.Post();
 
-                XElement xRids = xml.Element("rids");
-                if (xRids != null)
+                if (acnt > 0) // set in-memory recordId with server value for all newly added values
                 {
+                    XElement xRids = xml.Element("rids");
                     using (IEnumerator<XElement> xNodes = xRids.Elements("rid").GetEnumerator())
                     {
                         //set records as in server now
-                        foreach (IQRecord rec in addList)
+                        foreach (IQRecord rec in addRecs)
                         {
                             xNodes.MoveNext();
                             ((IQRecord_int) rec).ForceUpdateState(
-                                Int32.Parse(xNodes.Current.Value)); //set in-memory recordid to new server value
+                                Int32.Parse(xNodes.Current.Value));
                         }
 
-                        foreach (IQRecord rec in modList)
+                        foreach (IQRecord rec in modRecs)
                         {
                             ((IQRecord_int) rec).ForceUpdateState();
                         }
@@ -529,12 +525,12 @@ namespace Intuit.QuickBase.Client
             }
             else
             {
-                foreach (IQRecord rec in addList)
+                foreach (IQRecord rec in addRecs)
                     rec.AcceptChanges();
-                foreach (IQRecord rec in modList)
+                foreach (IQRecord rec in modRecs)
                     rec.AcceptChanges();
             }
-            foreach (IQRecord rec in uncleanList)
+            foreach (IQRecord rec in uncleanRecs)
                 rec.AcceptChanges();
         }
 
@@ -590,6 +586,8 @@ namespace Intuit.QuickBase.Client
                     lookup = mode == "lookup";
                     summary = mode == "summary";
                 }
+
+                bool allowHTML = columnNode.Element("allowHTML")?.Value == "1";
                 IQColumn col = ColumnFactory.CreateInstance(columnId, label, type, virt, lookup, summary, hidden);
                 if (columnNode.Element("choices") != null)
                 {

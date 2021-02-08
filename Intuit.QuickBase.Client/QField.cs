@@ -6,9 +6,7 @@
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
 using System;
-using System.CodeDom;
 using System.Collections.Generic;
-using System.IO;
 using System.Text.RegularExpressions;
 using Intuit.QuickBase.Core;
 
@@ -169,8 +167,8 @@ namespace Intuit.QuickBase.Client
                         {
                             case FieldType.address:
                                 if (value.GetType() != typeof (QAddress))
-                                    throw new ArgumentException("Can't supply type of " + value.GetType() + " to a " +
-                                                                this.Type.ToString() + " field.");
+                                    throw new ArgumentException(
+                                        $"Can't supply type of {value.GetType()} to a {this.Type} field.");
                                 Dictionary<string, int> colDict = ((IQColumn_int) Column).GetComposites();
                                 Record[colDict["street"]] = ((QAddress) value).Line1;
                                 Record[colDict["street2"]] = ((QAddress) value).Line2;
@@ -181,26 +179,23 @@ namespace Intuit.QuickBase.Client
                                 break;
                             case FieldType.rating:
                                 if (value.GetType() != typeof(float) || (float) value < 0 || (float) value > 5)
-                                    throw new ArgumentException("Invalid value for 'rating' fieldtype");
+                                    throw new ArgumentException("Invalid value for 'rating' field.");
                                 _value = value;
                                 break;
                             case FieldType.date:
                                 if (value.GetType() != typeof(DateTime))
-                                    throw new ArgumentException("Can't supply type of " + value.GetType() + " to a " +
-                                                                this.Type.ToString() + " field.");
+                                    throw new ArgumentException($"Can't supply type of {value.GetType()} to a {this.Type} field.");
                                 _value = ((DateTime) value).Date;
                                 break;
                             case FieldType.timestamp:
                                 if (value.GetType() != typeof(DateTime))
-                                    throw new ArgumentException("Can't supply type of " + value.GetType() + " to a " +
-                                                                this.Type.ToString() + " field.");
+                                    throw new ArgumentException($"Can't supply type of {value.GetType()} to a {this.Type} field.");
                                 _value = value;
                                 break;
                             case FieldType.duration:
                             case FieldType.timeofday:
                                 if (value.GetType() != typeof(TimeSpan))
-                                    throw new ArgumentException("Can't supply type of " + value.GetType() + " to a " +
-                                                                this.Type.ToString() + " field.");
+                                    throw new ArgumentException($"Can't supply type of {value.GetType()} to a {this.Type} field.");
                                 _value = value;
                                 break;
                             case FieldType.@float:
@@ -209,29 +204,22 @@ namespace Intuit.QuickBase.Client
                                 decimal? val = value as decimal?;
                                 Int32? val2 = value as Int32?;
                                 if (val == null && val2 == null)
-                                    throw new ArgumentException("Can't supply type of " + value.GetType() + " to a " +
-                                                                this.Type.ToString() + " field.");
-                                if (val.HasValue)
-                                    _value = val.Value;
-                                else
-                                    _value = val2.Value;
+                                    throw new ArgumentException($"Can't supply type of {value.GetType()} to a {this.Type} field.");
+                                _value = val.HasValue ? val.Value : val2.Value;
                                 break;
                             case FieldType.checkbox:
                                 if (value.GetType() != typeof(bool))
-                                    throw new ArgumentException("Can't supply type of " + value.GetType() + " to a " +
-                                                                this.Type.ToString() + " field.");
+                                    throw new ArgumentException($"Can't supply type of {value.GetType()} to a {this.Type} field.");
                                 _value = value;
                                 break;
                             case FieldType.recordid:
                                 if (value.GetType() != typeof(int?))
-                                   throw new ArgumentException("Can't supply type of " + value.GetType() + " to a " +
-                                                               this.Type.ToString() + " field.");
+                                   throw new ArgumentException($"Can't supply type of {value.GetType()} to a {this.Type} field.");
                                 _value = value;
                                 break;
                             default:
                                 if (value.GetType() != typeof(string))
-                                    throw new ArgumentException("Can't supply type of " + value.GetType() + " to a " +
-                                                                this.Type.ToString() + " field.");
+                                    throw new ArgumentException($"Can't supply type of {value.GetType()} to a {this.Type} field.");
                                 if (Type == FieldType.text)
                                     UncleanText = CSVUncleanRegEx.IsMatch((string)value);
                                 _value = value;

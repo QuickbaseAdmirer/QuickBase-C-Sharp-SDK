@@ -157,51 +157,62 @@ namespace Intuit.QuickBase.Client
 
         public void AcceptChanges()
         {
-            var fieldsToPost = new List<IField>();
-
-            if(RecordState == RecordState.Modified)
+            List<IField> fieldsToPost = null;
+            switch (RecordState)
             {
-                foreach (var field in _fields)
-                {
-                    if (field.Column.ColumnLookup) continue; //don't try to update values that are results of lookups
-                    if (field.Update)
+                case RecordState.Modified:
+                    fieldsToPost = new List<IField>();
+                    foreach (var field in _fields)
                     {
+                        if (field.Column.ColumnLookup || field.Column.ColumnSummary || field.Column.ColumnVirtual)
+                            continue; //don't try to update values that are results of lookups
+                        if (field.Update)
+                        {
+                            IField qField = new Field(field.FieldId, field.Type, field.QBValue);
+                            if (field.Type == FieldType.file)
+                            {
+                                qField.File = field.FullName;
+                            }
+
+                            fieldsToPost.Add(qField);
+                            field.Update = false;
+                        }
+                    }
+
+                    var editBuilder = new EditRecord.Builder(Application.Client.Ticket, Application.Token,
+                        Application.Client.AccountDomain, Table.TableId, RecordId, fieldsToPost);
+                    editBuilder.SetTimeInUtc(true);
+                    var editRecord = editBuilder.Build();
+                    editRecord.Post();
+                    RecordState = RecordState.Unchanged;
+                    break;
+
+                case RecordState.New:
+                    fieldsToPost = new List<IField>();
+                    foreach (var field in _fields)
+                    {
+                        if (field.Column.ColumnLookup || field.Column.ColumnSummary || field.Column.ColumnVirtual)
+                            continue; //don't try to update values that are results of lookups
                         IField qField = new Field(field.FieldId, field.Type, field.QBValue);
-                        if(field.Type == FieldType.file)
+                        if (field.Type == FieldType.file)
                         {
                             qField.File = field.FullName;
                         }
-                        fieldsToPost.Add(qField);
-                        field.Update = false;
-                    }
-                }
-                var editBuilder = new EditRecord.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, Table.TableId, RecordId, fieldsToPost);
-                editBuilder.SetTimeInUtc(true);
-                var editRecord = editBuilder.Build();
-                editRecord.Post();
-                RecordState = RecordState.Unchanged;
-            }
-            else if(RecordState == RecordState.New)
-            {
-                foreach (var field in _fields)
-                {
-                    if (field.Column.ColumnLookup) continue; //don't try to update values that are results of lookups
-                    IField qField = new Field(field.FieldId, field.Type, field.QBValue);
-                    if (field.Type == FieldType.file)
-                    {
-                        qField.File = field.FullName;
-                    }
-                    fieldsToPost.Add(qField);
-                }
-                var addBuilder = new AddRecord.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, Table.TableId, fieldsToPost);
-                addBuilder.SetTimeInUtc(true);
-                var addRecord = addBuilder.Build();
-                RecordState = RecordState.Unchanged;
 
-                var xml = addRecord.Post();
-                RecordId = int.Parse(xml.Element("rid").Value);
-                RecordState = RecordState.Unchanged;
-                IsOnServer = true;
+                        fieldsToPost.Add(qField);
+                    }
+
+                    var addBuilder = new AddRecord.Builder(Application.Client.Ticket, Application.Token,
+                        Application.Client.AccountDomain, Table.TableId, fieldsToPost);
+                    addBuilder.SetTimeInUtc(true);
+                    var addRecord = addBuilder.Build();
+                    RecordState = RecordState.Unchanged;
+
+                    var xml = addRecord.Post();
+                    RecordId = int.Parse(xml.Element("rid").Value);
+                    RecordState = RecordState.Unchanged;
+                    IsOnServer = true;
+                    break;
             }
         }
 
