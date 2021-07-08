@@ -5,7 +5,7 @@
  * which accompanies this distribution, and is available at
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
-using System.Xml.XPath;
+using System.Xml.Linq;
 
 namespace Intuit.QuickBase.Client
 {
@@ -13,27 +13,39 @@ namespace Intuit.QuickBase.Client
     {
         string TableName { get; }
         string TableId { get; }
+        int KeyFID { get; }
+        int KeyCIdx { get; }
         QRecordCollection Records { get; }
         QColumnCollection Columns { get; }
         void Clear();
+        string GenCsv();
         string GenCsv(int queryId);
-        XPathDocument GetTableSchema();
+        string GenCsv(Query query);
+        string GenHtml(string options = "", string colList = "a");
+        string GenHtml(int queryId, string options = "", string colList = "a");
+        string GenHtml(Query query, string options = "", string colList = "a");
+        XElement GetTableSchema();
         TableInfo GetTableInfo();
         int GetServerRecordCount();
-        void Query();
-        void Query(int[] clist);
-        void Query(int[] clist, string options);
-        void Query(Query query);
-        void Query(Query query, int[] clist);
-        void Query(Query query, int[] clist, int[] slist);
-        void Query(Query query, int[] clist, int[] slist, string options);
-        void Query(int queryId);
+        void Query(bool clearRecords = true);
+        void Query(string options, bool clearRecords = true);
+        void Query(int[] colList, bool clearRecords = true);
+        void Query(int[] colList, string options, bool clearRecords = true);
+        void Query(Query query, bool clearRecords = true);
+        void Query(Query query, string options, bool clearRecords = true);
+        void Query(Query query, int[] colList, bool clearRecords = true);
+        void Query(Query query, int[] colList, int[] sortList, bool clearRecords = true);
+        void Query(Query query, int[] colList, int[] sortList, string options, bool clearRecords = true);
+        void Query(int queryId, bool clearRecords = true);
+        void Query(int queryId, string options, bool clearRecords = true);
         int QueryCount(Query query);
         int QueryCount(int queryId);
         void PurgeRecords();
         void PurgeRecords(int queryId);
+        void PurgeRecords(Query query);
         void AcceptChanges();
         IQRecord NewRecord();
+        void RefreshColumns();
         string ToString();
     }
 }

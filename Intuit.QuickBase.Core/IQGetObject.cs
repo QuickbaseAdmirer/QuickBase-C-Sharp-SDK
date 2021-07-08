@@ -5,7 +5,7 @@
  * which accompanies this distribution, and is available at
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
-using System.Xml.XPath;
+using System.Xml.Linq;
 
 namespace Intuit.QuickBase.Core
 {
@@ -14,6 +14,6 @@ namespace Intuit.QuickBase.Core
         void AddParameter(string name, string value);
         System.Uri Uri { get; }
         string Action { get; }
-        XPathDocument Get();
+        XElement Get();
     }
 }

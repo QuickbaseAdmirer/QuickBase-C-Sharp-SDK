@@ -9,7 +9,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Text;
-using System.Xml.XPath;
+using System.Xml.Linq;
 
 namespace Intuit.QuickBase.Core
 {
@@ -21,7 +21,9 @@ namespace Intuit.QuickBase.Core
 
         internal override void Post(IQObject apiAction)
         {
-            var bytes = Encoding.UTF8.GetBytes(apiAction.XmlPayload);
+            XElement parent = new XElement("qdbapi");
+            apiAction.BuildXmlPayload(ref parent);
+            var bytes = Encoding.UTF8.GetBytes(parent.ToString());
             Stream requestStream = null;
             WebResponse webResponse = null;
             Stream responseStream = null;
@@ -51,10 +53,9 @@ namespace Intuit.QuickBase.Core
                 if (responseStream != null) responseStream.Close();
                 if (webResponse != null) webResponse.Close();
             }
-            var xml = new StringReader(String.Format("<?xml version=\"1.0\"?><response_data><![CDATA[{0}]]></response_data>", text));
-            Response = new XPathDocument(xml);
+            Response = XElement.Parse("<?xml version=\"1.0\"?><response_data><![CDATA[" + text + "]]></response_data>");
         }
 
-        internal override XPathDocument Response { get; set; }
+        internal override XElement Response { get; set; }
     }
 }

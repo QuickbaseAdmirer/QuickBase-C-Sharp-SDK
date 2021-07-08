@@ -6,7 +6,7 @@
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
 using System;
-using System.Xml.XPath;
+using System.Xml.Linq;
 using Intuit.QuickBase.Core.Payload;
 using Intuit.QuickBase.Core.Uri;
 
@@ -25,6 +25,9 @@ namespace Intuit.QuickBase.Core
         private const string QUICKBASE_ACTION = "API_DoQuery";
         private readonly Payload.Payload _doQueryPayload;
         private readonly IQUri _uri;
+        private readonly string _options;
+        private readonly string _query;
+        private readonly string _collist;
 
         public class Builder
         {
@@ -125,18 +128,33 @@ namespace Intuit.QuickBase.Core
                 .SetFmt(builder.Fmt)
                 .SetOptions(builder.Options)
                 .Build();
+            _options = builder.Options;
+            _query = builder.Query;
+            _collist = builder.CList;
             _doQueryPayload = new ApplicationTicket(_doQueryPayload, builder.Ticket);
             _doQueryPayload = new ApplicationToken(_doQueryPayload, builder.AppToken);
             _doQueryPayload = new WrapPayload(_doQueryPayload);
             _uri = new QUriDbid(builder.AccountDomain, builder.Dbid);
         }
 
-        public string XmlPayload
+        public string Options
         {
-            get
-            {
-                return _doQueryPayload.GetXmlPayload();
-            }
+            get { return _options; }
+        }
+
+        public string Query
+        {
+            get { return _query; }
+        }
+
+        public string Collist
+        {
+           get { return _collist; }
+        }
+
+        public void BuildXmlPayload(ref XElement parent)
+        {
+            _doQueryPayload.GetXmlPayload(ref parent);
         }
 
         public System.Uri Uri
@@ -155,7 +173,7 @@ namespace Intuit.QuickBase.Core
             }
         }
 
-        public XPathDocument Post()
+        public XElement Post()
         {
             HttpPost httpXml = new HttpPostXml();
             httpXml.Post(this);

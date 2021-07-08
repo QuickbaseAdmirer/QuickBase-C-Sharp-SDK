@@ -7,6 +7,7 @@
  */
 using System;
 using System.Text;
+using System.Xml.Linq;
 
 namespace Intuit.QuickBase.Core.Payload
 {
@@ -46,12 +47,11 @@ namespace Intuit.QuickBase.Core.Payload
 
         private bool CreateAppToken { get; set; }
 
-        internal override string GetXmlPayload()
+        internal override void GetXmlPayload(ref XElement parent)
         {
-            var xmlData = new StringBuilder();
-            xmlData.Append(String.Format("<dbname>{0}</dbname><dbdesc>{1}</dbdesc>", DbName, DBDesc));
-            xmlData.Append(CreateAppToken ? "<createapptoken>1</createapptoken>" : String.Empty);
-            return xmlData.ToString();
+            parent.Add(new XElement("dbname", DbName));
+            parent.Add(new XElement("dbdesc", DBDesc));
+            if (CreateAppToken) parent.Add(new XElement("createapptoken", 1));
         }
     }
 }

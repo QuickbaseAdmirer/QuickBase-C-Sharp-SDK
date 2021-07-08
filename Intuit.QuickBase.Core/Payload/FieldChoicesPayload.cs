@@ -8,6 +8,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml.Linq;
 
 namespace Intuit.QuickBase.Core.Payload
 {
@@ -42,15 +43,13 @@ namespace Intuit.QuickBase.Core.Payload
             }
         }
 
-        internal override string GetXmlPayload()
+        internal override void GetXmlPayload(ref XElement parent)
         {
-            var sb = new StringBuilder();
-            sb.Append(String.Format("<fid>{0}</fid>", Fid));
+            parent.Add(new XElement("fid", Fid));
             foreach(var choice in Choices)
             {
-                sb.Append(String.Format("<choice>{0}</choice>", choice));
+                parent.Add(new XElement("choice", choice));
             }
-            return sb.ToString();
         }
     }
 }

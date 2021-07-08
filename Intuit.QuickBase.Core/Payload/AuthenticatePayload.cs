@@ -7,6 +7,8 @@
  */
 using System;
 using System.Text;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace Intuit.QuickBase.Core.Payload
 {
@@ -60,13 +62,11 @@ namespace Intuit.QuickBase.Core.Payload
             }
         }
 
-        internal override string GetXmlPayload()
+        internal override void GetXmlPayload(ref XElement parent)
         {
-            var sb = new StringBuilder();
-            sb.Append(String.Format("<username>{0}</username><password>{1}</password>",
-                Username, Password));
-            sb.Append(Hours > 0 ? String.Format("<hours>{0}</hours>", Hours) : String.Empty);
-            return sb.ToString();
+            parent.Add(new XElement("username", Username));
+            parent.Add(new XElement("password", Password));
+            if (Hours > 0) parent.Add(new XElement("hours", Hours));
         }
     }
 }

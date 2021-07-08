@@ -6,9 +6,11 @@
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
 using System;
+using System.Runtime.Serialization;
 
 namespace Intuit.QuickBase.Core.Exceptions
 {
+    [Serializable]
     public class NotAllowedToCreateApplicationException : Exception
     {
         public NotAllowedToCreateApplicationException() { }
@@ -19,5 +21,12 @@ namespace Intuit.QuickBase.Core.Exceptions
         }
 
         public new string Message { get; set; }
+
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            base.GetObjectData(info, context);
+
+            info.AddValue("Message", Message);
+        }
     }
 }

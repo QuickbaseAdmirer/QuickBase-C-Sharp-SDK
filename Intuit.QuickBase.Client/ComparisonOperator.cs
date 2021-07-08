@@ -68,6 +68,14 @@ namespace Intuit.QuickBase.Client
         ///<summary>
         /// Is greater than or equal to
         ///</summary>
-        GTE
+        GTE,
+        /// <summary>
+        /// Is in range
+        /// </summary>
+        IR,
+        /// <summary>
+        /// Is not in range
+        /// </summary>
+        XIR
     }
 }

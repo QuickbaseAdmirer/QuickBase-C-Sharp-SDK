@@ -7,7 +7,7 @@
  */
 using System;
 using System.Collections.Generic;
-using System.Xml.XPath;
+using System.Xml.Linq;
 using Intuit.QuickBase.Core.Uri;
 
 namespace Intuit.QuickBase.Core
@@ -52,7 +52,7 @@ namespace Intuit.QuickBase.Core
             }
         }
 
-        public XPathDocument Get()
+        public XElement Get()
         {
             return new Http().Get(this);
         }

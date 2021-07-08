@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Xml.Linq;
 
 namespace Intuit.QuickBase.Core.Payload
 {
@@ -16,6 +17,7 @@ namespace Intuit.QuickBase.Core.Payload
     {
         private readonly List<IField> _fields;
         private readonly bool _disprec;
+        private readonly bool _timeInUtc;
         private readonly bool _fform;
 
         internal class Builder
@@ -31,6 +33,13 @@ namespace Intuit.QuickBase.Core.Payload
             internal Builder SetDisprec(bool val)
             {
                 Disprec = val;
+                return this;
+            }
+
+            internal bool TimeInUtc { get; private set; }
+            internal Builder SetTimeInUtc(bool val)
+            {
+                TimeInUtc = val;
                 return this;
             }
 
@@ -51,30 +60,31 @@ namespace Intuit.QuickBase.Core.Payload
         {
             _fields = builder.Fields;
             _disprec = builder.Disprec;
+            _timeInUtc = builder.TimeInUtc;
             _fform = builder.Fform;
         }
 
-        internal override string GetXmlPayload()
+        internal override void GetXmlPayload(ref XElement parent)
         {
-            var sb = new StringBuilder();
             foreach (var field in _fields)
             {
                 if (field.Type == FieldType.file)
                 {
-                    sb.Append(String.Format(
-                        "<field fid=\"{0}\" filename=\"{1}\">{2}</field>",
-                        field.Fid, field.Value, EncodeFile(field.File)));
+                    XElement xelm = new XElement("field", EncodeFile(field.File));
+                    xelm.SetAttributeValue("fid", field.Fid);
+                    xelm.SetAttributeValue("filename", field.Value);
+                    parent.Add(xelm);
                 }
                 else
                 {
-                    sb.Append(String.Format(
-                        "<field fid=\"{0}\">{1}</field>",
-                        field.Fid, field.Value));
+                    XElement xelm = new XElement("field", field.Value);
+                    xelm.SetAttributeValue("fid", field.Fid);
+                    parent.Add(xelm);
                 }
             }
-            sb.Append(_disprec ? "<disprec/>" : String.Empty);
-            sb.Append(_fform ? "<fform/>" : String.Empty);
-            return sb.ToString();
+            if (_disprec) parent.Add(new XElement("disprec"));
+            if (_timeInUtc) parent.Add(new XElement("msInUTC", 1));
+            if (_fform) parent.Add(new XElement("fform"));
         }
 
         private static string EncodeFile(string file)

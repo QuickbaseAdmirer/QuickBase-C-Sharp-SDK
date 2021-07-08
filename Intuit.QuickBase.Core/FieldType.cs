@@ -44,11 +44,6 @@ namespace Intuit.QuickBase.Core
         email,
 
         /// <summary>
-        /// File Attachment
-        /// </summary>
-        file,
-
-        /// <summary>
         /// Float
         /// </summary>
         @float,
@@ -58,6 +53,11 @@ namespace Intuit.QuickBase.Core
         /// </summary>
         currency,
 
+        /// <summary>
+        /// Percent
+        /// </summary>
+        percent,
+        
         /// <summary>
         /// Rating
         /// </summary>
@@ -74,6 +74,11 @@ namespace Intuit.QuickBase.Core
         text,
 
         /// <summary>
+        ///  DateTime
+        /// </summary>
+        timestamp,
+
+        /// <summary>
         /// Time Of Day
         /// </summary>
         timeofday,
@@ -83,13 +88,50 @@ namespace Intuit.QuickBase.Core
         /// </summary>
         url,
 
-        // TODO: To be deleted.
-        timestamp,
-        recordid,
+        /// <summary>
+        /// UserID
+        /// </summary>
         userid,
-        percent,
+
+        /// <summary>
+        /// Multi User Field
+        /// </summary>
+        multiuserid,
+
+        /// <summary>
+        /// address
+        /// </summary>
+        address,
+
+        /// <summary>
+        /// Record ID
+        /// </summary>
+        recordid,
+
+        /// <summary>
+        /// Multi-Select Text
+        /// </summary>
+        multitext,
+
+        //TODO: not yet supported
+        /// <summary>
+        /// File Attachment
+        /// </summary>
+        file,
+
+        /// <summary>
+        /// ICalendar entry
+        /// </summary>
         icalendarbutton,
+
+        /// <summary>
+        /// VCard package
+        /// </summary>
         vcardbutton,
+
+        /// <summary>
+        /// Project predecessor
+        /// </summary>
         predecessor
     }
 }

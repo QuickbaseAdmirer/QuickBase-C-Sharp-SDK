@@ -5,15 +5,16 @@
  * which accompanies this distribution, and is available at
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
-using System.Xml.XPath;
+
+using System.Xml.Linq;
 
 namespace Intuit.QuickBase.Core
 {
     public interface IQObject
     {
-        string XmlPayload { get; }
+        void BuildXmlPayload(ref XElement parent);
         System.Uri Uri { get; }
         string Action { get; }
-        XPathDocument Post();
+        XElement Post();
     }
 }
