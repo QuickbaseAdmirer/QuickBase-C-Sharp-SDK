@@ -157,7 +157,7 @@ namespace Intuit.QuickBase.Client
 
         public void AcceptChanges()
         {
-            List<IField> fieldsToPost = null;
+            List<IField> fieldsToPost;
             switch (RecordState)
             {
                 case RecordState.Modified:
@@ -236,7 +236,7 @@ namespace Intuit.QuickBase.Client
             return String.Join(",", csvList);
         }
 
-        private string CSVQuoter(string inStr)
+        private static string CSVQuoter(string inStr)
         {
             //if the string contains quote character(s), newlines or commas, surround the string with quotes, and double quotes if present
             if (inStr.Contains("\"") || inStr.Contains(",") || inStr.Contains("\n") || inStr.Contains("\r"))
@@ -317,14 +317,14 @@ namespace Intuit.QuickBase.Client
 
         public bool Equals(IQRecord record)
         {
-            if (ReferenceEquals(null, record)) return false;
+            if (record is null) return false;
             if (ReferenceEquals(this, record)) return true;
             return record.RecordId == RecordId;
         }
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != typeof (QRecord)) return false;
             return Equals((IQRecord) obj);
@@ -357,7 +357,7 @@ namespace Intuit.QuickBase.Client
                 var field = new QField(Columns[index].ColumnId, value, Columns[index].ColumnType, this, Columns[index], QBInternal);
                 _fields.Add(field);
             }
-            UncleanState = _fields.Any(f => f.UncleanText == true);
+            UncleanState = _fields.Any(f => f.UncleanText);
         }
 
         private void SetExistingField(int index, int fieldIndex, object value)

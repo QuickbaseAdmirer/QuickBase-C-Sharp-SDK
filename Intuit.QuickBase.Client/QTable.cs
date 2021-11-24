@@ -295,7 +295,7 @@ namespace Intuit.QuickBase.Client
                     }
                     catch (ViewTooLargeException)
                     {
-                        stride = stride / 2;
+                        stride /= 2;
                     }
                     catch (ApiRequestLimitExceededException ex)
                     {
@@ -475,12 +475,16 @@ namespace Intuit.QuickBase.Client
         public void AcceptChanges()
         {
             Records.RemoveRecords();
+            foreach (IQColumn_int col in Columns)
+            {
+                col.AcceptChanges(Application, TableId);
+            }
             //optimize record uploads
             List<IQRecord> addRecs = Records.Where(record => record.RecordState == RecordState.New && record.UncleanState == false).ToList();
             List<IQRecord> modRecs = Records.Where(record => record.RecordState == RecordState.Modified && record.UncleanState == false).ToList();
             List<IQRecord> uncleanRecs = Records.Where(record => record.UncleanState).ToList();
-            int acnt = addRecs.Count();
-            int mcnt = modRecs.Count();
+            int acnt = addRecs.Count;
+            int mcnt = modRecs.Count;
             bool hasFileColumn = Columns.Any(c => c.ColumnType == FieldType.file);
             if (!hasFileColumn && ((acnt + mcnt) > 0))  // if no file-type columns involved, use csv upload method for reducing API calls and speeding processing.
             {
@@ -603,7 +607,7 @@ namespace Intuit.QuickBase.Client
                                 value = choicenode.Value;
                                 break;
                         }
-                        ((IQColumn_int) col).AddChoice(value);
+                        ((IQColumn_int) col).AddChoice(value, true);
                     }
                 }
                 Dictionary<string, int> colComposites = ((IQColumn_int)col).GetComposites();

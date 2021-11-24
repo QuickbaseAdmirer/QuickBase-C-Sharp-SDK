@@ -7,8 +7,11 @@
  */
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using Intuit.QuickBase.Core;
+using Intuit.QuickBase.Core.Exceptions;
 
 namespace Intuit.QuickBase.Client
 {
@@ -73,6 +76,8 @@ namespace Intuit.QuickBase.Client
                         return ConvertTimeSpanToQBDuration((TimeSpan)_value);
                     case FieldType.checkbox:
                         return (bool)_value == true ? "1" : "0";
+                    case FieldType.multitext:
+                        return ConvertHashSetToQBMultiSelect((HashSet<int>)_value);
                     default:
                         return _value.ToString();
                 }
@@ -112,6 +117,9 @@ namespace Intuit.QuickBase.Client
                         break;
                     case FieldType.recordid:
                         _value = String.IsNullOrEmpty(value) ? new int?() : int.Parse(value);
+                        break;
+                    case FieldType.multitext:
+                        _value = String.IsNullOrEmpty(value) ? new HashSet<int>() : ConvertQBStringToHashSet(value);
                         break;
                     case FieldType.text:
                         _value = value;
@@ -157,8 +165,8 @@ namespace Intuit.QuickBase.Client
                 }
                 else
                 {
-                    if (Column.ColumnSummary)
-                        throw new ArgumentException("Cannot set values of summary fields.");
+                    if (Column.ColumnSummary || Column.ColumnVirtual || Column.ColumnLookup)
+                        throw new ArgumentException("Cannot set values of summary, virtual or lookup fields.");
                     if (_value == null || !_value.Equals(value))
                     {
                         UncleanText = false;
@@ -205,7 +213,7 @@ namespace Intuit.QuickBase.Client
                                 Int32? val2 = value as Int32?;
                                 if (val == null && val2 == null)
                                     throw new ArgumentException($"Can't supply type of {value.GetType()} to a {this.Type} field.");
-                                _value = val.HasValue ? val.Value : val2.Value;
+                                _value = val ?? val2.Value;
                                 break;
                             case FieldType.checkbox:
                                 if (value.GetType() != typeof(bool))
@@ -215,6 +223,11 @@ namespace Intuit.QuickBase.Client
                             case FieldType.recordid:
                                 if (value.GetType() != typeof(int?))
                                    throw new ArgumentException($"Can't supply type of {value.GetType()} to a {this.Type} field.");
+                                _value = value;
+                                break;
+                            case FieldType.multitext:
+                                if (value.GetType() != typeof(HashSet<int>))
+                                    throw new ArgumentException($"Can't supply type of {value.GetType()} to a {this.Type} field.");
                                 _value = value;
                                 break;
                             default:
@@ -237,14 +250,14 @@ namespace Intuit.QuickBase.Client
 
         public bool Equals(QField other)
         {
-            if (ReferenceEquals(null, other)) return false;
+            if (other is null) return false;
             if (ReferenceEquals(this, other)) return true;
             return other.FieldId == FieldId;
         }
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != typeof (QField)) return false;
             return Equals((QField) obj);
@@ -295,6 +308,58 @@ namespace Intuit.QuickBase.Client
         private static string ConvertTimeSpanToQBDuration(TimeSpan inTime)
         {
             return (inTime.TotalSeconds).ToString();
+        }
+
+        private HashSet<int> ConvertQBStringToHashSet(string value)
+        {
+            HashSet<int> retVal = new HashSet<int>();
+            string[] vals = value.Split(';');
+            List<object> optionList = Column.GetChoices();
+            if (optionList == null)
+                throw new InvalidChoiceException($"No options in field {Column.ColumnName}");
+            foreach (string val in vals)
+            {
+                bool found = false;
+                for (int i = 0; i < optionList.Count; i++)
+                {
+                    if (optionList[i].Equals(val))
+                    {
+                        retVal.Add(i);
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found)
+                {
+                    //if (Column.ColumnSummary || Column.ColumnLookup )
+                    //{
+                    //    /// QB doesn't send options for summary or lookup fields
+                    //    ((IQColumn_int)Column).AddChoice(val, true);
+                    //    retVal.Add(optionList.Count);
+                    //    optionList = Column.GetChoices();
+                    //}
+                    //else
+                    //    throw new InvalidChoiceException($"Specified multitext option '{val}' not found in field {Column.ColumnName} in record downloaded from QB?");
+
+                    //fixme:?? for now, even if QB sends us a list of options, add anything that came from QB as an option too.
+                    ((IQColumn_int)Column).AddChoice(val, true);
+                    retVal.Add(optionList.Count);
+                    optionList = Column.GetChoices();
+                }
+            }
+            return retVal;
+        }
+
+        private string ConvertHashSetToQBMultiSelect(HashSet<int> value)
+        {
+            List<object> optList = Column.GetChoices();
+            List<string> strList = new List<string>();
+            foreach (int i in value)
+            {
+                strList.Add(optList[i].ToString());
+            }
+            return string.Join(";", strList);
         }
     }
 }

@@ -27,12 +27,14 @@ namespace Intuit.QuickBase.Client
         bool Equals(object obj);
         int GetHashCode();
         string ToString();
-        object[] GetChoices();
+        List<object> GetChoices();
+        void AddChoice(object obj);
     }
 
     internal interface IQColumn_int
     {
-        void AddChoice(object obj);
+        void AcceptChanges(IQApplication Application, string tbid);
+        void AddChoice(object obj, bool onServer);
         Dictionary<string,int> GetComposites(); 
     }
 }

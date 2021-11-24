@@ -7,16 +7,30 @@
  */
 
 using System.Collections.Generic;
+using System.Linq;
 using Intuit.QuickBase.Core;
+using Intuit.QuickBase.Core.Exceptions;
 
 namespace Intuit.QuickBase.Client
 {
     public class QColumn : IQColumn, IQColumn_int
     {
+        internal class Choice
+        {
+            public object value;
+            public bool inServer;
+
+            internal Choice(object obj, bool inServ)
+            {
+                value = obj;
+                inServer = inServ;
+            }
+        }
+
         // Constructors
         internal QColumn()
         {
-            choices = new List<object>();
+            choices = new List<Choice>();
             composites = new Dictionary<string, int>();
         }
 
@@ -50,21 +64,21 @@ namespace Intuit.QuickBase.Client
         public bool ColumnSummary { get; set; }
         public bool IsHidden { get; set; }
         public bool ColumnLookup { get; set; }
-        internal List<object> choices;
+        internal List<Choice> choices;
         internal Dictionary<string,int> composites; 
         public string CurrencySymbol { get; set; }
 
         // Methods
         public bool Equals(IQColumn column)
         {
-            if (ReferenceEquals(null, column)) return false;
+            if (column is null) return false;
             if (ReferenceEquals(this, column)) return true;
             return Equals(column.ColumnName, ColumnName);
         }
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
+            if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != typeof (QColumn)) return false;
             return Equals((IQColumn) obj);
@@ -72,7 +86,7 @@ namespace Intuit.QuickBase.Client
 
         public override int GetHashCode()
         {
-            return (ColumnName != null ? ColumnName.GetHashCode() : 0);
+            return ColumnName != null ? ColumnName.GetHashCode() : 0;
         }
 
         public override string ToString()
@@ -80,19 +94,62 @@ namespace Intuit.QuickBase.Client
             return ColumnName;
         }
 
-        public object[] GetChoices()
+        public List<object> GetChoices()
         {
-            return choices.ToArray();
+            List<object> retVal = new List<object>(choices.Count);
+            foreach (Choice ch in choices)
+                retVal.Add(ch.value);
+            return retVal;
         }
 
         public void AddChoice(object obj)
         {
-            choices.Add(obj);
+            AddChoice(obj, false);
+        }
+
+        public void AddChoice(object obj, bool inServer)
+        {
+            Choice ch;
+            switch (ColumnType)
+            {
+                case FieldType.rating:
+                    if (obj.GetType() != typeof(int))
+                        throw new InvalidChoiceException($"Column {ColumnName} presented with invalid type");
+                    ch = new Choice(obj, inServer);
+                    choices.Add(ch);
+                    break;
+                case FieldType.multitext:
+                case FieldType.text:
+                    if (obj.GetType() != typeof(string))
+                        throw new InvalidChoiceException($"Column {ColumnName} presented with invalid type");
+                    ch = new Choice(obj, inServer);
+                    choices.Add(ch);
+                    break;
+                default:
+                    throw new InvalidChoiceException($"Column {ColumnName} does not support choices.");
+            }
         }
 
         public Dictionary<string,int> GetComposites()
         {
             return composites;
+        }
+
+        public void AcceptChanges(IQApplication Application, string tbid)
+        {
+            if (ColumnSummary || ColumnVirtual || ColumnLookup || choices.All(c => c.inServer)) return;
+            
+            List<string> changeList = new List<string>(choices.Count(c => c.inServer == false));
+            foreach (Choice ch in choices)
+            {
+                if (!ch.inServer)
+                {
+                    changeList.Add(ch.value.ToString());
+                    ch.inServer = true;
+                }
+            }
+            var fac = new FieldAddChoices(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, tbid, ColumnId, changeList);
+            var xml = fac.Post();
         }
     }
 }

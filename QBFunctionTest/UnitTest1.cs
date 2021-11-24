@@ -12,7 +12,7 @@ namespace QBFunctionTest
     public class UnitTest1
     {
         private IQApplication qbApp = null;
-        private Dictionary<string, string> qbSettings = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> qbSettings = new Dictionary<string, string>();
 
 
         private void LoadSettings()
@@ -92,6 +92,34 @@ namespace QBFunctionTest
                 percentVal = 95.5m;
                 urlVal = "http://www.sample.com";
             }
+        }
+
+        [TestMethod]
+        public void UntestedTest()
+        {
+            InitConnection();
+            List<GrantedAppsInfo> appsLst = qbApp.GrantedDBs();
+            IQTable testTab = null;
+            foreach (var app in appsLst)
+            {
+                foreach (var tab in app.GrantedTables)
+                {
+                    if (tab.Name == "APITestApp: APIUntested")
+                    {
+                        testTab = qbApp.GetTable(tab.Dbid);
+                        break;
+                    }
+                }
+
+                if (testTab != null)
+                    break;
+            }
+            testTab.Query();
+            IQRecord rec = testTab.Records[0];
+            var htmlStr = rec["RichText"];
+            var multiText = rec["MultiLine"];
+            var mselect = rec["MultiSelect"];
+
         }
 
         [TestMethod]
@@ -203,13 +231,15 @@ namespace QBFunctionTest
             }
             testTable.AcceptChanges();
 
-            List<int> delList = new List<int>();
-            delList.Add(5);
-            delList.Add(6);
-            delList.Add(7);
-            delList.Add(8);
-            delList.Add(9);
-            delList.Add(10);
+            List<int> delList = new List<int>
+            {
+                5,
+                6,
+                7,
+                8,
+                9,
+                10
+            };
             Random rndSrc = new Random();
             while (delList.Count < 120)
             {
