@@ -31,10 +31,19 @@ namespace Intuit.QuickBase.Core
         /// <param name="accountDomain"></param>
         /// <param name="dbid">Supply table-level dbid.</param>
         /// <param name="rid">Supply a record object.</param>
-        public GetRecordInfo(string ticket, string appToken, string accountDomain, string dbid, int rid)
+        /// <param name="userToken">option user token that can be used instead of a ticket</param>
+        public GetRecordInfo(string ticket, string appToken, string accountDomain, string dbid, int rid, string userToken = "")
         {
             _getRecordInfoPayload = new GetRecordInfoPayload(rid);
-            _getRecordInfoPayload = new ApplicationTicket(_getRecordInfoPayload, ticket);
+            //If a user token is provided, use it instead of a ticket
+            if (userToken.Length > 0)
+            {
+                _getRecordInfoPayload = new ApplicationUserToken(_getRecordInfoPayload, userToken);
+            }
+            else
+            {
+                _getRecordInfoPayload = new ApplicationTicket(_getRecordInfoPayload, ticket);
+            }
             _getRecordInfoPayload = new ApplicationToken(_getRecordInfoPayload, appToken);
             _getRecordInfoPayload = new WrapPayload(_getRecordInfoPayload);
             _uri = new QUriDbid(accountDomain, dbid);

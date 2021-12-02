@@ -18,10 +18,18 @@ namespace Intuit.QuickBase.Core
         private readonly Payload.Payload _fieldAddChoicesPayload;
         private readonly IQUri _uri;
 
-        public FieldRemoveChoices(string ticket, string appToken, string accountDomain, string dbid, int fid, List<string> choices)
+        public FieldRemoveChoices(string ticket, string appToken, string accountDomain, string dbid, int fid, List<string> choices, string userToken = "")
         {
             _fieldAddChoicesPayload = new FieldChoicesPayload(fid, choices);
-            _fieldAddChoicesPayload = new ApplicationTicket(_fieldAddChoicesPayload, ticket);
+            //If a user token is provided, use it instead of a ticket
+            if (userToken.Length > 0)
+            {
+                _fieldAddChoicesPayload = new ApplicationUserToken(_fieldAddChoicesPayload, userToken);
+            }
+            else
+            {
+                _fieldAddChoicesPayload = new ApplicationTicket(_fieldAddChoicesPayload, ticket);
+            }
             _fieldAddChoicesPayload = new ApplicationToken(_fieldAddChoicesPayload, appToken);
             _fieldAddChoicesPayload = new WrapPayload(_fieldAddChoicesPayload);
             _uri = new QUriDbid(accountDomain, dbid);

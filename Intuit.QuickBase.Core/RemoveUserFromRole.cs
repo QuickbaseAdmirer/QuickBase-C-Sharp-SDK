@@ -18,10 +18,18 @@ namespace Intuit.QuickBase.Core
         private readonly Payload.Payload _removeUserFromRolePayload;
         private readonly IQUri _uri;
 
-        public RemoveUserFromRole(string ticket, string appToken, string accountDomain, string dbid, string userId, int roleId)
+        public RemoveUserFromRole(string ticket, string appToken, string accountDomain, string dbid, string userId, int roleId, string userToken = "")
         {
             _removeUserFromRolePayload = new RemoveUserFromRolePayload(userId, roleId);
-            _removeUserFromRolePayload = new ApplicationTicket(_removeUserFromRolePayload, ticket);
+            //If a user token is provided, use it instead of a ticket
+            if (userToken.Length > 0)
+            {
+                _removeUserFromRolePayload = new ApplicationUserToken(_removeUserFromRolePayload, userToken);
+            }
+            else
+            {
+                _removeUserFromRolePayload = new ApplicationTicket(_removeUserFromRolePayload, ticket);
+            }
             _removeUserFromRolePayload = new ApplicationToken(_removeUserFromRolePayload, appToken);
             _removeUserFromRolePayload = new WrapPayload(_removeUserFromRolePayload);
             _uri = new QUriDbid(accountDomain, dbid);

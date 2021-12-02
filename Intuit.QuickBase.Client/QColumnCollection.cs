@@ -8,6 +8,7 @@
 using System.Collections.Generic;
 using System.Net;
 using Intuit.QuickBase.Core;
+using Intuit.QuickBase.Core.Exceptions;
 
 namespace Intuit.QuickBase.Client
 {
@@ -23,6 +24,25 @@ namespace Intuit.QuickBase.Client
         private IQApplication Application { get; set; }
         private IQTable Table { get; set; }
 
+        public IQColumn this[string columnName]
+        {
+            get
+            {
+                var index = base.IndexOf(new QColumn
+                {
+                    ColumnName = columnName
+                });
+                if (index == -1)
+                {
+                    throw new ColumnDoesNotExistInTableExecption($"Column '{columnName}' not found in table.");
+                }
+
+                return base[index];
+
+            }
+        }
+
+
         public new void Add(IQColumn column)
         {
             if (column.ColumnId == 0)
@@ -33,6 +53,8 @@ namespace Intuit.QuickBase.Client
                 var columnId = int.Parse(xml.Element("fid").Value);
                 column.ColumnId = columnId;
             }
+
+            if (column.ColumnType == FieldType.multitext) column.CanAddChoices = true;
             base.Add(column);
         }
 

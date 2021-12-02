@@ -18,19 +18,27 @@ namespace Intuit.QuickBase.Core
         private Payload.Payload _sendInvitationPayload;
         private IQUri _uri;
 
-        public SendInvitation(string ticket, string appToken, string accountDomain, string dbid, string userId, string userText)
+        public SendInvitation(string ticket, string appToken, string accountDomain, string dbid, string userId, string userText, string userToken = "")
         {
-            CommonConstruction(ticket, appToken, accountDomain, dbid, new SendInvitationPayload(userId, userText));
+            CommonConstruction(ticket, appToken, accountDomain, dbid, new SendInvitationPayload(userId, userText), userToken);
         }
 
-        public SendInvitation(string ticket, string appToken, string accountDomain, string dbid, string userId)
+        public SendInvitation(string ticket, string appToken, string accountDomain, string dbid, string userId, string userToken = "")
         {
-            CommonConstruction(ticket, appToken, accountDomain, dbid, new SendInvitationPayload(userId));
+            CommonConstruction(ticket, appToken, accountDomain, dbid, new SendInvitationPayload(userId), userToken);
         }
 
-        private void CommonConstruction(string ticket, string appToken, string accountDomain, string dbid, Payload.Payload payload)
+        private void CommonConstruction(string ticket, string appToken, string accountDomain, string dbid, Payload.Payload payload, string userToken = "")
         {
-            _sendInvitationPayload = new ApplicationTicket(payload, ticket);
+            //If a user token is provided, use it instead of a ticket
+            if (userToken.Length > 0)
+            {
+                _sendInvitationPayload = new ApplicationUserToken(payload, userToken);
+            }
+            else
+            {
+                _sendInvitationPayload = new ApplicationTicket(payload, ticket);
+            }
             _sendInvitationPayload = new ApplicationToken(_sendInvitationPayload, appToken);
             _sendInvitationPayload = new WrapPayload(_sendInvitationPayload);
             _uri = new QUriDbid(accountDomain, dbid);

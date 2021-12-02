@@ -31,10 +31,19 @@ namespace Intuit.QuickBase.Core
         /// <param name="accountDomain"></param>
         /// <param name="dbid">Supply application-level dbid.</param>
         /// <param name="newAppName">Supply a new application name.</param>
-        public RenameApp(string ticket, string appToken, string accountDomain, string dbid, string newAppName)
+        /// <param name="userToken">optional user token that can be used instead of a ticket</param>
+        public RenameApp(string ticket, string appToken, string accountDomain, string dbid, string newAppName, string userToken = "")
         {
             _renameAppPayload = new RenameAppPayload(newAppName);
-            _renameAppPayload = new ApplicationTicket(_renameAppPayload, ticket);
+            //If a user token is provided, use it instead of a ticket
+            if (userToken.Length > 0)
+            {
+                _renameAppPayload = new ApplicationUserToken(_renameAppPayload, userToken);
+            }
+            else
+            {
+                _renameAppPayload = new ApplicationTicket(_renameAppPayload, ticket);
+            }
             _renameAppPayload = new ApplicationToken(_renameAppPayload, appToken);
             _renameAppPayload = new WrapPayload(_renameAppPayload);
             _uri = new QUriDbid(accountDomain, dbid);

@@ -575,13 +575,14 @@ namespace Intuit.QuickBase.Client
             var columnNodes = xml.Element("table").Element("fields").Elements("field");
             foreach (XElement columnNode in columnNodes)
             {
-                var columnId = int.Parse(columnNode.Attribute("id").Value);
-                var type =
+                int columnId = int.Parse(columnNode.Attribute("id").Value);
+                FieldType type =
                     (FieldType) Enum.Parse(typeof(FieldType), columnNode.Attribute("field_type").Value, true);
-                var label = columnNode.Element("label").Value;
+                string label = columnNode.Element("label").Value;
                 bool hidden = false;
-                var hidNode = columnNode.Element("appears_by_default");
+                XElement hidNode = columnNode.Element("appears_by_default");
                 if (hidNode != null && hidNode.Value == "0") hidden = true;
+                bool canAddChoices = columnNode.Element("allow_new_choices")?.Value == "1";
                 bool virt = false, lookup = false, summary = false;
                 if (columnNode.Attribute("mode") != null)
                 {
@@ -592,7 +593,7 @@ namespace Intuit.QuickBase.Client
                 }
 
                 bool allowHTML = columnNode.Element("allowHTML")?.Value == "1";
-                IQColumn col = ColumnFactory.CreateInstance(columnId, label, type, virt, lookup, summary, hidden);
+                IQColumn col = ColumnFactory.CreateInstance(columnId, label, type, virt, lookup, summary, hidden, canAddChoices);
                 if (columnNode.Element("choices") != null)
                 {
                     foreach (XElement choicenode in columnNode.Element("choices").Elements("choice"))

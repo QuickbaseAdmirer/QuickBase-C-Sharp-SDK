@@ -167,6 +167,7 @@
     <Compile Include="Payload\AddUserToRolePayload.cs" />
     <Compile Include="Payload\ApplicationTicket.cs" />
     <Compile Include="Payload\ApplicationToken.cs" />
+    <Compile Include="Payload\ApplicationUserToken.cs" />
     <Compile Include="Payload\AuthenticatePayload.cs" />
     <Compile Include="Payload\ChangeRecordOwnerPayload.cs" />
     <Compile Include="Payload\ChangeUserRolePayload.cs" />

@@ -10,3 +10,5 @@ TestResults/
 *.lastcodeanalysissucceeded
 *.suo
 *.cache
+*.orig
+*.bak

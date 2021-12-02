@@ -46,12 +46,13 @@ namespace Intuit.QuickBase.Client
             ColumnId = columnId;
         }
 
-        internal QColumn(int columnId, string columnName, FieldType columnType, bool columnVirtual, bool columnLookup, bool columnSummary, bool isHidden)
+        internal QColumn(int columnId, string columnName, FieldType columnType, bool columnVirtual, bool columnLookup, bool columnSummary, bool isHidden, bool canAddChoices)
             : this(columnName, columnType)
         {
             ColumnVirtual = columnVirtual;
             ColumnLookup = columnLookup;
             ColumnSummary = columnSummary;
+            CanAddChoices = canAddChoices;
             IsHidden = isHidden;
             ColumnId = columnId;
         }
@@ -62,6 +63,7 @@ namespace Intuit.QuickBase.Client
         public FieldType ColumnType { get; set; }
         public bool ColumnVirtual { get; set; }
         public bool ColumnSummary { get; set; }
+        public bool CanAddChoices { get; set; }
         public bool IsHidden { get; set; }
         public bool ColumnLookup { get; set; }
         internal List<Choice> choices;
@@ -112,18 +114,48 @@ namespace Intuit.QuickBase.Client
             Choice ch;
             switch (ColumnType)
             {
-                case FieldType.rating:
-                    if (obj.GetType() != typeof(int))
-                        throw new InvalidChoiceException($"Column {ColumnName} presented with invalid type");
-                    ch = new Choice(obj, inServer);
-                    choices.Add(ch);
-                    break;
                 case FieldType.multitext:
-                case FieldType.text:
-                    if (obj.GetType() != typeof(string))
+                    if (obj is string multiChoice)
+                    {
+                        if (!CanAddChoices)
+                        {
+                            throw new InvalidChoiceException($"Column {ColumnName} does not allow adding new choices.");
+                        }
+                        if (multiChoice.Length > 60)
+                        {
+                            throw new InvalidChoiceException($"Column {ColumnName} presented with new choice that is longer than 60 characters");
+                        }
+
+                        if (choices.Count > 100)
+                        {
+                            throw new InvalidChoiceException($"Column {ColumnName} presented with new choice that would bring total # of choices over 100");
+                        }
+                        ch = new Choice(multiChoice, inServer);
+                        choices.Add(ch);
+                    }
+                    else
+                    {
                         throw new InvalidChoiceException($"Column {ColumnName} presented with invalid type");
-                    ch = new Choice(obj, inServer);
-                    choices.Add(ch);
+                    }
+                    break;
+                case FieldType.text:
+                    if (obj is string newChoice)
+                    {
+                        if (!CanAddChoices)
+                        {
+                            throw new InvalidChoiceException($"Column {ColumnName} does not allow adding new choices.");
+                        }
+                        if (choices == null)
+                        {
+                            throw new InvalidChoiceException($"Column {ColumnName} presented with new choice when field not setup for choices");
+                        }
+                        ch = new Choice(newChoice, inServer);
+                        choices.Add(ch);
+                    }
+                    else
+                    {
+                        throw new InvalidChoiceException($"Column {ColumnName} presented with invalid type");
+                    }
                     break;
                 default:
                     throw new InvalidChoiceException($"Column {ColumnName} does not support choices.");
@@ -150,6 +182,7 @@ namespace Intuit.QuickBase.Client
             }
             var fac = new FieldAddChoices(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, tbid, ColumnId, changeList);
             var xml = fac.Post();
+            Http.CheckForException(xml);
         }
     }
 }

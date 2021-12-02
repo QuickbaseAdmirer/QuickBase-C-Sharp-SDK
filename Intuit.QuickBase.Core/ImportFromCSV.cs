@@ -23,6 +23,7 @@ namespace Intuit.QuickBase.Core
             private string _recordsCsv;
 
             internal string Ticket { get; set; }
+            internal string UserToken { get; set; }
             internal string AppToken { get; set; }
             internal string AccountDomain { get; set; }
             internal string Dbid { get; set; }
@@ -40,9 +41,10 @@ namespace Intuit.QuickBase.Core
                 }
             }
 
-            public Builder(string ticket, string appToken, string accountDomain, string dbid, string recordsCsv)
+            public Builder(string ticket, string appToken, string accountDomain, string dbid, string recordsCsv, string userToken = "")
             {
                 Ticket = ticket;
+                UserToken = userToken;
                 AppToken = appToken;
                 AccountDomain = accountDomain;
                 Dbid = dbid;
@@ -88,7 +90,15 @@ namespace Intuit.QuickBase.Core
                 .SetSkipFirst(builder.SkipFirst)
                 .SetTimeInUtc(builder.TimeInUtc)
                 .Build();
-            _importFromCSVPayload = new ApplicationTicket(_importFromCSVPayload, builder.Ticket);
+            //If a user token is provided, use it instead of a ticket
+            if (builder.UserToken.Length > 0)
+            {
+                _importFromCSVPayload = new ApplicationUserToken(_importFromCSVPayload, builder.UserToken);
+            }
+            else
+            {
+                _importFromCSVPayload = new ApplicationTicket(_importFromCSVPayload, builder.Ticket);
+            }
             _importFromCSVPayload = new ApplicationToken(_importFromCSVPayload, builder.AppToken);
             _importFromCSVPayload = new WrapPayload(_importFromCSVPayload);
             _uri = new QUriDbid(builder.AccountDomain, builder.Dbid);

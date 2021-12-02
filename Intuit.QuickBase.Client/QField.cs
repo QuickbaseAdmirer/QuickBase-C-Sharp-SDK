@@ -55,7 +55,7 @@ namespace Intuit.QuickBase.Client
         // Properties
         internal int FieldId { get; private set; }
 
-        //This gets around a bug in QB's uploadCSV api that will interpret certain characters as EndOfRecord even when surrouned by quotes
+        //This gets around a bug in QB's uploadCSV api that will interpret certain characters as EndOfRecord even when surround by quotes
         internal bool UncleanText { get; private set; }
 
         internal string QBValue
@@ -307,7 +307,7 @@ namespace Intuit.QuickBase.Client
 
         private static string ConvertTimeSpanToQBDuration(TimeSpan inTime)
         {
-            return (inTime.TotalSeconds).ToString();
+            return ($"{inTime.TotalMilliseconds} milliseconds");
         }
 
         private HashSet<int> ConvertQBStringToHashSet(string value)
@@ -332,20 +332,15 @@ namespace Intuit.QuickBase.Client
 
                 if (!found)
                 {
-                    //if (Column.ColumnSummary || Column.ColumnLookup )
-                    //{
-                    //    /// QB doesn't send options for summary or lookup fields
-                    //    ((IQColumn_int)Column).AddChoice(val, true);
-                    //    retVal.Add(optionList.Count);
-                    //    optionList = Column.GetChoices();
-                    //}
-                    //else
-                    //    throw new InvalidChoiceException($"Specified multitext option '{val}' not found in field {Column.ColumnName} in record downloaded from QB?");
-
-                    //fixme:?? for now, even if QB sends us a list of options, add anything that came from QB as an option too.
-                    ((IQColumn_int)Column).AddChoice(val, true);
-                    retVal.Add(optionList.Count);
-                    optionList = Column.GetChoices();
+                    if (Column.ColumnSummary || Column.ColumnLookup)
+                    {
+                        // QB doesn't send options for summary or lookup fields
+                        ((IQColumn_int)Column).AddChoice(val, true);
+                        retVal.Add(optionList.Count);
+                        optionList = Column.GetChoices();
+                    }
+                    else
+                        throw new InvalidChoiceException($"Specified multitext option '{val}' not found in field {Column.ColumnName} in record downloaded from QB?");
                 }
             }
             return retVal;

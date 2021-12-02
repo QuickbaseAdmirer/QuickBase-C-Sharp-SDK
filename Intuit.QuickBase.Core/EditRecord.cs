@@ -31,6 +31,7 @@ namespace Intuit.QuickBase.Core
             private int _rid;
 
             internal string Ticket { get; set; }
+            internal string UserToken { get; set; }
             internal string AppToken { get; set; }
             internal string AccountDomain { get; set; }
             internal string Dbid { get; set; }
@@ -59,9 +60,10 @@ namespace Intuit.QuickBase.Core
                 }
             }
 
-            public Builder(string ticket, string appToken, string accountDomain, string dbid, int rid, List<IField> fields)
+            public Builder(string ticket, string appToken, string accountDomain, string dbid, int rid, List<IField> fields, string userToken = "")
             {
                 Ticket = ticket;
+                UserToken = userToken;
                 AppToken = appToken;
                 AccountDomain = accountDomain;
                 Dbid = dbid;
@@ -115,7 +117,15 @@ namespace Intuit.QuickBase.Core
                 .SetTimeInUtc(builder.TimeInUtc)
                 .SetFform(builder.Fform)
                 .Build();
-            _editRecordPayload = new ApplicationTicket(_editRecordPayload, builder.Ticket);
+            //If a user token is provided, use it instead of a ticket
+            if (builder.UserToken.Length > 0)
+            {
+                _editRecordPayload = new ApplicationUserToken(_editRecordPayload, builder.UserToken);
+            }
+            else
+            {
+                _editRecordPayload = new ApplicationTicket(_editRecordPayload, builder.Ticket);
+            }
             _editRecordPayload = new ApplicationToken(_editRecordPayload, builder.AppToken);
             _editRecordPayload = new WrapPayload(_editRecordPayload);
             _uri = new QUriDbid(builder.AccountDomain, builder.Dbid);

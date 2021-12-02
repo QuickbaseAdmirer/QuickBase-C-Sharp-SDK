@@ -34,10 +34,19 @@ namespace Intuit.QuickBase.Core
         /// <param name="accountDomain"></param>
         /// <param name="dbid">Supply table-level dbid.</param>
         /// <param name="fid">Supply a column object.</param>
-        public DeleteField(string ticket, string appToken, string accountDomain, string dbid, int fid)
+        /// <param name="userToken">optional user token that can be used instead of a ticket</param>
+        public DeleteField(string ticket, string appToken, string accountDomain, string dbid, int fid, string userToken = "")
         {
             _deleteFieldPayload = new DeleteFieldPayload(fid);
-            _deleteFieldPayload = new ApplicationTicket(_deleteFieldPayload, ticket);
+            //If a user token is provided, use it instead of a ticket
+            if (userToken.Length > 0)
+            {
+                _deleteFieldPayload = new ApplicationUserToken(_deleteFieldPayload, userToken);
+            }
+            else
+            {
+                _deleteFieldPayload = new ApplicationTicket(_deleteFieldPayload, ticket);
+            }
             _deleteFieldPayload = new ApplicationToken(_deleteFieldPayload, appToken);
             _deleteFieldPayload = new WrapPayload(_deleteFieldPayload);
             _uri = new QUriDbid(accountDomain, dbid);
