@@ -24,9 +24,9 @@ namespace Intuit.QuickBase.Client
             return _instance;
         }
 
-        internal override IQColumn CreateInstance(int columnId, string columnName, FieldType columnType, bool columnVirtual, bool columnLookup, bool columnSummary, bool ishidden, bool canAddChoices)
+        internal override IQColumn CreateInstance(int columnId, string columnName, FieldType columnType, bool columnVirtual, bool columnLookup, bool columnSummary, bool ishidden, bool allowHTML, bool canAddChoices)
         {
-            return new QColumn(columnId, columnName, columnType, columnVirtual, columnLookup, columnSummary, ishidden, canAddChoices);
+            return new QColumn(columnId, columnName, columnType, columnVirtual, columnLookup, columnSummary, ishidden, allowHTML, canAddChoices);
         }
     }
 }

@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml.Linq;
 
 namespace Intuit.QuickBase.Client
 {
@@ -130,10 +131,10 @@ namespace Intuit.QuickBase.Client
 
         private void SendDelete(string qry)
         {
-            var prBuild = new PurgeRecords.Builder(Application.Client.Ticket, Application.Token,
+            PurgeRecords.Builder prBuild = new PurgeRecords.Builder(Application.Client.Ticket, Application.Token,
                 Application.Client.AccountDomain, Table.TableId);
             prBuild.SetQuery(qry.ToString());
-            var xml = prBuild.Build().Post();
+            XElement xml = prBuild.Build().Post();
             int result = int.Parse(xml.Element("errcode").Value);
             if (result != 0)
             {

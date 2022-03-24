@@ -18,7 +18,7 @@ namespace Intuit.QuickBase.Client
 
         public static IQClient Login(string clientUserName, string clientPassword, string adminUserName, string adminPassword, string accountDomain, int hours)
         {
-            var clientFactory = QClientFactory.GetInstance();
+            QClientFactoryBase clientFactory = QClientFactory.GetInstance();
             return clientFactory.CreateInstance(clientUserName, clientPassword, adminUserName, adminPassword, accountDomain, hours);
         }
 

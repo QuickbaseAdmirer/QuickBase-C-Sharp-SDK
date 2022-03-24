@@ -25,16 +25,16 @@ namespace Intuit.QuickBase.Client
         // Creates a new table in QuickBase
         internal override IQTable CreateInstance(IQApplication application, string tableName, string pNoun)
         {
-            var columnFactory = QColumnFactory.GetInstance();
-            var recordFactory = QRecordFactory.GetInstance();
+            QColumnFactoryBase columnFactory = QColumnFactory.GetInstance();
+            QRecordFactoryBase recordFactory = QRecordFactory.GetInstance();
             return new QTable(columnFactory, recordFactory, application, tableName, pNoun);
         }
         
         // Doesn't create a table in QuickBase
         internal override IQTable CreateInstance(IQApplication application, string tableId)
         {
-            var columnFactory = QColumnFactory.GetInstance();
-            var recordFactory = QRecordFactory.GetInstance();
+            QColumnFactoryBase columnFactory = QColumnFactory.GetInstance();
+            QRecordFactoryBase recordFactory = QRecordFactory.GetInstance();
             return new QTable(columnFactory, recordFactory, application, tableId);
         }
 

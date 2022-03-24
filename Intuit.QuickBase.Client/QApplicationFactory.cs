@@ -24,7 +24,7 @@ namespace Intuit.QuickBase.Client
 
         internal override IQApplication CreateInstance(IQClient client, string applicationId, string token)
         {
-            var tableFactory = QTableFactory.GetInstance();
+            QTableFactoryBase tableFactory = QTableFactory.GetInstance();
             return new QApplication(tableFactory, client, applicationId, token);
         }
     }

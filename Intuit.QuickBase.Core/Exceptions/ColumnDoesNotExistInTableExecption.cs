@@ -11,7 +11,7 @@ using System.Runtime.Serialization;
 namespace Intuit.QuickBase.Core.Exceptions
 {
     [Serializable]
-    public class ColumnDoesNotExistInTableExecption : Exception
+    public class ColumnDoesNotExistInTableExecption : ArgumentException
     {
         public ColumnDoesNotExistInTableExecption() { }
 

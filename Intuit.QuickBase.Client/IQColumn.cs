@@ -22,6 +22,7 @@ namespace Intuit.QuickBase.Client
         bool ColumnSummary { get; set; }
         bool IsHidden { get; set; }
         bool ColumnLookup { get; set; }
+        bool AllowHTML { get; set; }
         bool CanAddChoices { get; set; }
         string CurrencySymbol { get; set; }
         bool Equals(IQColumn column);

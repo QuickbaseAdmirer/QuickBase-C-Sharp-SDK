@@ -34,12 +34,9 @@ namespace QBFunctionTest
 
         public void InitConnection()
         {
-            if (qbApp == null)
-            {
-                LoadSettings();
-                var client = QuickBase.Login(qbSettings["qbUser"], qbSettings["qbPass"], qbSettings["qbSiteURL"]);
-                qbApp = client.Connect(qbSettings["qbAppDBID"], qbSettings["qbAppToken"]);
-            }
+            LoadSettings();
+            var client = QuickBase.Login(qbSettings["qbUser"], qbSettings["qbPass"], qbSettings["qbSiteURL"]);
+            qbApp = client.Connect(qbSettings["qbAppDBID"], qbSettings["qbAppToken"]);
         }
 
         public static readonly List<string> multiTextOptions = new List<string>
@@ -114,28 +111,16 @@ namespace QBFunctionTest
         public void UntestedTest()
         {
             InitConnection();
-            List<GrantedAppsInfo> appsLst = qbApp.GrantedDBs();
-            IQTable testTab = null;
-            foreach (var app in appsLst)
-            {
-                foreach (var tab in app.GrantedTables)
-                {
-                    if (tab.Name == "APITestApp: APIUntested")
-                    {
-                        testTab = qbApp.GetTable(tab.Dbid);
-                        break;
-                    }
-                }
-
-                if (testTab != null)
-                    break;
-            }
+            IQTable testTab = qbApp.GetTable("bpexujk45");
             testTab.Query();
             IQRecord rec = testTab.Records[0];
-            var htmlStr = rec["RichText"];
-            var multiText = rec["MultiLine"];
-            var mselect = rec["MultiSelect"];
-
+            var richText = rec["RichText"];
+            var multiLine = rec["MultiLine"];
+            var multiChoice = rec["MultiChoice"];
+            var fileAttach = rec["FileAttachment"];
+            var address = rec["Address"];
+            var userList = rec["ListUser"];
+            var homeAddress = rec["HomeAddress"];
         }
 
         [TestMethod]
@@ -440,23 +425,6 @@ namespace QBFunctionTest
             Assert.AreEqual(exemplar.urlVal, outRec2["UrlTest"], "Url update fail");
             Assert.IsTrue(exemplar.multiTextVal.SetEquals((HashSet<int>)outRec2["MultiTextTest"]), "MultiText update fail");
             Assert.AreEqual(exemplar.ratingVal, outRec2["RatingTest"], "Rating update fail");
-        }
-
-        [TestMethod]
-        public void TestDuration()
-        {
-            InitConnection();
-
-            IQTable testTable = qbApp.GetTable("bnrmadvx3");
-
-            TimeSpan tstVal = new TimeSpan(1, 23, 55, 11);
-            IQRecord newRec = testTable.NewRecord();
-            newRec["DurationTest"] = tstVal;
-            testTable.Records.Add(newRec);
-            testTable.AcceptChanges();
-            testTable.Query();
-            IQRecord loopRec = testTable.Records[0];
-            Assert.AreEqual(tstVal, loopRec["DurationTest"], "Duration doesn't round trip");
         }
     }
 }

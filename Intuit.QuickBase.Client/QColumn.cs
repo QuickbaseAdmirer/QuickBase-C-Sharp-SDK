@@ -8,6 +8,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 using Intuit.QuickBase.Core;
 using Intuit.QuickBase.Core.Exceptions;
 
@@ -46,12 +47,13 @@ namespace Intuit.QuickBase.Client
             ColumnId = columnId;
         }
 
-        internal QColumn(int columnId, string columnName, FieldType columnType, bool columnVirtual, bool columnLookup, bool columnSummary, bool isHidden, bool canAddChoices)
+        internal QColumn(int columnId, string columnName, FieldType columnType, bool columnVirtual, bool columnLookup, bool columnSummary, bool isHidden, bool allowHTML, bool canAddChoices)
             : this(columnName, columnType)
         {
             ColumnVirtual = columnVirtual;
             ColumnLookup = columnLookup;
             ColumnSummary = columnSummary;
+            AllowHTML = allowHTML;
             CanAddChoices = canAddChoices;
             IsHidden = isHidden;
             ColumnId = columnId;
@@ -65,6 +67,7 @@ namespace Intuit.QuickBase.Client
         public bool ColumnSummary { get; set; }
         public bool CanAddChoices { get; set; }
         public bool IsHidden { get; set; }
+        public bool AllowHTML { get; set; }
         public bool ColumnLookup { get; set; }
         internal List<Choice> choices;
         internal Dictionary<string,int> composites; 
@@ -141,7 +144,7 @@ namespace Intuit.QuickBase.Client
                 case FieldType.text:
                     if (obj is string newChoice)
                     {
-                        if (!CanAddChoices)
+                        if (!CanAddChoices && !inServer)
                         {
                             throw new InvalidChoiceException($"Column {ColumnName} does not allow adding new choices.");
                         }
@@ -180,8 +183,8 @@ namespace Intuit.QuickBase.Client
                     ch.inServer = true;
                 }
             }
-            var fac = new FieldAddChoices(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, tbid, ColumnId, changeList);
-            var xml = fac.Post();
+            FieldAddChoices fac = new FieldAddChoices(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, tbid, ColumnId, changeList);
+            XElement xml = fac.Post();
             Http.CheckForException(xml);
         }
     }

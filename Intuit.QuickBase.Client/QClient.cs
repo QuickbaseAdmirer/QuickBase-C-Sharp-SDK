@@ -44,8 +44,8 @@ namespace Intuit.QuickBase.Client
 
         private void Login()
         {
-            var signin = new Authenticate(ClientUserName, ClientPassword, AccountDomain, Hours);
-            var xml = signin.Post();
+            Authenticate signin = new Authenticate(ClientUserName, ClientPassword, AccountDomain, Hours);
+            XElement xml = signin.Post();
 
             Ticket = xml.Element("ticket").Value;
         }
@@ -53,7 +53,7 @@ namespace Intuit.QuickBase.Client
 
         public void Logout()
         {
-            var signout = new SignOut(AccountDomain);
+            SignOut signout = new SignOut(AccountDomain);
             signout.Post();
             Ticket = null;
             ClientUserName = null;
@@ -81,26 +81,26 @@ namespace Intuit.QuickBase.Client
 
         public IQApplication CreateApplication(string qbName, string qbDescription, CreateApplicationToken createApplicationToken)
         {
-            var createToken = Convert.ToBoolean(createApplicationToken);
+            bool createToken = Convert.ToBoolean(createApplicationToken);
 
-            var createDb = new CreateDatabase(Ticket, AccountDomain, qbName, qbDescription, createToken);
-            var xml = createDb.Post();
+            CreateDatabase createDb = new CreateDatabase(Ticket, AccountDomain, qbName, qbDescription, createToken);
+            XElement xml = createDb.Post();
 
             string token = null;
             if (createToken)
             {
                 token = xml.Element("apptoken").Value;
             }
-            var applicationId = xml.Element("appdbid").Value;
+            string applicationId = xml.Element("appdbid").Value;
             return Connect(applicationId, token);
         }
 
         public List<string> FindApplication(string qbName)
         {
-            var findDb = new FindDbByName(Ticket, AccountDomain, qbName);
-            var xml = findDb.Post();
+            FindDbByName findDb = new FindDbByName(Ticket, AccountDomain, qbName);
+            XElement xml = findDb.Post();
 
-            var dbids = new List<string>();
+            List<string> dbids = new List<string>();
             foreach (XElement node in xml.Elements("dbid"))
             {
                 dbids.Add(node.Value);

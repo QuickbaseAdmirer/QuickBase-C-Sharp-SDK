@@ -7,8 +7,6 @@
  */
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using Intuit.QuickBase.Core;
 using Intuit.QuickBase.Core.Exceptions;
@@ -18,7 +16,7 @@ namespace Intuit.QuickBase.Client
     internal class QField
     {
         private static readonly Regex CSVUncleanRegEx = new Regex(@"[\r\n]");
-        private static readonly DateTime qbTSOffset = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+        private static readonly DateTime TSOffset = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
         // Instance fields
         private object _value;
 
@@ -75,7 +73,7 @@ namespace Intuit.QuickBase.Client
                     case FieldType.duration:
                         return ConvertTimeSpanToQBDuration((TimeSpan)_value);
                     case FieldType.checkbox:
-                        return (bool)_value == true ? "1" : "0";
+                        return (bool)_value ? "1" : "0";
                     case FieldType.multitext:
                         return ConvertHashSetToQBMultiSelect((HashSet<int>)_value);
                     default:
@@ -275,12 +273,12 @@ namespace Intuit.QuickBase.Client
 
         private static DateTime ConvertQBMillisecondsToDateTime(string milliseconds)
         {
-            DateTime dtu = new DateTime(long.Parse(milliseconds) * TimeSpan.TicksPerMillisecond + qbTSOffset.Ticks, DateTimeKind.Utc);
+            DateTime dtu = new DateTime(long.Parse(milliseconds) * TimeSpan.TicksPerMillisecond + TSOffset.Ticks, DateTimeKind.Utc);
             return dtu.ToLocalTime();
         }
         private static DateTime ConvertQBMillisecondsToDate(string milliseconds)
         {
-            DateTime dtu = new DateTime(long.Parse(milliseconds) * TimeSpan.TicksPerMillisecond + qbTSOffset.Ticks, DateTimeKind.Utc);
+            DateTime dtu = new DateTime(long.Parse(milliseconds) * TimeSpan.TicksPerMillisecond + TSOffset.Ticks, DateTimeKind.Utc);
             return dtu.ToLocalTime().Date;
         }
         private static TimeSpan ConvertQBDurationToTimeSpan(string milliseconds)
@@ -296,7 +294,7 @@ namespace Intuit.QuickBase.Client
         private static string ConvertDateTimeToQBMilliseconds(DateTime inDT)
         {
             DateTime dte = inDT.ToUniversalTime();
-            return ((dte.Ticks - qbTSOffset.Ticks) / TimeSpan.TicksPerMillisecond).ToString();
+            return ((dte.Ticks - TSOffset.Ticks) / TimeSpan.TicksPerMillisecond).ToString();
         }
 
         private static string ConvertTimeSpanToQBTimeOfDay(TimeSpan inTime)

@@ -9,6 +9,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Xml.Linq;
+using System.Xml.XPath;
 
 namespace Intuit.QuickBase.Core
 {
@@ -23,7 +24,7 @@ namespace Intuit.QuickBase.Core
             XElement parent = new XElement("qdbapi"); ;
             qObject.BuildXmlPayload(ref parent);
             var bytes = Encoding.UTF8.GetBytes(parent.ToString());
-            //File.AppendAllText(@"C:\Temp\QBDebugLog.txt", "**Sent->>" + qObject.Uri + " " + QUICKBASE_HEADER + qObject.Action + "\r\n" + qObject.XmlPayload + "\r\n");
+            //File.AppendAllText(@"C:\Temp\QBDebugLog.txt", "**Sent->>" + qObject.Uri + " " + QUICKBASE_HEADER + qObject.Action + "\r\n" + qObject.GetPayload + "\r\n");
             Stream requestStream = null;
             WebResponse webResponse = null;
             Stream responseStream = null;
@@ -45,7 +46,7 @@ namespace Intuit.QuickBase.Core
 
                 webResponse = request.GetResponse();
                 responseStream = webResponse.GetResponseStream();
-                xml = XElement.Load(responseStream);
+                xml = XElement.Load(responseStream, LoadOptions.PreserveWhitespace);
                 //File.AppendAllText(@"C:\Temp\QBDebugLog.txt", "**Received-<<\r\n" + xml.CreateNavigator().InnerXml + "\r\n");
             }
             finally

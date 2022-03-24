@@ -7,6 +7,7 @@
  */
 using System.Collections.Generic;
 using System.Net;
+using System.Xml.Linq;
 using Intuit.QuickBase.Core;
 using Intuit.QuickBase.Core.Exceptions;
 
@@ -28,7 +29,7 @@ namespace Intuit.QuickBase.Client
         {
             get
             {
-                var index = base.IndexOf(new QColumn
+                int index = base.IndexOf(new QColumn
                 {
                     ColumnName = columnName
                 });
@@ -47,10 +48,10 @@ namespace Intuit.QuickBase.Client
         {
             if (column.ColumnId == 0)
             {
-                var addCol = new AddField(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, Table.TableId, column.ColumnName, column.ColumnType);
-                var xml = addCol.Post();
+                AddField addCol = new AddField(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, Table.TableId, column.ColumnName, column.ColumnType);
+                XElement xml = addCol.Post();
                 Http.CheckForException(xml);
-                var columnId = int.Parse(xml.Element("fid").Value);
+                int columnId = int.Parse(xml.Element("fid").Value);
                 column.ColumnId = columnId;
             }
 
@@ -60,7 +61,7 @@ namespace Intuit.QuickBase.Client
 
         public new bool Remove(IQColumn column)
         {
-            var deleteField = new DeleteField(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, Table.TableId, column.ColumnId);
+            DeleteField deleteField = new DeleteField(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, Table.TableId, column.ColumnId);
             deleteField.Post();
             return base.Remove(column);
         }

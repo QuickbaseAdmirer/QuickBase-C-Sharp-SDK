@@ -39,12 +39,12 @@ namespace Intuit.QuickBase.Client
 
         internal QTable(QColumnFactoryBase columnFactory, QRecordFactoryBase recordFactory, IQApplication application, string tableName, string pNoun)
         {
-            var createTable = new CreateTable.Builder(application.Client.Ticket, application.Token, application.Client.AccountDomain, application.ApplicationId)
+            CreateTable createTable = new CreateTable.Builder(application.Client.Ticket, application.Token, application.Client.AccountDomain, application.ApplicationId)
                 .SetTName(tableName)
                 .SetPNoun(pNoun)
                 .Build();
-            var xml = createTable.Post();
-            var tableId = xml.Element("newdbid").Value;
+            XElement xml = createTable.Post();
+            string tableId = xml.Element("newdbid").Value;
 
             TableName = tableName;
             RecordNames = pNoun;
@@ -98,84 +98,84 @@ namespace Intuit.QuickBase.Client
 
         public string GenCsv()
         {
-            var genResultsTable = new GenResultsTable.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
+            GenResultsTable genResultsTable = new GenResultsTable.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
                 .SetOptions("csv")
                 .Build();
-            var xml = genResultsTable.Post();
+            XElement xml = genResultsTable.Post();
             return xml.Value;
         }
 
         public string GenCsv(int queryId)
         {
-            var genResultsTable = new GenResultsTable.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
+            GenResultsTable genResultsTable = new GenResultsTable.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
                 .SetQid(queryId)
                 .SetOptions("csv")
                 .Build();
-            var xml = genResultsTable.Post();
+            XElement xml = genResultsTable.Post();
             return xml.Value;
         }
 
         public string GenCsv(Query query)
         {
-            var genResultsTable = new GenResultsTable.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
+            GenResultsTable genResultsTable = new GenResultsTable.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
                 .SetQuery(query.ToString())
                 .SetOptions("csv")
                 .Build();
-            var xml = genResultsTable.Post();
+            XElement xml = genResultsTable.Post();
             return xml.Value;
         }
 
         public string GenHtml(string options = "", string colList = "a")
         {
-            var genResultsTable = new GenResultsTable.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
+            GenResultsTable genResultsTable = new GenResultsTable.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
                 .SetOptions(options)
                 .SetCList(colList)
                 .Build();
-            var xml = genResultsTable.Post();
+            XElement xml = genResultsTable.Post();
             return xml.Value;
         }
 
         public string GenHtml(int queryId, string options = "", string colList = "a")
         {
-            var genResultsTable = new GenResultsTable.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
+            GenResultsTable genResultsTable = new GenResultsTable.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
                 .SetQid(queryId)
                 .SetOptions(options)
                 .SetCList(colList)
                 .Build();
-            var xml = genResultsTable.Post();
+            XElement xml = genResultsTable.Post();
             return xml.Value;
         }
 
         public string GenHtml(Query query, string options = "", string colList = "a")
         {
-            var genResultsTable = new GenResultsTable.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
+            GenResultsTable genResultsTable = new GenResultsTable.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
                 .SetQuery(query.ToString())
                 .SetOptions(options)
                 .SetCList(colList)
                 .Build();
-            var xml = genResultsTable.Post();
+            XElement xml = genResultsTable.Post();
             return xml.Value;
         }
 
         public XElement GetTableSchema()
         {
-            var tblSchema = new GetSchema(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId);
+            GetSchema tblSchema = new GetSchema(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId);
             return tblSchema.Post();
         }
 
         public TableInfo GetTableInfo()
         {
-            var getTblInfo = new GetDbInfo(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId);
-            var xml = getTblInfo.Post();
+            GetDbInfo getTblInfo = new GetDbInfo(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId);
+            XElement xml = getTblInfo.Post();
 
-            var dbName = xml.Element("dbname").Value;
-            var lastRecModTime = long.Parse(xml.Element("lastRecModTime").Value);
-            var lastModifiedTime = long.Parse(xml.Element("lastModifiedTime").Value);
-            var createTime = long.Parse(xml.Element("createdTime").Value);
-            var numRecords = int.Parse(xml.Element("numRecords").Value);
-            var mgrId = xml.Element("mgrID").Value;
-            var mgrName = xml.Element("mgrName").Value;
-            var version = xml.Element("version").Value;
+            string dbName = xml.Element("dbname").Value;
+            long lastRecModTime = long.Parse(xml.Element("lastRecModTime").Value);
+            long lastModifiedTime = long.Parse(xml.Element("lastModifiedTime").Value);
+            long createTime = long.Parse(xml.Element("createdTime").Value);
+            int numRecords = int.Parse(xml.Element("numRecords").Value);
+            string mgrId = xml.Element("mgrID").Value;
+            string mgrName = xml.Element("mgrName").Value;
+            string version = xml.Element("version").Value;
 
             return new TableInfo(dbName, lastRecModTime, lastModifiedTime, createTime, numRecords, mgrId, mgrName,
                                     version);
@@ -183,12 +183,12 @@ namespace Intuit.QuickBase.Client
 
         public int GetServerRecordCount()
         {
-            var tblRecordCount = new GetNumRecords(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId);
-            var xml = tblRecordCount.Post();
+            GetNumRecords tblRecordCount = new GetNumRecords(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId);
+            XElement xml = tblRecordCount.Post();
             return int.Parse(xml.Element("num_records").Value);
         }
 
-        private void _doQuery(DoQuery qry, bool clear)
+        private void DoQuery(DoQuery qry, bool clear)
         {
             if (clear) Records.Clear();
             try
@@ -220,7 +220,7 @@ namespace Intuit.QuickBase.Client
                     if (!string.IsNullOrEmpty(qry.Collist)) qBuild = qBuild.SetCList(qry.Collist);
                     if (!string.IsNullOrEmpty(qry.Options)) qBuild = qBuild.SetOptions(qry.Options);
                     DoQuery dqry = qBuild.Build();
-                    var xml = dqry.Post();
+                    XElement xml = dqry.Post();
                     if (sentArgs == 0) LoadColumns(xml);
                     LoadRecords(xml);
                     sentArgs += useArgs;
@@ -228,7 +228,7 @@ namespace Intuit.QuickBase.Client
             }
             catch (ViewTooLargeException)
             {
-                //split into smaller queries automagically
+                //split into smaller queries auto-magically
                 List<string> optionsList = new List<string>();
                 string query = qry.Query;
                 string collist = qry.Collist;
@@ -260,7 +260,7 @@ namespace Intuit.QuickBase.Client
                         dqryCnt = new DoQueryCount.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId).Build();
                     else
                         dqryCnt = new DoQueryCount.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId).SetQuery(query).Build();
-                    var cntXml = dqryCnt.Post();
+                    XElement cntXml = dqryCnt.Post();
                     maxCount = int.Parse(cntXml.Element("numMatches").Value);
                 }
                 int stride = maxCount / 2;
@@ -308,155 +308,155 @@ namespace Intuit.QuickBase.Client
 
         public void Query(bool clear = true)
         {
-            var doQuery = new DoQuery.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
+            DoQuery doQuery = new DoQuery.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
                 .SetCList("a")
                 .SetFmt(true)
                 .Build();
-            _doQuery(doQuery, clear);
+            this.DoQuery(doQuery, clear);
         }
 
         public void Query(string options, bool clear = true)
         {
-            var doQuery = new DoQuery.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
+            DoQuery doQuery = new DoQuery.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
                 .SetCList("a")
                 .SetFmt(true)
                 .SetOptions(options)
                 .Build();
-            _doQuery(doQuery, clear);
+            this.DoQuery(doQuery, clear);
         }
 
         public void Query(int[] colList, bool clear = true)
         {
-            var clmnList = GetColumnList(colList);
+            string clmnList = GetColumnList(colList);
 
-            var doQuery = new DoQuery.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
+            DoQuery doQuery = new DoQuery.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
                 .SetCList(clmnList)
                 .SetFmt(true)
                 .Build();
-            _doQuery(doQuery, clear);
+            this.DoQuery(doQuery, clear);
         }
 
         public void Query(int[] colList, string options, bool clear = true)
         {
-            var clmnList = GetColumnList(colList);
+            string clmnList = GetColumnList(colList);
 
-            var doQuery = new DoQuery.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
+            DoQuery doQuery = new DoQuery.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
                 .SetCList(clmnList)
                 .SetOptions(options)
                 .SetFmt(true)
                 .Build();
-            _doQuery(doQuery, clear);
+            this.DoQuery(doQuery, clear);
         }
 
         public void Query(Query query, bool clear = true)
         {
-            var doQuery = new DoQuery.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
+            DoQuery doQuery = new DoQuery.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
                 .SetQuery(query.ToString())
                 .SetCList("a")
                 .SetFmt(true)
                 .Build();
-            _doQuery(doQuery, clear);
+            this.DoQuery(doQuery, clear);
         }
 
         public void Query(Query query, string options, bool clear = true)
         {
-            var doQuery = new DoQuery.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
+            DoQuery doQuery = new DoQuery.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
                 .SetQuery(query.ToString())
                 .SetCList("a")
                 .SetOptions(options)
                 .SetFmt(true)
                 .Build();
-            _doQuery(doQuery, clear);
+            this.DoQuery(doQuery, clear);
         }
 
         public void Query(Query query, int[] colList, bool clear = true)
         {
-            var clmnList = GetColumnList(colList);
+            string clmnList = GetColumnList(colList);
 
-            var doQuery = new DoQuery.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
+            DoQuery doQuery = new DoQuery.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
                 .SetQuery(query.ToString())
                 .SetCList(clmnList)
                 .SetFmt(true)
                 .Build();
-            _doQuery(doQuery, clear);
+            this.DoQuery(doQuery, clear);
         }
 
         public void Query(Query query, int[] colList, int[] sortList, bool clear = true)
         {
-            var solList = GetSortList(sortList);
-            var clmnList = GetColumnList(colList);
+            string solList = GetSortList(sortList);
+            string clmnList = GetColumnList(colList);
 
-            var doQuery = new DoQuery.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
+            DoQuery doQuery = new DoQuery.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
                 .SetQuery(query.ToString())
                 .SetCList(clmnList)
                 .SetSList(solList)
                 .SetFmt(true)
                 .Build();
-            _doQuery(doQuery, clear);
+            this.DoQuery(doQuery, clear);
         }
 
         public void Query(Query query, int[] colList, int[] sortList, string options, bool clear = true)
         {
-            var solList = GetSortList(sortList);
-            var clmnList = GetColumnList(colList);
+            string solList = GetSortList(sortList);
+            string clmnList = GetColumnList(colList);
 
-            var doQuery = new DoQuery.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
+            DoQuery doQuery = new DoQuery.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
                 .SetQuery(query.ToString())
                 .SetCList(clmnList)
                 .SetSList(solList)
                 .SetOptions(options)
                 .SetFmt(true)
                 .Build();
-            _doQuery(doQuery, clear);
+            this.DoQuery(doQuery, clear);
         }
 
         public void Query(int queryId, bool clear = true)
         {
-            var doQuery = new DoQuery.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
+            DoQuery doQuery = new DoQuery.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
                 .SetQid(queryId)
                 .SetFmt(true)
                 .Build();
-            _doQuery(doQuery, clear);
+            this.DoQuery(doQuery, clear);
         }
 
         public void Query(int queryId, string options, bool clear = true)
         {
-            var doQuery = new DoQuery.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
+            DoQuery doQuery = new DoQuery.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
                 .SetQid(queryId)
                 .SetFmt(true)
                 .SetOptions(options)
                 .Build();
-            _doQuery(doQuery, clear);
+            this.DoQuery(doQuery, clear);
         }
 
         public int QueryCount(Query query)
         {
-            var doQuery = new DoQueryCount.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
+            DoQueryCount doQuery = new DoQueryCount.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
                 .SetQuery(query.ToString())
                 .Build();
-            var xml = doQuery.Post();
+            XElement xml = doQuery.Post();
             return int.Parse(xml.Element("numMatches").Value);
         }
 
         public int QueryCount(int queryId)
         {
-            var doQuery = new DoQueryCount.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
+            DoQueryCount doQuery = new DoQueryCount.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
                 .SetQid(queryId)
                 .Build();
-            var xml = doQuery.Post();
+            XElement xml = doQuery.Post();
             return int.Parse(xml.Element("numMatches").Value);
         }
 
         public void PurgeRecords()
         {
-            var purge = new PurgeRecords.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId).Build();
+            PurgeRecords purge = new PurgeRecords.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId).Build();
             purge.Post();
             Records.Clear();
         }
 
         public void PurgeRecords(int queryId)
         {
-            var purge = new PurgeRecords.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
+            PurgeRecords purge = new PurgeRecords.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
                 .SetQid(queryId)
                 .Build();
             purge.Post();
@@ -465,7 +465,7 @@ namespace Intuit.QuickBase.Client
 
         public void PurgeRecords(Query query)
         {
-            var purge = new PurgeRecords.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
+            PurgeRecords purge = new PurgeRecords.Builder(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, TableId)
                 .SetQuery(query.ToString())
                 .Build();
             purge.Post();
@@ -499,13 +499,13 @@ namespace Intuit.QuickBase.Client
                 {
                     csvLines.AddRange(modRecs.Select(record => record.GetAsCSV(colList)));
                 }
-                var csvBuilder = new ImportFromCSV.Builder(Application.Client.Ticket, Application.Token,
+                ImportFromCSV.Builder csvBuilder = new ImportFromCSV.Builder(Application.Client.Ticket, Application.Token,
                     Application.Client.AccountDomain, TableId, String.Join("\r\n", csvLines.ToArray()));
                 csvBuilder.SetCList(colList);
                 csvBuilder.SetTimeInUtc(true);
-                var csvUpload = csvBuilder.Build();
+                ImportFromCSV csvUpload = csvBuilder.Build();
 
-                var xml = csvUpload.Post();
+                XElement xml = csvUpload.Post();
 
                 if (acnt > 0) // set in-memory recordId with server value for all newly added values
                 {
@@ -559,7 +559,7 @@ namespace Intuit.QuickBase.Client
         {
             foreach (XElement recordNode in xml.Element("table").Element("records").Elements("record"))
             {
-                var record = RecordFactory.CreateInstance(Application, this, Columns, recordNode);
+                IQRecord record = RecordFactory.CreateInstance(Application, this, Columns, recordNode);
                 Records.Add(record);
             }
         }
@@ -572,16 +572,14 @@ namespace Intuit.QuickBase.Client
         private void LoadColumns(XElement xml)
         {
             Columns.Clear();
-            var columnNodes = xml.Element("table").Element("fields").Elements("field");
+            IEnumerable<XElement> columnNodes = xml.Element("table").Element("fields").Elements("field");
             foreach (XElement columnNode in columnNodes)
             {
                 int columnId = int.Parse(columnNode.Attribute("id").Value);
                 FieldType type =
                     (FieldType) Enum.Parse(typeof(FieldType), columnNode.Attribute("field_type").Value, true);
                 string label = columnNode.Element("label").Value;
-                bool hidden = false;
-                XElement hidNode = columnNode.Element("appears_by_default");
-                if (hidNode != null && hidNode.Value == "0") hidden = true;
+                bool hidden = columnNode.Element("appears_by_default")?.Value == "0";
                 bool canAddChoices = columnNode.Element("allow_new_choices")?.Value == "1";
                 bool virt = false, lookup = false, summary = false;
                 if (columnNode.Attribute("mode") != null)
@@ -593,7 +591,7 @@ namespace Intuit.QuickBase.Client
                 }
 
                 bool allowHTML = columnNode.Element("allowHTML")?.Value == "1";
-                IQColumn col = ColumnFactory.CreateInstance(columnId, label, type, virt, lookup, summary, hidden, canAddChoices);
+                IQColumn col = ColumnFactory.CreateInstance(columnId, label, type, virt, lookup, summary, hidden, allowHTML, canAddChoices);
                 if (columnNode.Element("choices") != null)
                 {
                     foreach (XElement choicenode in columnNode.Element("choices").Elements("choice"))
@@ -622,7 +620,7 @@ namespace Intuit.QuickBase.Client
                 }
                 Columns.Add(col);
             }
-            var keyFidNode = xml.Element("table").Element("original").Element("key_fid");
+            XElement keyFidNode = xml.Element("table").Element("original").Element("key_fid");
             KeyFID = keyFidNode != null ? Int32.Parse(keyFidNode.Value) : Columns.Find(c => c.ColumnType == FieldType.recordid).ColumnId;
             KeyCIdx = Columns.FindIndex(c => c.ColumnId == KeyFID);
         }
@@ -632,8 +630,8 @@ namespace Intuit.QuickBase.Client
             if (colList.Count > 0)
             {
                 const int RECORDID_COLUMN_ID = 3;
-                var columns = String.Empty;
-                var columnList = new List<int>(colList.Count + 1) { RECORDID_COLUMN_ID };
+                string columns = String.Empty;
+                List<int> columnList = new List<int>(colList.Count + 1) { RECORDID_COLUMN_ID };
                 columnList.AddRange(colList.Where(columnId => columnId != RECORDID_COLUMN_ID));
 
                 // Seed the list with the column ID of Record#ID
@@ -646,7 +644,7 @@ namespace Intuit.QuickBase.Client
 
         private static string GetSortList(IEnumerable<int> sortList)
         {
-            var solList = sortList.Aggregate(String.Empty, (current, sol) => current + (sol + "."));
+            string solList = sortList.Aggregate(String.Empty, (current, sol) => current + (sol + "."));
             return solList.TrimEnd('.');
         }
     }
