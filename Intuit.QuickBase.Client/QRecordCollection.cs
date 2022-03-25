@@ -86,25 +86,21 @@ namespace Intuit.QuickBase.Client
                     {
                         if (rangeStart != -1)
                         {
-                            lstQry.Add(string.Format("{{'{0}'.GTE.'{1}'}} AND {{'{0}'.LTE.'{2}'}}", keyfield, rangeStart, rangeEnd));
+                            lstQry.Add($"{{'{keyfield}'.GTE.'{rangeStart}'}} AND {{'{keyfield}'.LTE.'{rangeEnd}'}}");
                             rangeStart = -1;
                             rangeEnd = -1;
                         }
                         else
                         {
-                            lstQry.Add(string.Format("{{'{0}'.EQ.'{1}'}}", keyfield, lastVal));   
+                            lstQry.Add($"{{'{keyfield}'.EQ.'{lastVal}'}}");   
                         }
                     }
                     lastVal = val;
                 }
-                if (rangeStart != -1)
-                {
-                    lstQry.Add(string.Format("{{'{0}'.GTE.'{1}'}} AND {{'{0}'.LTE.'{2}'}}", keyfield, rangeStart, rangeEnd));
-                }
-                else
-                {
-                    lstQry.Add(string.Format("{{'{0}'.EQ.'{1}'}}", keyfield, lastVal));
-                }
+
+                lstQry.Add(rangeStart != -1
+                    ? $"{{'{keyfield}'.GTE.'{rangeStart}'}} AND {{'{keyfield}'.LTE.'{rangeEnd}'}}"
+                    : $"{{'{keyfield}'.EQ.'{lastVal}'}}");
                 StringBuilder qry = null;
                 int cnt = 0;
                 foreach (string addStr in lstQry)

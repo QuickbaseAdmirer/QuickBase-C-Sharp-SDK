@@ -223,7 +223,7 @@ namespace QBFunctionTest
             testTable.Columns.Add(new QColumn("NumberValue", FieldType.@float));
             testTable.Columns.Add(new QColumn("TextValue", FieldType.text));
 
-            for (int i = 0; i < 500; i++)
+            for (int i = 1; i <= 500; i++)
             {
                 IQRecord newRec = testTable.NewRecord();
                 newRec["NumberValue"] = i;
@@ -231,6 +231,8 @@ namespace QBFunctionTest
                 testTable.Records.Add(newRec);
             }
             testTable.AcceptChanges();
+            testTable.Query();
+            Assert.AreEqual(500, testTable.Records.Count,"Big Record creation fails");
 
             List<int> delList = new List<int>
             {
@@ -244,17 +246,18 @@ namespace QBFunctionTest
             Random rndSrc = new Random();
             while (delList.Count < 120)
             {
-                int addVal = rndSrc.Next(500);
+                int addVal = rndSrc.Next(1,500);
                 if (!delList.Contains(addVal)) delList.Add(addVal);
             }
-            foreach (int i in delList.OrderByDescending(x => x))
+            foreach (int i in delList)
             {
-                testTable.Records.RemoveAt(i);
+                testTable.Records.Remove(testTable.Records.Single(r => (decimal)r["NumberValue"] == i));
             }
+            Assert.AreEqual(380, testTable.Records.Count, "Deletion process fail");
             testTable.AcceptChanges();
 
             testTable.Query();
-            Assert.AreEqual(testTable.Records.Count, 380, "Big Record deletion fails");
+            Assert.AreEqual(380, testTable.Records.Count, "Big Record deletion fails");
         }
 
 #if false           //Turning off this test as it requires external setup... will try to make a randomly generated huge table later
