@@ -129,7 +129,7 @@ namespace Intuit.QuickBase.Client
                             throw new InvalidChoiceException($"Column {ColumnName} presented with new choice that is longer than 60 characters");
                         }
 
-                        if (choices.Count > 100)
+                        if (choices.Count > 100 && !inServer)
                         {
                             throw new InvalidChoiceException($"Column {ColumnName} presented with new choice that would bring total # of choices over 100");
                         }

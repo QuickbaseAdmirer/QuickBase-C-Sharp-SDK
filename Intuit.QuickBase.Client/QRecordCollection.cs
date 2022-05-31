@@ -49,6 +49,19 @@ namespace Intuit.QuickBase.Client
             base.RemoveAt(index);
         }
 
+        public new void RemoveRange(int start, int count)
+        {
+            for (int idx = start; idx < start + count; idx++)
+            {
+                IQRecord record = this[idx];
+                if (record.IsOnServer)
+                {
+                    _recordsToRemove.Add(record.RecordId);
+                }
+            }
+            base.RemoveRange(start, count);
+        }
+
         public new void RemoveAll(Predicate<IQRecord> predicate)
         {
             int idx = 0;
