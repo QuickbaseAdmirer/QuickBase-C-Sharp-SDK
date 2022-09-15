@@ -6,7 +6,10 @@
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
 using System.Collections.Generic;
+using System.Net;
+using System.Xml.Linq;
 using Intuit.QuickBase.Core;
+using Intuit.QuickBase.Core.Exceptions;
 
 namespace Intuit.QuickBase.Client
 {
@@ -22,21 +25,43 @@ namespace Intuit.QuickBase.Client
         private IQApplication Application { get; set; }
         private IQTable Table { get; set; }
 
+        public IQColumn this[string columnName]
+        {
+            get
+            {
+                int index = base.IndexOf(new QColumn
+                {
+                    ColumnName = columnName
+                });
+                if (index == -1)
+                {
+                    throw new ColumnDoesNotExistInTableExecption($"Column '{columnName}' not found in table.");
+                }
+
+                return base[index];
+
+            }
+        }
+
+
         public new void Add(IQColumn column)
         {
             if (column.ColumnId == 0)
             {
-                var addCol = new AddField(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, Table.TableId, column.ColumnName, column.ColumnType);
-                var xml = addCol.Post().CreateNavigator();
-                var columnId = int.Parse(xml.SelectSingleNode("/qdbapi/fid").Value);
+                AddField addCol = new AddField(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, Table.TableId, column.ColumnName, column.ColumnType);
+                XElement xml = addCol.Post();
+                Http.CheckForException(xml);
+                int columnId = int.Parse(xml.Element("fid").Value);
                 column.ColumnId = columnId;
             }
+
+            if (column.ColumnType == FieldType.multitext) column.CanAddChoices = true;
             base.Add(column);
         }
 
         public new bool Remove(IQColumn column)
         {
-            var deleteField = new DeleteField(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, Table.TableId, column.ColumnId);
+            DeleteField deleteField = new DeleteField(Application.Client.Ticket, Application.Token, Application.Client.AccountDomain, Table.TableId, column.ColumnId);
             deleteField.Post();
             return base.Remove(column);
         }

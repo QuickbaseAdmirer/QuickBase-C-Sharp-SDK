@@ -5,7 +5,8 @@
  * which accompanies this distribution, and is available at
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
-using System.Xml.XPath;
+
+using System.Xml.Linq;
 using Intuit.QuickBase.Core.Payload;
 using Intuit.QuickBase.Core.Uri;
 
@@ -17,21 +18,26 @@ namespace Intuit.QuickBase.Core
         private readonly Payload.Payload _removeUserFromRolePayload;
         private readonly IQUri _uri;
 
-        public RemoveUserFromRole(string ticket, string appToken, string accountDomain, string dbid, string userId, int roleId)
+        public RemoveUserFromRole(string ticket, string appToken, string accountDomain, string dbid, string userId, int roleId, string userToken = "")
         {
             _removeUserFromRolePayload = new RemoveUserFromRolePayload(userId, roleId);
-            _removeUserFromRolePayload = new ApplicationTicket(_removeUserFromRolePayload, ticket);
+            //If a user token is provided, use it instead of a ticket
+            if (userToken.Length > 0)
+            {
+                _removeUserFromRolePayload = new ApplicationUserToken(_removeUserFromRolePayload, userToken);
+            }
+            else
+            {
+                _removeUserFromRolePayload = new ApplicationTicket(_removeUserFromRolePayload, ticket);
+            }
             _removeUserFromRolePayload = new ApplicationToken(_removeUserFromRolePayload, appToken);
             _removeUserFromRolePayload = new WrapPayload(_removeUserFromRolePayload);
             _uri = new QUriDbid(accountDomain, dbid);
         }
 
-        public string XmlPayload
+        public void BuildXmlPayload(ref XElement parent)
         {
-            get
-            {
-                return _removeUserFromRolePayload.GetXmlPayload();
-            }
+            _removeUserFromRolePayload.GetXmlPayload(ref parent);
         }
 
         public System.Uri Uri
@@ -50,7 +56,7 @@ namespace Intuit.QuickBase.Core
             }
         }
 
-        public XPathDocument Post()
+        public XElement Post()
         {
             HttpPost httpXml = new HttpPostXml();
             httpXml.Post(this);

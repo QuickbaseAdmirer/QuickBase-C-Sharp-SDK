@@ -7,18 +7,18 @@
  */
 using System.Net;
 using System.IO;
-using System.Xml.XPath;
+using System.Xml.Linq;
 using Intuit.QuickBase.Core.Exceptions;
 
 namespace Intuit.QuickBase.Core
 {
-    internal class Http
+    public class Http
     {
-        internal XPathDocument Get(IQGetObject apiAction)
+        internal XElement Get(IQGetObject apiAction)
         {
             WebResponse response = null;
             Stream responseStream = null;
-            XPathDocument xml;
+            XElement xml;
 
             try
             {
@@ -30,14 +30,13 @@ namespace Intuit.QuickBase.Core
 
                 response = request.GetResponse();
                 responseStream = response.GetResponseStream();
-                xml = new XPathDocument(responseStream);
+                xml = XElement.Load(responseStream);
             }
             finally
             {
                 if (responseStream != null) responseStream.Close();
                 if (response != null) response.Close();
             }
-
             CheckForException(xml);
             return xml;
         }
@@ -47,8 +46,7 @@ namespace Intuit.QuickBase.Core
             BinaryReader br = null;
             BinaryWriter bw = null;
             WebResponse response = null;
-            Stream responseStream = null;
-            
+
             try
             {
                 // Request
@@ -63,7 +61,7 @@ namespace Intuit.QuickBase.Core
 
                 // Response
                 response = request.GetResponse();
-                responseStream = response.GetResponseStream();
+                var responseStream = response.GetResponseStream();
 
                 // Write file
                 if (!Directory.Exists(downloadFile.Path))
@@ -79,17 +77,20 @@ namespace Intuit.QuickBase.Core
             {
                 if (bw != null) bw.Close();
                 if (br != null) br.Close();
-                if (responseStream != null) responseStream.Close();
                 if (response != null) response.Close();
             }
         }
 
-        internal static void CheckForException(XPathDocument xml)
+        public static void CheckForException(XElement xmlNav)
         {
-            var xmlNav = xml.CreateNavigator();
-            var errorcode = xmlNav.SelectSingleNode("/qdbapi/errcode").Value;
-            var errortext = xmlNav.SelectSingleNode("/qdbapi/errtext").Value;
-
+            string errorcode = xmlNav.Element("errcode").Value;
+            string errortext = xmlNav.Element("errtext").Value;
+            var errDetailNode = xmlNav.Element("errdetail");
+            if (errDetailNode != null)
+            {
+                string errdetail = errDetailNode.Value;
+                if (errdetail.Length > 0) errortext += ":" + errdetail;
+            }
             if ("2".Equals(errorcode))
             {
                 throw new InvalidInputException(errortext);
@@ -277,7 +278,8 @@ namespace Intuit.QuickBase.Core
 
             if ("77".Equals(errorcode))
             {
-                throw new ApiRequestLimitExceededException(errortext);
+                System.DateTime waitUntil = System.DateTime.Now.AddSeconds(5); //I can't find any examples of where the 'wait time' is supposedly included in the error message, so just putting in a 5 sec wait time
+                throw new ApiRequestLimitExceededException(errortext, waitUntil);
             }
 
             if ("80".Equals(errorcode))

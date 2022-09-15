@@ -11,6 +11,6 @@ namespace Intuit.QuickBase.Client
 {
     internal abstract class QColumnFactoryBase
     {
-        internal abstract IQColumn CreateInstace(int columnId, string columnName, FieldType columnType);
+        internal abstract IQColumn CreateInstance(int columnId, string columnName, FieldType columnType, bool columnVirtual, bool columnLookup, bool columnSummary, bool isHidden, bool allowHTML, bool canAddChoices);
     }
 }

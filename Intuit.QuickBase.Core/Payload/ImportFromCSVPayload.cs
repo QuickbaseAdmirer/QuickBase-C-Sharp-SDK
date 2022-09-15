@@ -7,6 +7,7 @@
  */
 using System;
 using System.Text;
+using System.Xml.Linq;
 
 namespace Intuit.QuickBase.Core.Payload
 {
@@ -15,6 +16,7 @@ namespace Intuit.QuickBase.Core.Payload
         private readonly string _recordsCsv;
         private readonly string _cList;
         private readonly bool _skipFirst;
+        private readonly bool _timeInUtc;
 
         internal class Builder
         {
@@ -39,6 +41,13 @@ namespace Intuit.QuickBase.Core.Payload
                 return this;
             }
 
+            internal bool TimeInUtc { get; private set; }
+            internal Builder SetTimeInUtc(bool val)
+            {
+                TimeInUtc = val;
+                return this;
+            }
+
             internal ImportFromCSVPayload Build()
             {
                 return new ImportFromCSVPayload(this);
@@ -50,15 +59,15 @@ namespace Intuit.QuickBase.Core.Payload
             _recordsCsv = builder.RecordsCsv;
             _cList = builder.CList;
             _skipFirst = builder.SkipFirst;
+            _timeInUtc = builder.TimeInUtc;
         }
 
-        internal override string GetXmlPayload()
+        internal override void GetXmlPayload(ref XElement parent)
         {
-            var sb = new StringBuilder();
-            sb.Append(String.Format("<records_csv><![CDATA[{0}]]></records_csv>", _recordsCsv));
-            sb.Append((!String.IsNullOrEmpty(_cList)) ? String.Format("<clist>{0}</clist>", _cList) : String.Empty);
-            sb.Append(_skipFirst ? "<skipfirst>1</skipfirst>" : String.Empty);
-            return sb.ToString();
+            parent.Add(new XElement("records_csv", new XCData(_recordsCsv)));
+            if (!string.IsNullOrEmpty(_cList)) parent.Add(new XElement("clist", _cList));
+            if (_skipFirst) parent.Add(new XElement("skipfirst", 1));
+            if (_timeInUtc) parent.Add(new XElement("msInUTC", 1));
         }
     }
 }

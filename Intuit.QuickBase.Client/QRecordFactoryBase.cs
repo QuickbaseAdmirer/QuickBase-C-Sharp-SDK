@@ -5,7 +5,7 @@
  * which accompanies this distribution, and is available at
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
-using System.Xml.XPath;
+using System.Xml.Linq;
 
 namespace Intuit.QuickBase.Client
 {
@@ -13,6 +13,6 @@ namespace Intuit.QuickBase.Client
     {
         internal abstract IQRecord CreateInstance(IQApplication application, IQTable table, QColumnCollection columns);
 
-        internal abstract IQRecord CreateInstance(IQApplication application, IQTable table, QColumnCollection columns, XPathNavigator recordNode);
+        internal abstract IQRecord CreateInstance(IQApplication application, IQTable table, QColumnCollection columns, XElement recordNode);
     }
 }

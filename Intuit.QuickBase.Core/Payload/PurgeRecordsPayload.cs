@@ -7,6 +7,7 @@
  */
 using System;
 using System.Text;
+using System.Xml.Linq;
 
 namespace Intuit.QuickBase.Core.Payload
 {
@@ -52,13 +53,11 @@ namespace Intuit.QuickBase.Core.Payload
             _qname = builder.QName;
         }
 
-        internal override string GetXmlPayload()
+        internal override void GetXmlPayload(ref XElement parent)
         {
-            var sb = new StringBuilder();
-            sb.Append(!String.IsNullOrEmpty(_query) ? String.Format("<query>{0}</query>", _query) : String.Empty);
-            sb.Append(_qid > 0 ? String.Format("<qid>{0}</qid>", _qid) : String.Empty);
-            sb.Append(!String.IsNullOrEmpty(_qname) ? String.Format("<qname>{0}</qname>", _qname) : String.Empty);
-            return sb.ToString();
+            if (!string.IsNullOrEmpty(_query)) parent.Add(new XElement("query", _query));
+            if (_qid > 0) parent.Add(new XElement("qid", _qid));
+            if (!string.IsNullOrEmpty(_qname)) parent.Add(new XElement("qname", _qname));
         }
     }
 }

@@ -5,7 +5,8 @@
  * which accompanies this distribution, and is available at
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
-using System.Xml.XPath;
+
+using System.Xml.Linq;
 using Intuit.QuickBase.Core.Payload;
 using Intuit.QuickBase.Core.Uri;
 
@@ -17,31 +18,36 @@ namespace Intuit.QuickBase.Core
         private Payload.Payload _changeUserRolePayload;
         private IQUri _uri;
 
-        public ChangeUserRole(string ticket, string appToken, string accountDomain, string dbid, string userId, int currentRoleId, int newRoldId)
+        public ChangeUserRole(string ticket, string appToken, string accountDomain, string dbid, string userId, int currentRoleId, int newRoldId, string userToken = "")
         {
-            CommonConstruction(ticket, appToken, accountDomain, dbid, new ChangeUserRolePayload(userId, currentRoleId, newRoldId));
+            CommonConstruction(ticket, appToken, accountDomain, dbid, new ChangeUserRolePayload(userId, currentRoleId, newRoldId), userToken);
 
         }
 
-        public ChangeUserRole(string ticket, string appToken, string accountDomain, string dbid, string userId, int currentRoleId)
+        public ChangeUserRole(string ticket, string appToken, string accountDomain, string dbid, string userId, int currentRoleId, string userToken = "")
         {
-            CommonConstruction(ticket, appToken, accountDomain, dbid, new ChangeUserRolePayload(userId, currentRoleId));
+            CommonConstruction(ticket, appToken, accountDomain, dbid, new ChangeUserRolePayload(userId, currentRoleId), userToken);
         }
 
-        private void CommonConstruction(string ticket, string appToken, string accountDomain, string dbid, Payload.Payload payload)
+        private void CommonConstruction(string ticket, string appToken, string accountDomain, string dbid, Payload.Payload payload, string userToken = "")
         {
-            _changeUserRolePayload = new ApplicationTicket(payload, ticket);
+            //If a user token is provided, use it instead of a ticket
+            if (userToken.Length > 0)
+            {
+                _changeUserRolePayload = new ApplicationUserToken(payload, userToken);
+            }
+            else
+            {
+                _changeUserRolePayload = new ApplicationTicket(payload, ticket);
+            }
             _changeUserRolePayload = new ApplicationToken(_changeUserRolePayload, appToken);
             _changeUserRolePayload = new WrapPayload(_changeUserRolePayload);
             _uri = new QUriDbid(accountDomain, dbid);
         }
 
-        public string XmlPayload
+        public void BuildXmlPayload(ref XElement parent)
         {
-            get
-            {
-                return _changeUserRolePayload.GetXmlPayload();
-            }
+            _changeUserRolePayload.GetXmlPayload(ref parent);
         }
 
         public System.Uri Uri
@@ -60,7 +66,7 @@ namespace Intuit.QuickBase.Core
             }
         }
 
-        public XPathDocument Post()
+        public XElement Post()
         {
             HttpPost httpXml = new HttpPostXml();
             httpXml.Post(this);

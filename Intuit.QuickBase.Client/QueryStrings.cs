@@ -27,7 +27,7 @@ namespace Intuit.QuickBase.Client
         // Methods
         public override string ToString()
         {
-            var logicalOp = string.Empty;
+            string logicalOp = string.Empty;
 
             switch (LogicalOp)
             {

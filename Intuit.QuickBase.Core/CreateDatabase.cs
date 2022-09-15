@@ -5,7 +5,8 @@
  * which accompanies this distribution, and is available at
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
-using System.Xml.XPath;
+
+using System.Xml.Linq;
 using Intuit.QuickBase.Core.Payload;
 using Intuit.QuickBase.Core.Uri;
 
@@ -46,20 +47,26 @@ namespace Intuit.QuickBase.Core
         /// <param name="dbName">Supply a new application name.</param>
         /// <param name="dbDesc">Supply an application description.</param>
         /// <param name="createAppToken">Supply "true" to create a new token, "false" otherwise.</param>
-        public CreateDatabase(string ticket, string accountDomain, string dbName, string dbDesc, bool createAppToken)
+        /// <param name="userToken">a user token that can be used instead of a ticket</param>
+        public CreateDatabase(string ticket, string accountDomain, string dbName, string dbDesc, bool createAppToken, string userToken = "")
         {
             _createDatabasePayload = new CreateDatabasePayload(dbName, dbDesc, createAppToken);
-            _createDatabasePayload = new ApplicationTicket(_createDatabasePayload, ticket);
+            //If a user token is provided, use it instead of a ticket
+            if (userToken.Length > 0)
+            {
+                _createDatabasePayload = new ApplicationUserToken(_createDatabasePayload, userToken);
+            }
+            else
+            {
+                _createDatabasePayload = new ApplicationTicket(_createDatabasePayload, ticket);
+            }
             _createDatabasePayload = new WrapPayload(_createDatabasePayload);
             _uri = new QUriMain(accountDomain);
         }
 
-        public string XmlPayload
+        public void BuildXmlPayload(ref XElement parent)
         {
-            get
-            {
-                return _createDatabasePayload.GetXmlPayload();
-            }
+            _createDatabasePayload.GetXmlPayload(ref parent);
         }
 
         public System.Uri Uri
@@ -78,7 +85,7 @@ namespace Intuit.QuickBase.Core
             }
         }
 
-        public XPathDocument Post()
+        public XElement Post()
         {
             HttpPost httpXml = new HttpPostXml();
             httpXml.Post(this);

@@ -8,6 +8,7 @@
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Xml.Linq;
 using System.Xml.XPath;
 
 namespace Intuit.QuickBase.Core
@@ -20,17 +21,20 @@ namespace Intuit.QuickBase.Core
 
         internal override void Post(IQObject qObject)
         {
-            var bytes = Encoding.UTF8.GetBytes(qObject.XmlPayload);
+            XElement parent = new XElement("qdbapi"); ;
+            qObject.BuildXmlPayload(ref parent);
+            var bytes = Encoding.UTF8.GetBytes(parent.ToString());
+            //File.AppendAllText(@"C:\Temp\QBDebugLog.txt", "**Sent->>" + qObject.Uri + " " + QUICKBASE_HEADER + qObject.Action + "\r\n" + qObject.GetPayload + "\r\n");
             Stream requestStream = null;
             WebResponse webResponse = null;
             Stream responseStream = null;
-            XPathDocument xml;
+            XElement xml;
 
             try
             {
                 var request = (HttpWebRequest)WebRequest.Create(qObject.Uri);
                 request.Method = METHOD;
-                request.ProtocolVersion = HttpVersion.Version10;
+                request.ProtocolVersion = HttpVersion.Version11;
                 request.ContentType = CONTENT_TYPE;
                 request.ContentLength = bytes.Length;
                 request.KeepAlive = false;
@@ -42,19 +46,20 @@ namespace Intuit.QuickBase.Core
 
                 webResponse = request.GetResponse();
                 responseStream = webResponse.GetResponseStream();
-                xml = new XPathDocument(responseStream);
+                xml = XElement.Load(responseStream, LoadOptions.PreserveWhitespace);
+                //File.AppendAllText(@"C:\Temp\QBDebugLog.txt", "**Received-<<\r\n" + xml.CreateNavigator().InnerXml + "\r\n");
             }
             finally
             {
-                if (requestStream != null) requestStream.Close();
-                if (responseStream != null) responseStream.Close();
-                if (webResponse != null) webResponse.Close();
+                requestStream?.Close();
+                responseStream?.Close();
+                webResponse?.Close();
             }
         
             Http.CheckForException(xml);
             Response = xml;
         }
 
-        internal override XPathDocument Response { get; set; }
+        internal override XElement Response { get; set; }
     }
 }

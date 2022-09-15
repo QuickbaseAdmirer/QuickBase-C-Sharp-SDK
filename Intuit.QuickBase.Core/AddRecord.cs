@@ -7,7 +7,7 @@
  */
 using System;
 using System.Collections.Generic;
-using System.Xml.XPath;
+using System.Xml.Linq;
 using Intuit.QuickBase.Core.Payload;
 using Intuit.QuickBase.Core.Uri;
 
@@ -31,6 +31,7 @@ namespace Intuit.QuickBase.Core
             private List<IField> _fields;
 
             internal string Ticket { get; set; }
+            internal string UserToken { get; set; }
             internal string AppToken { get; set; }
             internal string AccountDomain { get; set; }
             internal string Dbid { get; set; }
@@ -47,20 +48,30 @@ namespace Intuit.QuickBase.Core
                 }
             }
 
-            public Builder(string ticket, string appToken, string accountDomain, string dbid, List<IField> fields)
+            public Builder(string ticket, string appToken, string accountDomain, string dbid, List<IField> fields, string userToken = "")
             {
                 Ticket = ticket;
+                UserToken = userToken;
                 AppToken = appToken;
                 AccountDomain = accountDomain;
                 Dbid = dbid;
                 Fields = fields;
             }
 
+
             internal bool Disprec { get; private set; }
 
             public Builder SetDisprec(bool val)
             {
                 Disprec = val;
+                return this;
+            }
+
+            internal bool TimeInUtc { get; private set; }
+
+            public Builder SetTimeInUtc(bool val)
+            {
+                TimeInUtc = val;
                 return this;
             }
 
@@ -82,20 +93,25 @@ namespace Intuit.QuickBase.Core
         {
             _addRecordPayload = new AddRecordPayload.Builder(builder.Fields)
                 .SetDisprec(builder.Disprec)
+                .SetTimeInUtc(builder.TimeInUtc)
                 .SetFform(builder.Fform)
                 .Build();
-            _addRecordPayload = new ApplicationTicket(_addRecordPayload, builder.Ticket);
+            if (builder.UserToken.Length > 0)
+            {
+                _addRecordPayload = new ApplicationUserToken(_addRecordPayload, builder.UserToken);
+            }
+            else
+            {
+                _addRecordPayload = new ApplicationTicket(_addRecordPayload, builder.Ticket);
+            }
             _addRecordPayload = new ApplicationToken(_addRecordPayload, builder.AppToken);
             _addRecordPayload = new WrapPayload(_addRecordPayload);
             _uri = new QUriDbid(builder.AccountDomain, builder.Dbid);
         }
 
-        public string XmlPayload
+        public void BuildXmlPayload(ref XElement parent)
         {
-            get
-            {
-                return _addRecordPayload.GetXmlPayload();
-            }
+            _addRecordPayload.GetXmlPayload(ref parent);
         }
 
         public System.Uri Uri
@@ -114,7 +130,7 @@ namespace Intuit.QuickBase.Core
             }
         }
 
-        public XPathDocument Post()
+        public XElement Post()
         {
             HttpPost httpXml = new HttpPostXml();
             httpXml.Post(this);

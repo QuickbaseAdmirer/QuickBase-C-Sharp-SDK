@@ -6,6 +6,7 @@
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
 using System;
+using System.Xml.Linq;
 
 namespace Intuit.QuickBase.Core.Payload
 {
@@ -28,9 +29,9 @@ namespace Intuit.QuickBase.Core.Payload
             }
         }
 
-        internal override string GetXmlPayload()
+        internal override void GetXmlPayload(ref XElement parent)
         {
-            return String.Format("<fid>{0}</fid>", Fid);
+            parent.Add(new XElement("fid", Fid));
         }
     }
 }

@@ -5,7 +5,8 @@
  * which accompanies this distribution, and is available at
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
-using System.Xml.XPath;
+
+using System.Xml.Linq;
 using Intuit.QuickBase.Core.Payload;
 using Intuit.QuickBase.Core.Uri;
 
@@ -17,30 +18,35 @@ namespace Intuit.QuickBase.Core
         private Payload.Payload _getUserInfoPayload;
         private IQUri _uri;
 
-        public GetUserInfo(string ticket, string appToken, string accountDomain, string email)
+        public GetUserInfo(string ticket, string appToken, string accountDomain, string email, string userToken = "")
         {
-            CommonConstruction(ticket, appToken, accountDomain, new GetUserInfoPayload(email));
+            CommonConstruction(ticket, appToken, accountDomain, new GetUserInfoPayload(email), userToken);
         }
 
-        public GetUserInfo(string ticket, string appToken, string accountDomain)
+        public GetUserInfo(string ticket, string appToken, string accountDomain, string userToken = "")
         {
-            CommonConstruction(ticket, appToken, accountDomain, new GetUserInfoPayload());
+            CommonConstruction(ticket, appToken, accountDomain, new GetUserInfoPayload(), userToken);
         }
 
-        private void CommonConstruction(string ticket, string appToken, string accountDomain, Payload.Payload payload)
+        private void CommonConstruction(string ticket, string appToken, string accountDomain, Payload.Payload payload, string userToken = "")
         {
-            _getUserInfoPayload = new ApplicationTicket(payload, ticket);
+            //If a user token is provided, use it instead of a ticket
+            if (userToken.Length > 0)
+            {
+                _getUserInfoPayload = new ApplicationUserToken(payload, userToken);
+            }
+            else
+            {
+                _getUserInfoPayload = new ApplicationTicket(payload, ticket);
+            }
             _getUserInfoPayload = new ApplicationToken(_getUserInfoPayload, appToken);
             _getUserInfoPayload = new WrapPayload(_getUserInfoPayload);
             _uri = new QUriMain(accountDomain);
         }
 
-        public string XmlPayload
+        public void BuildXmlPayload(ref XElement parent)
         {
-            get
-            {
-                return _getUserInfoPayload.GetXmlPayload();
-            }
+            _getUserInfoPayload.GetXmlPayload(ref parent);
         }
 
         public System.Uri Uri
@@ -59,7 +65,7 @@ namespace Intuit.QuickBase.Core
             }
         }
 
-        public XPathDocument Post()
+        public XElement Post()
         {
             HttpPost httpXml = new HttpPostXml();
             httpXml.Post(this);

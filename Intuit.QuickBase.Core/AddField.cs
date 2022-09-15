@@ -5,7 +5,8 @@
  * which accompanies this distribution, and is available at
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
-using System.Xml.XPath;
+
+using System.Xml.Linq;
 using Intuit.QuickBase.Core.Payload;
 using Intuit.QuickBase.Core.Uri;
 
@@ -37,9 +38,9 @@ namespace Intuit.QuickBase.Core
         /// <param name="label"></param>
         /// <param name="type"></param>
         /// <param name="mode"></param>
-        public AddField(string ticket, string appToken, string accountDomain, string dbid, string label, FieldType type, Mode mode)
+        public AddField(string ticket, string appToken, string accountDomain, string dbid, string label, FieldType type, Mode mode, string userToken = "")
         {
-            CommonConstruction(ticket, appToken, accountDomain, dbid, new AddFieldPayload(label, type, mode));
+            CommonConstruction(ticket, appToken, accountDomain, dbid, new AddFieldPayload(label, type, mode), userToken);
         }
 
         /// <summary>
@@ -51,25 +52,30 @@ namespace Intuit.QuickBase.Core
         /// <param name="dbid">Supply table-level dbid.</param>
         /// <param name="label"></param>
         /// <param name="type"></param>
-        public AddField(string ticket, string appToken, string accountDomain, string dbid, string label, FieldType type)
+        /// <param name="userToken">an optional user token that can be used instead of a ticket</param>
+        public AddField(string ticket, string appToken, string accountDomain, string dbid, string label, FieldType type, string userToken = "")
         {
-            CommonConstruction(ticket, appToken, accountDomain, dbid, new AddFieldPayload(label, type));
+            CommonConstruction(ticket, appToken, accountDomain, dbid, new AddFieldPayload(label, type), userToken);
         }
 
-        private void CommonConstruction(string ticket, string appToken, string accountDomain, string dbid, Payload.Payload payload)
+        private void CommonConstruction(string ticket, string appToken, string accountDomain, string dbid, Payload.Payload payload, string userToken = "")
         {
-            _addFieldPayload = new ApplicationTicket(payload, ticket);
+            if (userToken.Length > 0)
+            {
+                _addFieldPayload = new ApplicationUserToken(payload, userToken);
+            }
+            else
+            {
+                _addFieldPayload = new ApplicationTicket(payload, ticket);
+            }
             _addFieldPayload = new ApplicationToken(_addFieldPayload, appToken);
             _addFieldPayload = new WrapPayload(_addFieldPayload);
             _uri = new QUriDbid(accountDomain, dbid);
         }
 
-        public string XmlPayload
+        public void BuildXmlPayload(ref XElement parent)
         {
-            get
-            {
-                return _addFieldPayload.GetXmlPayload();
-            }
+            _addFieldPayload.GetXmlPayload(ref parent);
         }
 
         public System.Uri Uri
@@ -88,7 +94,7 @@ namespace Intuit.QuickBase.Core
             }
         }
 
-        public XPathDocument Post()
+        public XElement Post()
         {
             HttpPost httpXml = new HttpPostXml();
             httpXml.Post(this);

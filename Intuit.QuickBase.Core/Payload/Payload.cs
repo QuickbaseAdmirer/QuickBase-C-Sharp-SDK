@@ -5,10 +5,12 @@
  * which accompanies this distribution, and is available at
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
+using System.Xml.Linq;
+
 namespace Intuit.QuickBase.Core.Payload
 {
     internal abstract class Payload
     {
-        internal abstract string GetXmlPayload();
+        internal abstract void GetXmlPayload(ref XElement parent);
     }
 }

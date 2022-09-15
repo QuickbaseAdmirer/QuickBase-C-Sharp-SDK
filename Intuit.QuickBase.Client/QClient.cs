@@ -7,7 +7,7 @@
  */
 using System;
 using System.Collections.Generic;
-using System.Xml.XPath;
+using System.Xml.Linq;
 using Intuit.QuickBase.Core;
 
 namespace Intuit.QuickBase.Client
@@ -40,20 +40,20 @@ namespace Intuit.QuickBase.Client
         public string AdminPassword { get; private set; }
         public string AccountDomain { get; private set; }
         public int Hours { get; private set; }
-        private QApplicationFactoryBase ApplicationFactory { get; set; }
+        private QApplicationFactoryBase ApplicationFactory { get; }
 
         private void Login()
         {
-            var signin = new Authenticate(ClientUserName, ClientPassword, AccountDomain, Hours);
-            var xml = signin.Post().CreateNavigator();
+            Authenticate signin = new Authenticate(ClientUserName, ClientPassword, AccountDomain, Hours);
+            XElement xml = signin.Post();
 
-            Ticket = xml.SelectSingleNode("/qdbapi/ticket").Value;
+            Ticket = xml.Element("ticket").Value;
         }
 
 
         public void Logout()
         {
-            var signout = new SignOut(AccountDomain);
+            SignOut signout = new SignOut(AccountDomain);
             signout.Post();
             Ticket = null;
             ClientUserName = null;
@@ -81,28 +81,27 @@ namespace Intuit.QuickBase.Client
 
         public IQApplication CreateApplication(string qbName, string qbDescription, CreateApplicationToken createApplicationToken)
         {
-            var createToken = Convert.ToBoolean(createApplicationToken);
+            bool createToken = Convert.ToBoolean(createApplicationToken);
 
-            var createDb = new CreateDatabase(Ticket, AccountDomain, qbName, qbDescription, createToken);
-            var xml = createDb.Post().CreateNavigator();
+            CreateDatabase createDb = new CreateDatabase(Ticket, AccountDomain, qbName, qbDescription, createToken);
+            XElement xml = createDb.Post();
 
             string token = null;
             if (createToken)
             {
-                token = xml.SelectSingleNode("/qdbapi/apptoken").Value;
+                token = xml.Element("apptoken").Value;
             }
-            var applicationId = xml.SelectSingleNode("/qdbapi/appdbid").Value;
+            string applicationId = xml.Element("appdbid").Value;
             return Connect(applicationId, token);
         }
 
         public List<string> FindApplication(string qbName)
         {
-            var findDb = new FindDbByName(Ticket, AccountDomain, qbName);
-            var xml = findDb.Post().CreateNavigator();
+            FindDbByName findDb = new FindDbByName(Ticket, AccountDomain, qbName);
+            XElement xml = findDb.Post();
 
-            var nodes = xml.Select("/qdbapi/dbid");
-            var dbids = new List<string>();
-            foreach (XPathNavigator node in nodes)
+            List<string> dbids = new List<string>();
+            foreach (XElement node in xml.Elements("dbid"))
             {
                 dbids.Add(node.Value);
             }

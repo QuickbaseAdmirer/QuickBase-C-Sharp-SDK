@@ -5,7 +5,8 @@
  * which accompanies this distribution, and is available at
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
-using System.Xml.XPath;
+
+using System.Xml.Linq;
 using Intuit.QuickBase.Core.Payload;
 using Intuit.QuickBase.Core.Uri;
 
@@ -17,21 +18,26 @@ namespace Intuit.QuickBase.Core
         private readonly Payload.Payload _userRolesPayload;
         private readonly IQUri _uri;
 
-        public UserRoles(string ticket, string appToken, string accountDomain, string dbid)
+        public UserRoles(string ticket, string appToken, string accountDomain, string dbid, string userToken = "")
         {
             _userRolesPayload = new UserRolesPayload();
-            _userRolesPayload = new ApplicationTicket(_userRolesPayload, ticket);
+            //If a user token is provided, use it instead of a ticket
+            if (userToken.Length > 0)
+            {
+                _userRolesPayload = new ApplicationUserToken(_userRolesPayload, userToken);
+            }
+            else
+            {
+                _userRolesPayload = new ApplicationTicket(_userRolesPayload, ticket);
+            }
             _userRolesPayload = new ApplicationToken(_userRolesPayload, appToken);
             _userRolesPayload = new WrapPayload(_userRolesPayload);
             _uri = new QUriDbid(accountDomain, dbid);
         }
 
-        public string XmlPayload
+        public void BuildXmlPayload(ref XElement parent)
         {
-            get
-            {
-                return _userRolesPayload.GetXmlPayload();
-            }
+            _userRolesPayload.GetXmlPayload(ref parent);
         }
 
         public System.Uri Uri
@@ -50,7 +56,7 @@ namespace Intuit.QuickBase.Core
             }
         }
 
-        public XPathDocument Post()
+        public XElement Post()
         {
             HttpPost httpXml = new HttpPostXml();
             httpXml.Post(this);

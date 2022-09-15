@@ -6,7 +6,7 @@
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
 using System.Collections.Generic;
-using System.Xml.XPath;
+using System.Xml.Linq;
 
 namespace Intuit.QuickBase.Client
 {
@@ -18,7 +18,7 @@ namespace Intuit.QuickBase.Client
         IQClient Client { get; }
         void Disconnect();
         AppInfo GetApplicationInfo();
-        XPathDocument GetApplicationSchema();
+        XElement GetApplicationSchema();
         string CloneApplication(string qbNewName, string qbNewDescription, CloneData cloneData);
         void RenameApplication(string qbNewName);
         void DeleteApplication();

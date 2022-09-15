@@ -5,7 +5,8 @@
  * which accompanies this distribution, and is available at
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
-using System.Xml.XPath;
+
+using System.Xml.Linq;
 using Intuit.QuickBase.Core.Payload;
 using Intuit.QuickBase.Core.Uri;
 
@@ -33,21 +34,27 @@ namespace Intuit.QuickBase.Core
         /// <param name="accountDomain"></param>
         /// <param name="dbid">Supply table-level dbid.</param>
         /// <param name="fid">Supply a column object.</param>
-        public DeleteField(string ticket, string appToken, string accountDomain, string dbid, int fid)
+        /// <param name="userToken">optional user token that can be used instead of a ticket</param>
+        public DeleteField(string ticket, string appToken, string accountDomain, string dbid, int fid, string userToken = "")
         {
             _deleteFieldPayload = new DeleteFieldPayload(fid);
-            _deleteFieldPayload = new ApplicationTicket(_deleteFieldPayload, ticket);
+            //If a user token is provided, use it instead of a ticket
+            if (userToken.Length > 0)
+            {
+                _deleteFieldPayload = new ApplicationUserToken(_deleteFieldPayload, userToken);
+            }
+            else
+            {
+                _deleteFieldPayload = new ApplicationTicket(_deleteFieldPayload, ticket);
+            }
             _deleteFieldPayload = new ApplicationToken(_deleteFieldPayload, appToken);
             _deleteFieldPayload = new WrapPayload(_deleteFieldPayload);
             _uri = new QUriDbid(accountDomain, dbid);
         }
 
-        public string XmlPayload
+        public void BuildXmlPayload(ref XElement parent)
         {
-            get
-            {
-                return _deleteFieldPayload.GetXmlPayload();
-            }
+            _deleteFieldPayload.GetXmlPayload(ref parent);
         }
 
         public System.Uri Uri
@@ -66,7 +73,7 @@ namespace Intuit.QuickBase.Core
             }
         }
 
-        public XPathDocument Post()
+        public XElement Post()
         {
             HttpPost httpXml = new HttpPostXml();
             httpXml.Post(this);

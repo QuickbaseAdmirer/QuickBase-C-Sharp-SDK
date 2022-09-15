@@ -5,7 +5,8 @@
  * which accompanies this distribution, and is available at
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
-using System.Xml.XPath;
+
+using System.Xml.Linq;
 using Intuit.QuickBase.Core.Payload;
 using Intuit.QuickBase.Core.Uri;
 
@@ -17,30 +18,34 @@ namespace Intuit.QuickBase.Core
         private Payload.Payload _addReplaceDBPagePayload;
         private IQUri _uri;
 
-        public AddReplaceDBPage(string ticket, string appToken, string accountDomain, string dbid, string pageName, PageType pageType, string pageBody)
+        public AddReplaceDBPage(string ticket, string appToken, string accountDomain, string dbid, string pageName, PageType pageType, string pageBody, string userToken = "")
         {
-            CommonConstruction(ticket, appToken, accountDomain, dbid, new AddReplaceDBPagePayload(pageName, pageType, pageBody));
+            CommonConstruction(ticket, appToken, accountDomain, dbid, new AddReplaceDBPagePayload(pageName, pageType, pageBody), userToken);
         }
 
-        public AddReplaceDBPage(string ticket, string appToken, string accountDomain, string dbid, int pageId, PageType pageType, string pageBody)
+        public AddReplaceDBPage(string ticket, string appToken, string accountDomain, string dbid, int pageId, PageType pageType, string pageBody, string userToken = "")
         {
-            CommonConstruction(ticket, appToken, accountDomain, dbid, new AddReplaceDBPagePayload(pageId, pageType, pageBody));
+            CommonConstruction(ticket, appToken, accountDomain, dbid, new AddReplaceDBPagePayload(pageId, pageType, pageBody), userToken);
         }
 
-        private void CommonConstruction(string ticket, string appToken, string accountDomain, string dbid, Payload.Payload payload)
+        private void CommonConstruction(string ticket, string appToken, string accountDomain, string dbid, Payload.Payload payload, string userToken = "")
         {
-            _addReplaceDBPagePayload = new ApplicationTicket(payload, ticket);
+            if (userToken.Length > 0)
+            {
+                _addReplaceDBPagePayload = new ApplicationUserToken(payload, userToken);
+            }
+            else
+            {
+                _addReplaceDBPagePayload = new ApplicationTicket(payload, ticket);
+            }
             _addReplaceDBPagePayload = new ApplicationToken(_addReplaceDBPagePayload, appToken);
             _addReplaceDBPagePayload = new WrapPayload(_addReplaceDBPagePayload);
             _uri = new QUriDbid(accountDomain, dbid);
         }
 
-        public string XmlPayload
+        public void BuildXmlPayload(ref XElement parent)
         {
-            get
-            {
-                return _addReplaceDBPagePayload.GetXmlPayload();
-            }
+            _addReplaceDBPagePayload.GetXmlPayload(ref parent);
         }
 
         public System.Uri Uri
@@ -59,7 +64,7 @@ namespace Intuit.QuickBase.Core
             }
         }
 
-        public XPathDocument Post()
+        public XElement Post()
         {
             HttpPost httpXml = new HttpPostXml();
             httpXml.Post(this);

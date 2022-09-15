@@ -7,7 +7,7 @@
  */
 using System;
 using System.Collections.Generic;
-using System.Xml.XPath;
+using System.Xml.Linq;
 using Intuit.QuickBase.Core.Payload;
 using Intuit.QuickBase.Core.Uri;
 
@@ -31,6 +31,7 @@ namespace Intuit.QuickBase.Core
             private int _rid;
 
             internal string Ticket { get; set; }
+            internal string UserToken { get; set; }
             internal string AppToken { get; set; }
             internal string AccountDomain { get; set; }
             internal string Dbid { get; set; }
@@ -59,9 +60,10 @@ namespace Intuit.QuickBase.Core
                 }
             }
 
-            public Builder(string ticket, string appToken, string accountDomain, string dbid, int rid, List<IField> fields)
+            public Builder(string ticket, string appToken, string accountDomain, string dbid, int rid, List<IField> fields, string userToken = "")
             {
                 Ticket = ticket;
+                UserToken = userToken;
                 AppToken = appToken;
                 AccountDomain = accountDomain;
                 Dbid = dbid;
@@ -85,6 +87,14 @@ namespace Intuit.QuickBase.Core
                 return this;
             }
 
+            internal bool TimeInUtc { get; private set; }
+
+            public Builder SetTimeInUtc(bool val)
+            {
+                TimeInUtc = val;
+                return this;
+            }
+
             internal bool Fform { get; private set; }
 
             public Builder SetFform(bool val)
@@ -104,20 +114,26 @@ namespace Intuit.QuickBase.Core
             _editRecordPayload = new EditRecordPayload.Builder(builder.Rid, builder.Fields)
                 .SetUpdateId(builder.UpdateId)
                 .SetDisprec(builder.Disprec)
+                .SetTimeInUtc(builder.TimeInUtc)
                 .SetFform(builder.Fform)
                 .Build();
-            _editRecordPayload = new ApplicationTicket(_editRecordPayload, builder.Ticket);
+            //If a user token is provided, use it instead of a ticket
+            if (builder.UserToken.Length > 0)
+            {
+                _editRecordPayload = new ApplicationUserToken(_editRecordPayload, builder.UserToken);
+            }
+            else
+            {
+                _editRecordPayload = new ApplicationTicket(_editRecordPayload, builder.Ticket);
+            }
             _editRecordPayload = new ApplicationToken(_editRecordPayload, builder.AppToken);
             _editRecordPayload = new WrapPayload(_editRecordPayload);
             _uri = new QUriDbid(builder.AccountDomain, builder.Dbid);
         }
 
-        public string XmlPayload
+        public void BuildXmlPayload(ref XElement parent)
         {
-            get
-            {
-                return _editRecordPayload.GetXmlPayload();
-            }
+            _editRecordPayload.GetXmlPayload(ref parent);
         }
 
         public System.Uri Uri
@@ -136,7 +152,7 @@ namespace Intuit.QuickBase.Core
             }
         }
 
-        public XPathDocument Post()
+        public XElement Post()
         {
             HttpPost httpXml = new HttpPostXml();
             httpXml.Post(this);

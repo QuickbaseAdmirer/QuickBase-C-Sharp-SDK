@@ -7,6 +7,7 @@
  */
 using System;
 using System.Text;
+using System.Xml.Linq;
 
 namespace Intuit.QuickBase.Core.Payload
 {
@@ -37,12 +38,10 @@ namespace Intuit.QuickBase.Core.Payload
 
         private bool Jht { get; set; }
 
-        internal override string GetXmlPayload()
+        internal override void GetXmlPayload(ref XElement parent)
         {
-            var sb = new StringBuilder();
-            sb.Append(String.Format("<rid>{0}</rid>", Rid));
-            sb.Append(Jht ? "<jht>" + "1" + "</jht>" : String.Empty);
-            return sb.ToString();
+            parent.Add(new XElement("rid", Rid));
+            if (Jht) parent.Add(new XElement("jht", 1));
         }
     }
 }

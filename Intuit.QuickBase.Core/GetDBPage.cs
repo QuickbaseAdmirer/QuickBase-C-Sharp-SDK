@@ -5,7 +5,8 @@
  * which accompanies this distribution, and is available at
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
-using System.Xml.XPath;
+
+using System.Xml.Linq;
 using Intuit.QuickBase.Core.Payload;
 using Intuit.QuickBase.Core.Uri;
 
@@ -17,21 +18,26 @@ namespace Intuit.QuickBase.Core
         private readonly Payload.Payload _getDbPagePayload;
         private readonly IQUri _uri;
 
-        public GetDBPage(string ticket, string appToken, string accountDomain, string dbid, int pageId)
+        public GetDBPage(string ticket, string appToken, string accountDomain, string dbid, int pageId, string userToken = "")
         {
             _getDbPagePayload = new GetDBPagePayload(pageId);
-            _getDbPagePayload = new ApplicationTicket(_getDbPagePayload, ticket);
+            //If a user token is provided, use it instead of a ticket
+            if (userToken.Length > 0)
+            {
+                _getDbPagePayload = new ApplicationUserToken(_getDbPagePayload, userToken);
+            }
+            else
+            {
+                _getDbPagePayload = new ApplicationTicket(_getDbPagePayload, ticket);
+            }
             _getDbPagePayload = new ApplicationToken(_getDbPagePayload, appToken);
             _getDbPagePayload = new WrapPayload(_getDbPagePayload);
             _uri = new QUriDbid(accountDomain, dbid);
         }
 
-        public string XmlPayload
+        public void BuildXmlPayload(ref XElement parent)
         {
-            get
-            {
-                return _getDbPagePayload.GetXmlPayload();
-            }
+            _getDbPagePayload.GetXmlPayload(ref parent);
         }
 
         public System.Uri Uri
@@ -50,7 +56,7 @@ namespace Intuit.QuickBase.Core
             }
         }
 
-        public XPathDocument Post()
+        public XElement Post()
         {
             HttpPost httpXml = new HttpPostXml();
             httpXml.Post(this);

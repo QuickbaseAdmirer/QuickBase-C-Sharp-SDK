@@ -5,7 +5,8 @@
  * which accompanies this distribution, and is available at
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
-using System.Xml.XPath;
+
+using System.Xml.Linq;
 using Intuit.QuickBase.Core.Payload;
 using Intuit.QuickBase.Core.Uri;
 
@@ -17,21 +18,26 @@ namespace Intuit.QuickBase.Core
         private readonly Payload.Payload _changeRecordOwnerPayload;
         private readonly IQUri _uri;
 
-        public ChangeRecordOwner(string ticket, string appToken, string accountDomain, string dbid, int rid, string newOwner)
+        public ChangeRecordOwner(string ticket, string appToken, string accountDomain, string dbid, int rid, string newOwner, string userToken = "")
         {
             _changeRecordOwnerPayload = new ChangeRecordOwnerPayload(rid, newOwner);
-            _changeRecordOwnerPayload = new ApplicationTicket(_changeRecordOwnerPayload, ticket);
+            //If a user token is provided, use it instead of a ticket
+            if (userToken.Length > 0)
+            {
+                _changeRecordOwnerPayload = new ApplicationUserToken(_changeRecordOwnerPayload, userToken);
+            }
+            else
+            {
+                _changeRecordOwnerPayload = new ApplicationTicket(_changeRecordOwnerPayload, ticket);
+            }
             _changeRecordOwnerPayload = new ApplicationToken(_changeRecordOwnerPayload, appToken);
             _changeRecordOwnerPayload = new WrapPayload(_changeRecordOwnerPayload);
             _uri = new QUriDbid(accountDomain, dbid);
         }
 
-        public string XmlPayload
+        public void BuildXmlPayload(ref XElement parent)
         {
-            get
-            {
-                return _changeRecordOwnerPayload.GetXmlPayload();
-            }
+            _changeRecordOwnerPayload.GetXmlPayload(ref parent);
         }
 
         public System.Uri Uri
@@ -50,7 +56,7 @@ namespace Intuit.QuickBase.Core
             }
         }
 
-        public XPathDocument Post()
+        public XElement Post()
         {
             HttpPost httpXml = new HttpPostXml();
             httpXml.Post(this);

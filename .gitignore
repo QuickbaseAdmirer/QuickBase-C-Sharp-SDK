@@ -1,1 +1,14 @@
-.svn
+.svn/
+.vs/
+*/obj/
+*/bin/
+**/packages/
+QBFunctionTest/TestConfigs.xml
+TestResults/
+*.CodeAnalysisLog.xml
+*.ruleset
+*.lastcodeanalysissucceeded
+*.suo
+*.cache
+*.orig
+*.bak

@@ -6,7 +6,7 @@
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
 using System;
-using System.Xml.XPath;
+using System.Xml.Linq;
 using Intuit.QuickBase.Core.Payload;
 using Intuit.QuickBase.Core.Uri;
 
@@ -33,13 +33,15 @@ namespace Intuit.QuickBase.Core
         public class Builder
         {
             internal string Ticket { get; set; }
+            internal string UserToken { get; set; }
             internal string AppToken { get; set; }
             internal string AccountDomain { get; set; }
             internal string Dbid { get; set; }
 
-            public Builder(string ticket, string appToken, string accountDomain, string dbid)
+            public Builder(string ticket, string appToken, string accountDomain, string dbid, string userToken = "")
             {
                 Ticket = ticket;
+                UserToken = userToken;
                 AppToken = appToken;
                 AccountDomain = accountDomain;
                 Dbid = dbid;
@@ -87,18 +89,23 @@ namespace Intuit.QuickBase.Core
                 .SetQid(builder.Qid)
                 .SetQName(builder.QName)
                 .Build();
-            _purgeRecordsPayload = new ApplicationTicket(_purgeRecordsPayload, builder.Ticket);
+            //If a user token is provided, use it instead of a ticket
+            if (builder.UserToken.Length > 0)
+            {
+                _purgeRecordsPayload = new ApplicationUserToken(_purgeRecordsPayload, builder.UserToken);
+            }
+            else
+            {
+                _purgeRecordsPayload = new ApplicationTicket(_purgeRecordsPayload, builder.Ticket);
+            }
             _purgeRecordsPayload = new ApplicationToken(_purgeRecordsPayload, builder.AppToken);
             _purgeRecordsPayload = new WrapPayload(_purgeRecordsPayload);
             _uri = new QUriDbid(builder.AccountDomain, builder.Dbid);
         }
 
-        public string XmlPayload
+        public void BuildXmlPayload(ref XElement parent)
         {
-            get
-            {
-                return _purgeRecordsPayload.GetXmlPayload();
-            }
+            _purgeRecordsPayload.GetXmlPayload(ref parent);
         }
 
         public System.Uri Uri
@@ -117,7 +124,7 @@ namespace Intuit.QuickBase.Core
             }
         }
 
-        public XPathDocument Post()
+        public XElement Post()
         {
             HttpPost httpXml = new HttpPostXml();
             httpXml.Post(this);

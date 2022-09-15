@@ -5,7 +5,8 @@
  * which accompanies this distribution, and is available at
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
-using System.Xml.XPath;
+
+using System.Xml.Linq;
 using Intuit.QuickBase.Core.Payload;
 using Intuit.QuickBase.Core.Uri;
 
@@ -30,21 +31,27 @@ namespace Intuit.QuickBase.Core
         /// <param name="appToken">Supply application token that is assigned to your QuickBase Application. See QuickBase Online help to obtain an application token.</param>
         /// <param name="accountDomain"></param>
         /// <param name="dbid">Supply application-level or table-level dbid.</param>
-        public DeleteDatabase(string ticket, string appToken, string accountDomain, string dbid)
+        /// <param name="userToken">optional user token that can be used instead of a ticket</param>
+        public DeleteDatabase(string ticket, string appToken, string accountDomain, string dbid, string userToken = "")
         {
             _deleteDatabasePayload = new DeleteDatabasePayload();
-            _deleteDatabasePayload = new ApplicationTicket(_deleteDatabasePayload, ticket);
+            //If a user token is provided, use it instead of a ticket
+            if (userToken.Length > 0)
+            {
+                _deleteDatabasePayload = new ApplicationUserToken(_deleteDatabasePayload, userToken);
+            }
+            else
+            {
+                _deleteDatabasePayload = new ApplicationTicket(_deleteDatabasePayload, ticket);
+            }
             _deleteDatabasePayload = new ApplicationToken(_deleteDatabasePayload, appToken);
             _deleteDatabasePayload = new WrapPayload(_deleteDatabasePayload);
             _uri = new QUriDbid(accountDomain, dbid);
         }
 
-        public string XmlPayload
+        public void BuildXmlPayload(ref XElement parent)
         {
-            get
-            {
-                return _deleteDatabasePayload.GetXmlPayload();
-            }
+            _deleteDatabasePayload.GetXmlPayload(ref parent);
         }
 
         public System.Uri Uri
@@ -63,7 +70,7 @@ namespace Intuit.QuickBase.Core
             }
         }
 
-        public XPathDocument Post()
+        public XElement Post()
         {
             HttpPost httpXml = new HttpPostXml();
             httpXml.Post(this);

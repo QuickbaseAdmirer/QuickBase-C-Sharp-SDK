@@ -7,6 +7,7 @@
  */
 using System;
 using System.Text;
+using System.Xml.Linq;
 
 namespace Intuit.QuickBase.Core.Payload
 {
@@ -52,13 +53,11 @@ namespace Intuit.QuickBase.Core.Payload
             _adminOnly = builder.AdminOnly;
         }
 
-        internal override string GetXmlPayload()
+        internal override void GetXmlPayload(ref XElement parent)
         {
-            var sb = new StringBuilder();
-            sb.Append(_excludeParents ? "<Excludeparents>1</Excludeparents>" : "<Excludeparents>0</Excludeparents>");
-            sb.Append(_withEmbeddedTables ? "<withembeddedtables>1</withembeddedtables>" : "<withembeddedtables>0</withembeddedtables>");
-            sb.Append(_adminOnly ? "<adminOnly/>" : String.Empty);
-            return sb.ToString();
+            parent.Add(new XElement("Excludeparents", _excludeParents ? 1 : 0));
+            parent.Add(new XElement("withembeddedtables", _withEmbeddedTables ? 1 : 0));
+            if (_adminOnly) parent.Add(new XElement("adminOnly"));
         }
     }
 }

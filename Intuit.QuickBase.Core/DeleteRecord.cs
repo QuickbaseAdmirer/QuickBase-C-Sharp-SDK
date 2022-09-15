@@ -5,7 +5,8 @@
  * which accompanies this distribution, and is available at
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
-using System.Xml.XPath;
+
+using System.Xml.Linq;
 using Intuit.QuickBase.Core.Payload;
 using Intuit.QuickBase.Core.Uri;
 
@@ -30,21 +31,27 @@ namespace Intuit.QuickBase.Core
         /// <param name="accountDomain"></param>
         /// <param name="dbid">Supply table-level dbid.</param>
         /// <param name="rid">Supply a record object.</param>
-        public DeleteRecord(string ticket, string appToken, string accountDomain, string dbid, int rid)
+        /// <param name="userToken">optional user token that can be used instead of a ticket</param>
+        public DeleteRecord(string ticket, string appToken, string accountDomain, string dbid, int rid, string userToken = "")
         {
             _deleteRecordPayload = new DeleteRecordPayload(rid);
-            _deleteRecordPayload = new ApplicationTicket(_deleteRecordPayload, ticket);
+            //If a user token is provided, use it instead of a ticket
+            if (userToken.Length > 0)
+            {
+                _deleteRecordPayload = new ApplicationUserToken(_deleteRecordPayload, userToken);
+            }
+            else
+            {
+                _deleteRecordPayload = new ApplicationTicket(_deleteRecordPayload, ticket);
+            }
             _deleteRecordPayload = new ApplicationToken(_deleteRecordPayload, appToken);
             _deleteRecordPayload = new WrapPayload(_deleteRecordPayload);
             _uri = new QUriDbid(accountDomain, dbid);
         }
 
-        public string XmlPayload
+        public void BuildXmlPayload(ref XElement parent)
         {
-            get
-            {
-                return _deleteRecordPayload.GetXmlPayload();
-            }
+            _deleteRecordPayload.GetXmlPayload(ref parent);
         }
 
         public System.Uri Uri
@@ -63,7 +70,7 @@ namespace Intuit.QuickBase.Core
             }
         }
 
-        public XPathDocument Post()
+        public XElement Post()
         {
             HttpPost httpXml = new HttpPostXml();
             httpXml.Post(this);

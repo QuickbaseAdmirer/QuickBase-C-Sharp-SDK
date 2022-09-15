@@ -5,7 +5,8 @@
  * which accompanies this distribution, and is available at
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
-using System.Xml.XPath;
+
+using System.Xml.Linq;
 using Intuit.QuickBase.Core.Payload;
 using Intuit.QuickBase.Core.Uri;
 
@@ -17,30 +18,35 @@ namespace Intuit.QuickBase.Core
         private Payload.Payload _getRecordAsHtmlPayload;
         private IQUri _uri;
 
-        public GetRecordAsHtml(string ticket, string appToken, string accountDomain, string dbid, int rid, bool jht)
+        public GetRecordAsHtml(string ticket, string appToken, string accountDomain, string dbid, int rid, bool jht, string userToken = "")
         {
-            CommonConstruction(ticket, appToken, accountDomain, dbid, new GetRecordAsHtmlPayload(rid, jht));
+            CommonConstruction(ticket, appToken, accountDomain, dbid, new GetRecordAsHtmlPayload(rid, jht), userToken);
         }
 
-        public GetRecordAsHtml(string ticket, string appToken, string accountDomain, string dbid, int rid)
+        public GetRecordAsHtml(string ticket, string appToken, string accountDomain, string dbid, int rid, string userToken = "")
         {
-            CommonConstruction(ticket, appToken, accountDomain, dbid, new GetRecordAsHtmlPayload(rid));
+            CommonConstruction(ticket, appToken, accountDomain, dbid, new GetRecordAsHtmlPayload(rid), userToken);
         }
 
-        private void CommonConstruction(string ticket, string appToken, string accountDomain, string dbid, Payload.Payload payload)
+        private void CommonConstruction(string ticket, string appToken, string accountDomain, string dbid, Payload.Payload payload, string userToken = "")
         {
-            _getRecordAsHtmlPayload = new ApplicationTicket(payload, ticket);
+            //If a user token is provided, use it instead of a ticket
+            if (userToken.Length > 0)
+            {
+                _getRecordAsHtmlPayload = new ApplicationUserToken(payload, userToken);
+            }
+            else
+            {
+                _getRecordAsHtmlPayload = new ApplicationTicket(payload, ticket);
+            }
             _getRecordAsHtmlPayload = new ApplicationToken(_getRecordAsHtmlPayload, appToken);
             _getRecordAsHtmlPayload = new WrapPayload(_getRecordAsHtmlPayload);
             _uri = new QUriDbid(accountDomain, dbid);
         }
 
-        public string XmlPayload
+        public void BuildXmlPayload(ref XElement parent)
         {
-            get
-            {
-                return _getRecordAsHtmlPayload.GetXmlPayload();
-            }
+            _getRecordAsHtmlPayload.GetXmlPayload(ref parent);
         }
 
         public System.Uri Uri
@@ -59,7 +65,7 @@ namespace Intuit.QuickBase.Core
             }
         }
 
-        public XPathDocument Post()
+        public XElement Post()
         {
             HttpPost httpXml = new HttpPostXml();
             httpXml.Post(this);

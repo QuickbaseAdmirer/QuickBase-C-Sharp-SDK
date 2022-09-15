@@ -5,7 +5,8 @@
  * which accompanies this distribution, and is available at
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
-using System.Xml.XPath;
+
+using System.Xml.Linq;
 using Intuit.QuickBase.Core.Payload;
 using Intuit.QuickBase.Core.Uri;
 
@@ -20,12 +21,14 @@ namespace Intuit.QuickBase.Core
         public class Builder
         {
             internal string Ticket { get; set; }
+            internal string UserToken { get; set; }
             internal string AppToken { get; set; }
             internal string AccountDomain { get; set; }
 
-            public Builder(string ticket, string appToken, string accountDomain)
+            public Builder(string ticket, string appToken, string accountDomain, string userToken = "")
             {
                 Ticket = ticket;
+                UserToken = userToken;
                 AppToken = appToken;
                 AccountDomain = accountDomain;
             }
@@ -67,18 +70,23 @@ namespace Intuit.QuickBase.Core
                 .SetWithEmbeddedTables(builder.WithEmbeddedTables)
                 .SetAdminOnly(builder.AdminOnly)
                 .Build();
-            _grantDBsPayload = new ApplicationTicket(_grantDBsPayload, builder.Ticket);
+            //If a user token is provided, use it instead of a ticket
+            if (builder.UserToken.Length > 0)
+            {
+                _grantDBsPayload = new ApplicationUserToken(_grantDBsPayload, builder.UserToken);
+            }
+            else
+            {
+                _grantDBsPayload = new ApplicationTicket(_grantDBsPayload, builder.Ticket);
+            }
             _grantDBsPayload = new ApplicationToken(_grantDBsPayload, builder.AppToken);
             _grantDBsPayload = new WrapPayload(_grantDBsPayload);
             _uri = new QUriMain(builder.AccountDomain);
         }
 
-        public string XmlPayload
+        public void BuildXmlPayload(ref XElement parent)
         {
-            get
-            {
-                return _grantDBsPayload.GetXmlPayload();
-            }
+            _grantDBsPayload.GetXmlPayload(ref parent);
         }
 
         public System.Uri Uri
@@ -97,7 +105,7 @@ namespace Intuit.QuickBase.Core
             }
         }
 
-        public XPathDocument Post()
+        public XElement Post()
         {
             HttpPost httpXml = new HttpPostXml();
             httpXml.Post(this);

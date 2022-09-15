@@ -6,7 +6,7 @@
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
 using System;
-using System.Xml.XPath;
+using System.Xml.Linq;
 using Intuit.QuickBase.Core.Payload;
 using Intuit.QuickBase.Core.Uri;
 
@@ -25,68 +25,74 @@ namespace Intuit.QuickBase.Core
         private const string QUICKBASE_ACTION = "API_DoQuery";
         private readonly Payload.Payload _doQueryPayload;
         private readonly IQUri _uri;
+        private readonly string _options;
+        private readonly string _query;
+        private readonly string _collist;
 
         public class Builder
         {
             internal string Ticket { get; set; }
+            internal string UserToken { get; set; }
             internal string AppToken { get; set; }
             internal string AccountDomain { get; set; }
             internal string Dbid { get; set; }
 
-            public Builder(string ticket, string appToken, string accountDomain, string dbid)
+            public Builder(string ticket, string appToken, string accountDomain, string dbid, string userToken = "")
             {
                 Ticket = ticket;
+                UserToken = userToken;
                 AppToken = appToken;
                 AccountDomain = accountDomain;
                 Dbid = dbid;
             }
 
+
             internal string Query { get; private set; }
 
-            public Builder SetQuery(string val)
+            public Builder SetQuery(string query)
             {
-                if (val == null) throw new ArgumentNullException("query");
-                if (val.Trim() == String.Empty) throw new ArgumentException("query");
-                Query = val;
+                if (query == null) throw new ArgumentNullException(nameof(query));
+                if (query.Trim() == String.Empty) throw new ArgumentException("query is empty after whitespace trim");
+                Query = query;
                 return this;
             }
 
             internal int Qid { get; private set; }
 
-            public Builder SetQid(int val)
+            public Builder SetQid(int qid)
             {
-                if (val < 1) throw new ArgumentException("qid");
-                Qid = val;
+                if (qid < 1) throw new ArgumentException("Invalid QB Id");
+                Qid = qid;
                 return this;
             }
 
             internal string QName { get; private set; }
 
-            public Builder SetQName(string val)
+            public Builder SetQName(string qName)
             {
-                if (val == null) throw new ArgumentNullException("qName");
-                if (val.Trim() == String.Empty) throw new ArgumentException("qName");
-                QName = val;
+                if (qName == null) throw new ArgumentNullException(nameof(qName));
+                if (qName.Trim() == String.Empty) throw new ArgumentException("qName is empty after whitespace trim");
+                QName = qName;
                 return this;
             }
 
             internal string CList { get; private set; }
 
-            public Builder SetCList(string val)
+            public Builder SetCList(string cList)
             {
-                if (val == null) throw new ArgumentNullException("cList");
-                if (val.Trim() == String.Empty) throw new ArgumentException("cList");
-                CList = val;
+                if (cList == null) throw new ArgumentNullException(nameof(cList));
+                if (cList.Trim() == String.Empty) throw new ArgumentException("cList is empty after whitespace trim");
+                CList = cList;
                 return this;
             }
 
             internal string SList { get; private set; }
 
-            public Builder SetSList(string val)
+            public Builder SetSList(string sList)
             {
-                if (val == null) throw new ArgumentNullException("sList");
-                if (val.Trim() == String.Empty) throw new ArgumentException("sList");
-                SList = val;
+                if (sList == null) throw new ArgumentNullException(nameof(sList));
+                if (sList.Trim() == String.Empty) throw new ArgumentException("sList is empty after whitespace trim");
+                SList = sList;
                 return this;
             }
 
@@ -100,11 +106,11 @@ namespace Intuit.QuickBase.Core
 
             internal string Options { get; private set; }
 
-            public Builder SetOptions(string val)
+            public Builder SetOptions(string opts)
             {
-                if (val == null) throw new ArgumentNullException("options");
-                if (val.Trim() == String.Empty) throw new ArgumentException("options");
-                Options = val;
+                if (opts == null) throw new ArgumentNullException(nameof(opts));
+                if (opts.Trim() == String.Empty) throw new ArgumentException("opts empty after whitespace trim");
+                Options = opts;
                 return this;
             }
 
@@ -125,18 +131,41 @@ namespace Intuit.QuickBase.Core
                 .SetFmt(builder.Fmt)
                 .SetOptions(builder.Options)
                 .Build();
-            _doQueryPayload = new ApplicationTicket(_doQueryPayload, builder.Ticket);
+            _options = builder.Options;
+            _query = builder.Query;
+            _collist = builder.CList;
+            //If a user token is provided, use it instead of a ticket
+            if (builder.UserToken.Length > 0)
+            {
+                _doQueryPayload = new ApplicationUserToken(_doQueryPayload, builder.UserToken);
+            }
+            else
+            {
+                _doQueryPayload = new ApplicationTicket(_doQueryPayload, builder.Ticket);
+            }
             _doQueryPayload = new ApplicationToken(_doQueryPayload, builder.AppToken);
             _doQueryPayload = new WrapPayload(_doQueryPayload);
             _uri = new QUriDbid(builder.AccountDomain, builder.Dbid);
         }
 
-        public string XmlPayload
+        public string Options
         {
-            get
-            {
-                return _doQueryPayload.GetXmlPayload();
-            }
+            get { return _options; }
+        }
+
+        public string Query
+        {
+            get { return _query; }
+        }
+
+        public string Collist
+        {
+           get { return _collist; }
+        }
+
+        public void BuildXmlPayload(ref XElement parent)
+        {
+            _doQueryPayload.GetXmlPayload(ref parent);
         }
 
         public System.Uri Uri
@@ -155,7 +184,7 @@ namespace Intuit.QuickBase.Core
             }
         }
 
-        public XPathDocument Post()
+        public XElement Post()
         {
             HttpPost httpXml = new HttpPostXml();
             httpXml.Post(this);
