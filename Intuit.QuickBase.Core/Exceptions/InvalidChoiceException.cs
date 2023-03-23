@@ -13,21 +13,12 @@ namespace Intuit.QuickBase.Core.Exceptions
     [Serializable]
     public class InvalidChoiceException : Exception
     {
-        public InvalidChoiceException() { }
+        public InvalidChoiceException() : base() { }
 
-        public InvalidChoiceException(string message)
-        {
-            Message = message;
-        }
+        public InvalidChoiceException(string message) : base(message) { }
 
-        public new string Message { get; set; }
+        public InvalidChoiceException(string message, Exception innerException) : base(message, innerException) { }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Message", Message);
-        }
-
+        protected InvalidChoiceException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

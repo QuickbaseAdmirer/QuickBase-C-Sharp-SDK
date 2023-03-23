@@ -13,20 +13,12 @@ namespace Intuit.QuickBase.Core.Exceptions
     [Serializable]
     public class SyntaxErrorException : Exception
     {
-        public SyntaxErrorException() { }
+        public SyntaxErrorException() : base() { }
 
-        public SyntaxErrorException(string message)
-        {
-            Message = message;
-        }
+        public SyntaxErrorException(string message) : base(message) { }
 
-        public new string Message { get; set; }
+        public SyntaxErrorException(string message, Exception innerException) : base(message, innerException) { }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Message", Message);
-        }
+        protected SyntaxErrorException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

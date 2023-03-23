@@ -13,20 +13,12 @@ namespace Intuit.QuickBase.Core.Exceptions
     [Serializable]
     public class BadTicketException : Exception
     {
-        public BadTicketException() { }
+        public BadTicketException() : base() { }
 
-        public BadTicketException(string message)
-        {
-            Message = message;
-        }
+        public BadTicketException(string message) : base(message) { }
 
-        public new string Message { get; set; }
+        public BadTicketException(string message, Exception innerException) : base(message, innerException) { }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Message", Message);
-        }
+        protected BadTicketException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

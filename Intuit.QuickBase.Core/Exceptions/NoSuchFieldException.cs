@@ -13,20 +13,12 @@ namespace Intuit.QuickBase.Core.Exceptions
     [Serializable]
     public class NoSuchFieldException : Exception
     {
-        public NoSuchFieldException() { }
+        public NoSuchFieldException() : base() { }
 
-        public NoSuchFieldException(string message)
-        {
-            Message = message;
-        }
+        public NoSuchFieldException(string message) : base(message) { }
 
-        public new string Message { get; set; }
+        public NoSuchFieldException(string message, Exception innerException) : base(message, innerException) { }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Message", Message);
-        }
+        protected NoSuchFieldException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

@@ -13,20 +13,12 @@ namespace Intuit.QuickBase.Core.Exceptions
     [Serializable]
     public class NoSuchRecordException : Exception
     {
-        public NoSuchRecordException() { }
+        public NoSuchRecordException() : base() { }
 
-        public NoSuchRecordException(string message)
-        {
-            Message = message;
-        }
+        public NoSuchRecordException(string message) : base(message) { }
 
-        public new string Message { get; set; }
+        public NoSuchRecordException(string message, Exception innerException) : base(message, innerException) { }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Message", Message);
-        }
+        protected NoSuchRecordException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

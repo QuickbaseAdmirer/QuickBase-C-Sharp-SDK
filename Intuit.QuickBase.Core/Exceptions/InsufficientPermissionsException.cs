@@ -13,20 +13,12 @@ namespace Intuit.QuickBase.Core.Exceptions
     [Serializable]
     public class InsufficientPermissionsException : Exception
     {
-        public InsufficientPermissionsException() { }
+        public InsufficientPermissionsException() : base() { }
 
-        public InsufficientPermissionsException(string message)
-        {
-            Message = message;
-        }
+        public InsufficientPermissionsException(string message) : base(message) { }
 
-        public new string Message { get; set; }
+        public InsufficientPermissionsException(string message,  Exception innerException) : base(message, innerException) { }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Message", Message);
-        }
+        protected InsufficientPermissionsException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

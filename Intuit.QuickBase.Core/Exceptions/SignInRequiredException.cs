@@ -13,20 +13,12 @@ namespace Intuit.QuickBase.Core.Exceptions
     [Serializable]
     public class SignInRequiredException : Exception
     {
-        public SignInRequiredException() { }
+        public SignInRequiredException() : base() { }
 
-        public SignInRequiredException(string message)
-        {
-            Message = message;
-        }
+        public SignInRequiredException(string message) : base(message) { }
 
-        public new string Message { get; set; }
+        public SignInRequiredException(string message, Exception innerException) : base(message, innerException) { }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Message", Message);
-        }
+        protected SignInRequiredException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

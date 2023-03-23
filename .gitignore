@@ -12,3 +12,5 @@ TestResults/
 *.cache
 *.orig
 *.bak
+/License.log
+/Intuit.QuickBase.sln.DotSettings.user

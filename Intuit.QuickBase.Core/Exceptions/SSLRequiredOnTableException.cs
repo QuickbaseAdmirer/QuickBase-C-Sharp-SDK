@@ -13,20 +13,12 @@ namespace Intuit.QuickBase.Core.Exceptions
     [Serializable]
     public class SslRequiredOnTableException : Exception
     {
-        public SslRequiredOnTableException() { }
+        public SslRequiredOnTableException() : base() { }
 
-        public SslRequiredOnTableException(string message)
-        {
-            Message = message;
-        }
+        public SslRequiredOnTableException(string message) : base(message) { }
 
-        public new string Message { get; set; }
+        public SslRequiredOnTableException(string message, Exception innerException) : base(message, innerException) { }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Message", Message);
-        }
+        protected SslRequiredOnTableException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

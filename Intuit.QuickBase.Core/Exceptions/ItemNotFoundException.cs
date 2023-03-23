@@ -13,20 +13,12 @@ namespace Intuit.QuickBase.Core.Exceptions
     [Serializable]
     public class ItemNotFoundException : Exception
     {
-        public ItemNotFoundException() { }
+        public ItemNotFoundException() : base() { }
 
-        public ItemNotFoundException(string message)
-        {
-            Message = message;
-        }
+        public ItemNotFoundException(string message): base(message) { }
 
-        public new string Message { get; set; }
+        public ItemNotFoundException(string message, Exception  innerException): base(message, innerException) { } 
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Message", Message);
-        }
+        protected ItemNotFoundException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

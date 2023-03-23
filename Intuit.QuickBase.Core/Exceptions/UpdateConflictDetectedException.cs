@@ -13,20 +13,12 @@ namespace Intuit.QuickBase.Core.Exceptions
     [Serializable]
     public class UpdateConflictDetectedException : Exception
     {
-        public UpdateConflictDetectedException() { }
+        public UpdateConflictDetectedException() : base() { }
 
-        public UpdateConflictDetectedException(string message)
-        {
-            Message = message;
-        }
+        public UpdateConflictDetectedException(string message) : base(message) { }
 
-        public new string Message { get; set; }
+        public UpdateConflictDetectedException(string message, Exception innerException) : base(message, innerException) { }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Message", Message);
-        }
+        protected UpdateConflictDetectedException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

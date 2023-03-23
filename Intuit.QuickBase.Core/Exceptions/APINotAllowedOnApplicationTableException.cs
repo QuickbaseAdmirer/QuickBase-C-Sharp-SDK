@@ -13,21 +13,13 @@ namespace Intuit.QuickBase.Core.Exceptions
     [Serializable]
     public class ApiNotAllowedOnApplicationTableException : Exception
     {
-        public ApiNotAllowedOnApplicationTableException() { }
+        public ApiNotAllowedOnApplicationTableException() : base() { }
 
-        public ApiNotAllowedOnApplicationTableException(string message)
-        {
-            Message = message;
-        }
+        public ApiNotAllowedOnApplicationTableException(string message) : base(message) { }
 
-        public new string Message { get; set; }
+        public ApiNotAllowedOnApplicationTableException(string message,  Exception innerException) : base(message, innerException) { }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Message", Message);
-        }
+        protected ApiNotAllowedOnApplicationTableException(SerializationInfo info, StreamingContext context) : base(info, context) { }
 
     }
 }

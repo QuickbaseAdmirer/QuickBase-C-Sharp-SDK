@@ -13,22 +13,12 @@ namespace Intuit.QuickBase.Core.Exceptions
     [Serializable]
     public class UserAlreadyInRoleException : Exception
     {
-        public UserAlreadyInRoleException()
-        {
-        }
+        public UserAlreadyInRoleException() : base() { }
 
-        public UserAlreadyInRoleException(string message)
-        {
-            Message = message;
-        }
+        public UserAlreadyInRoleException(string message) : base(message) { }
 
-        public new string Message { get; set; }
+        public UserAlreadyInRoleException(string message, Exception innerException) : base(message, innerException) { }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Message", Message);
-        }
+        protected UserAlreadyInRoleException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

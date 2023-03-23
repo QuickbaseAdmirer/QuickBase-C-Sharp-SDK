@@ -13,20 +13,12 @@ namespace Intuit.QuickBase.Core.Exceptions
     [Serializable]
     public class TechnicalDifficultiesException : Exception
     {
-        public TechnicalDifficultiesException() { }
+        public TechnicalDifficultiesException() : base() { }
 
-        public TechnicalDifficultiesException(string message)
-        {
-            Message = message;
-        }
+        public TechnicalDifficultiesException(string message) : base(message) { }
 
-        public new string Message { get; set; }
+        public TechnicalDifficultiesException(string message, Exception innerException) : base(message, innerException) { }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Message", Message);
-        }
+        protected TechnicalDifficultiesException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

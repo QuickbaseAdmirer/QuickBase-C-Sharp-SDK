@@ -15,18 +15,10 @@ namespace Intuit.QuickBase.Core.Exceptions
     {
         public ViewTooLargeException() { }
 
-        public ViewTooLargeException(string message)
-        {
-            Message = message;
-        }
+        public ViewTooLargeException(string message) : base(message) { }
 
-        public new string Message { get; set; }
+        public ViewTooLargeException(string message,  Exception innerException) : base(message, innerException) { }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Message", Message);
-        }
+        protected ViewTooLargeException(SerializationInfo serializationInfo, StreamingContext streamingContext) : base(serializationInfo, streamingContext) { }
     }
 }

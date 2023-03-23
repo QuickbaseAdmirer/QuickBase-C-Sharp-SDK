@@ -13,20 +13,12 @@ namespace Intuit.QuickBase.Core.Exceptions
     [Serializable]
     public class RecordDoesNotExistInTableException : Exception
     {
-        public RecordDoesNotExistInTableException() { }
+        public RecordDoesNotExistInTableException() : base() { }
 
-        public RecordDoesNotExistInTableException(string message)
-        {
-            Message = message;
-        }
+        public RecordDoesNotExistInTableException(string message) : base(message) { }
 
-        public new string Message { get; set; }
+        public RecordDoesNotExistInTableException(string message, Exception innerException) : base(message, innerException) { }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Message", Message);
-        }
+        protected RecordDoesNotExistInTableException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

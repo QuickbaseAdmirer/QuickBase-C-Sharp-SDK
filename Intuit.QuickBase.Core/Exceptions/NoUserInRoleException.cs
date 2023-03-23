@@ -13,20 +13,12 @@ namespace Intuit.QuickBase.Core.Exceptions
     [Serializable]
     public class NoUserInRoleException : Exception
     {
-        public NoUserInRoleException() { }
+        public NoUserInRoleException() : base() { }
 
-        public NoUserInRoleException(string message)
-        {
-            Message = message;
-        }
+        public NoUserInRoleException(string message) : base(message) { }
 
-        public new string Message { get; set; }
+        public NoUserInRoleException(string message, Exception innerException) : base(message, innerException) { }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Message", Message);
-        }
+        protected NoUserInRoleException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

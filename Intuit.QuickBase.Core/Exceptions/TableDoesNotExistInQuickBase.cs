@@ -13,20 +13,12 @@ namespace Intuit.QuickBase.Core.Exceptions
     [Serializable]
     public class TableDoesNotExistInQuickBase : Exception
     {
-        public TableDoesNotExistInQuickBase() { }
+        public TableDoesNotExistInQuickBase() : base() { }
 
-        public TableDoesNotExistInQuickBase(string message)
-        {
-            Message = message;
-        }
+        public TableDoesNotExistInQuickBase(string message) : base(message) { }
 
-        public new string Message { get; set; }
+        public TableDoesNotExistInQuickBase(string message, Exception innerException) : base(message, innerException) { }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Message", Message);
-        }
+        protected TableDoesNotExistInQuickBase(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

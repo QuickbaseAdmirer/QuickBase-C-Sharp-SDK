@@ -13,20 +13,12 @@ namespace Intuit.QuickBase.Core.Exceptions
     [Serializable]
     public class MissingRequiredFieldException : Exception
     {
-        public MissingRequiredFieldException() { }
+        public MissingRequiredFieldException() : base() { }
 
-        public MissingRequiredFieldException(string message)
-        {
-            Message = message;
-        }
+        public MissingRequiredFieldException(string message) : base(message) { }
 
-        public new string Message { get; set; }
+        public MissingRequiredFieldException(string message,  Exception innerException) : base(message, innerException) { }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Message", Message);
-        }
+        protected MissingRequiredFieldException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

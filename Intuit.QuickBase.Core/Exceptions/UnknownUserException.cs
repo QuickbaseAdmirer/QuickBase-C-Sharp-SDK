@@ -13,20 +13,12 @@ namespace Intuit.QuickBase.Core.Exceptions
     [Serializable]
     public class UnknownUserException : Exception
     {
-        public UnknownUserException() { }
+        public UnknownUserException() : base() { }
 
-        public UnknownUserException(string message)
-        {
-            Message = message;
-        }
+        public UnknownUserException(string message) : base(message) { }
 
-        public new string Message { get; set; }
+        public UnknownUserException(string message, Exception innerException) : base(message, innerException) { }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Message", Message);
-        }
+        protected UnknownUserException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

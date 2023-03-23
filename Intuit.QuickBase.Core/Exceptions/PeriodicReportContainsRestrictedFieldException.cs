@@ -13,22 +13,12 @@ namespace Intuit.QuickBase.Core.Exceptions
     [Serializable]
     public class PeriodicReportContainsRestrictedFieldException : Exception
     {
-        public PeriodicReportContainsRestrictedFieldException()
-        {
-        }
+        public PeriodicReportContainsRestrictedFieldException() : base() { }
 
-        public PeriodicReportContainsRestrictedFieldException(string message)
-        {
-            Message = message;
-        }
+        public PeriodicReportContainsRestrictedFieldException(string message) : base(message) { }
 
-        public new string Message { get; set; }
+        public PeriodicReportContainsRestrictedFieldException(string message, Exception innerException) : base(message, innerException) { }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Message", Message);
-        }
+        protected PeriodicReportContainsRestrictedFieldException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

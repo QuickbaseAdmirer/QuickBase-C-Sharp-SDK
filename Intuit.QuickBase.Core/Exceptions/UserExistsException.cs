@@ -13,20 +13,12 @@ namespace Intuit.QuickBase.Core.Exceptions
     [Serializable]
     public class UserExistsException : Exception
     {
-        public UserExistsException() { }
+        public UserExistsException() : base() { }
 
-        public UserExistsException(string message)
-        {
-            Message = message;
-        }
+        public UserExistsException(string message) : base(message) { }
 
-        public new string Message { get; set; }
+        public UserExistsException(string message, Exception innerException) : base(message, innerException) { }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Message", Message);
-        }
+        protected UserExistsException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

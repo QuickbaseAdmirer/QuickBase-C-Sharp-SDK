@@ -13,20 +13,12 @@ namespace Intuit.QuickBase.Core.Exceptions
     [Serializable]
     public class UnableToParseXmlException : Exception
     {
-        public UnableToParseXmlException() { }
+        public UnableToParseXmlException() :base() { }
 
-        public UnableToParseXmlException(string message)
-        {
-            Message = message;
-        }
+        public UnableToParseXmlException(string message) : base(message) { }
 
-        public new string Message { get; set; }
+        public UnableToParseXmlException(string message,  Exception innerException) : base(message, innerException) { }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Message", Message);
-        }
+        protected UnableToParseXmlException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

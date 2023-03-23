@@ -13,20 +13,12 @@ namespace Intuit.QuickBase.Core.Exceptions
     [Serializable]
     public class AccountSizeLimitExceededException : Exception
     {
-        public AccountSizeLimitExceededException() { }
+        public AccountSizeLimitExceededException() : base() { }
 
-        public AccountSizeLimitExceededException(string message)
-        {
-            Message = message;
-        }
+        public AccountSizeLimitExceededException(string message) : base(message) { }
 
-        public new string Message { get; set; }
+        public AccountSizeLimitExceededException(string message,  Exception innerException) : base(message, innerException) { }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Message", Message);
-        }
+        protected AccountSizeLimitExceededException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

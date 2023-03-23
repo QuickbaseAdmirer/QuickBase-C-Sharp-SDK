@@ -13,20 +13,12 @@ namespace Intuit.QuickBase.Core.Exceptions
     [Serializable]
     public class AttemptingToAddNonUniqueValueException : Exception
     {
-        public AttemptingToAddNonUniqueValueException() { }
+        public AttemptingToAddNonUniqueValueException() : base() { }
 
-        public AttemptingToAddNonUniqueValueException(string message)
-        {
-            Message = message;
-        }
+        public AttemptingToAddNonUniqueValueException(string message) : base(message) { }
 
-        public new string Message { get; set; }
+        public AttemptingToAddNonUniqueValueException(string message,  Exception innerException) : base(message, innerException) { }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Message", Message);
-        }
+        protected AttemptingToAddNonUniqueValueException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

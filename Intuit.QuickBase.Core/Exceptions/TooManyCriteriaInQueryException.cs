@@ -13,20 +13,12 @@ namespace Intuit.QuickBase.Core.Exceptions
     [Serializable]
     public class TooManyCriteriaInQueryException : Exception
     {
-        public TooManyCriteriaInQueryException() { }
+        public TooManyCriteriaInQueryException() : base() { }
 
-        public TooManyCriteriaInQueryException(string message)
-        {
-            Message = message;
-        }
+        public TooManyCriteriaInQueryException(string message) : base (message) { }
 
-        public new string Message { get; set; }
+        public TooManyCriteriaInQueryException(string message,  Exception inner) : base(message, inner) { }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Message", Message);
-        }
+        protected TooManyCriteriaInQueryException(SerializationInfo serializationInfo, StreamingContext streamingContext) : base(serializationInfo, streamingContext) { }
     }
 }

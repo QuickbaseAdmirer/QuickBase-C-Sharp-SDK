@@ -13,20 +13,12 @@ namespace Intuit.QuickBase.Core.Exceptions
     [Serializable]
     public class InvalidRoleException : Exception
     {
-        public InvalidRoleException() { }
+        public InvalidRoleException() : base() { }
 
-        public InvalidRoleException(string message)
-        {
-            Message = message;
-        }
+        public InvalidRoleException(string message) : base(message) { }
 
-        public new string Message { get; set; }
+        public InvalidRoleException(string message,  Exception innerException) : base(message, innerException) { }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Message", Message);
-        }
+        protected InvalidRoleException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

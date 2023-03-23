@@ -13,20 +13,12 @@ namespace Intuit.QuickBase.Core.Exceptions
     [Serializable]
     public class InvalidAccountIDException : Exception
     {
-        public InvalidAccountIDException() { }
+        public InvalidAccountIDException() : base() { }
 
-        public InvalidAccountIDException(string message)
-        {
-            Message = message;
-        }
+        public InvalidAccountIDException(string message) : base(message) { }
 
-        public new string Message { get; set; }
+        public InvalidAccountIDException(string message,  Exception innerException) : base(message, innerException) { }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Message", Message);
-        }
+        protected InvalidAccountIDException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

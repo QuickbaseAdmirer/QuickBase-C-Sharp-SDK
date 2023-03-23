@@ -13,20 +13,12 @@ namespace Intuit.QuickBase.Core.Exceptions
     [Serializable]
     public class ApplicationDoesNotExistOrDeletedException : Exception
     {
-        public ApplicationDoesNotExistOrDeletedException() { }
+        public ApplicationDoesNotExistOrDeletedException() : base() { }
 
-        public ApplicationDoesNotExistOrDeletedException(string message)
-        {
-            Message = message;
-        }
+        public ApplicationDoesNotExistOrDeletedException(string message) : base(message) { }
 
-        public new string Message { get; set; }
+        public ApplicationDoesNotExistOrDeletedException(string message,  Exception innerException) : base(message, innerException) { }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Message", Message);
-        }
+        protected ApplicationDoesNotExistOrDeletedException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

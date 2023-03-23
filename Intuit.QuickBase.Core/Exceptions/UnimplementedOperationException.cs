@@ -13,20 +13,12 @@ namespace Intuit.QuickBase.Core.Exceptions
     [Serializable]
     public class UnimplementedOperationException : Exception
     {
-        public UnimplementedOperationException() { }
+        public UnimplementedOperationException() : base() { }
 
-        public UnimplementedOperationException(string message)
-        {
-            Message = message;
-        }
+        public UnimplementedOperationException(string message) : base(message) { }
 
-        public new string Message { get; set; }
+        public UnimplementedOperationException(string message, Exception innerException) : base(message, innerException) { }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Message", Message);
-        }
+        protected UnimplementedOperationException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

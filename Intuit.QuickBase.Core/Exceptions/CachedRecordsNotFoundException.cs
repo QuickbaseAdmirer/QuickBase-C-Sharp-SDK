@@ -13,20 +13,12 @@ namespace Intuit.QuickBase.Core.Exceptions
     [Serializable]
     public class CachedRecordsNotFoundException : Exception
     {
-        public CachedRecordsNotFoundException() { }
+        public CachedRecordsNotFoundException() : base() { }
 
-        public CachedRecordsNotFoundException(string message)
-        {
-            Message = message;
-        }
+        public CachedRecordsNotFoundException(string message) : base(message) { }
 
-        public new string Message { get; set; }
+        public CachedRecordsNotFoundException(string message,  Exception innerException) : base(message, innerException) { }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Message", Message);
-        }
+        protected CachedRecordsNotFoundException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

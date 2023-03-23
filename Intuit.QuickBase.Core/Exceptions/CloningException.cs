@@ -13,20 +13,12 @@ namespace Intuit.QuickBase.Core.Exceptions
     [Serializable]
     public class CloningException : Exception
     {
-        public CloningException() { }
+        public CloningException() : base() { }
 
-        public CloningException(string message)
-        {
-            Message = message;
-        }
+        public CloningException(string message) : base(message) { }
 
-        public new string Message { get; set; }
+        public CloningException(string message,  Exception innerException) : base(message, innerException) { }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Message", Message);
-        }
+        protected CloningException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

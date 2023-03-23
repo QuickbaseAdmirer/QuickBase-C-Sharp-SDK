@@ -13,20 +13,12 @@ namespace Intuit.QuickBase.Core.Exceptions
     [Serializable]
     public class NoSuchDatabaseException : Exception
     {
-        public NoSuchDatabaseException() { }
+        public NoSuchDatabaseException() : base() { }
 
-        public NoSuchDatabaseException(string message)
-        {
-            Message = message;
-        }
+        public NoSuchDatabaseException(string message) : base(message) { }
 
-        public new string Message { get; set; }
+        public NoSuchDatabaseException(string message, Exception innerException) : base(message, innerException) { }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Message", Message);
-        }
+        protected NoSuchDatabaseException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

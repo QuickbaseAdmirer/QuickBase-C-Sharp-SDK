@@ -13,20 +13,12 @@ namespace Intuit.QuickBase.Core.Exceptions
     [Serializable]
     public class UnknownUsernamePasswordException : Exception
     {
-        public UnknownUsernamePasswordException() { }
+        public UnknownUsernamePasswordException() : base() { }
 
-        public UnknownUsernamePasswordException(string message)
-        {
-            Message = message;
-        }
+        public UnknownUsernamePasswordException(string message) : base(message) { }
 
-        public new string Message { get; set; }
+        public UnknownUsernamePasswordException(string message, Exception innerException) : base(message, innerException) { }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Message", Message);
-        }
+        protected  UnknownUsernamePasswordException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

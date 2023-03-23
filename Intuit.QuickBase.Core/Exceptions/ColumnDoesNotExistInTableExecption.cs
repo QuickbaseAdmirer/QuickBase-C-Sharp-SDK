@@ -11,22 +11,14 @@ using System.Runtime.Serialization;
 namespace Intuit.QuickBase.Core.Exceptions
 {
     [Serializable]
-    public class ColumnDoesNotExistInTableExecption : ArgumentException
+    public class ColumnDoesNotExistInTableException : ArgumentException
     {
-        public ColumnDoesNotExistInTableExecption() { }
+        public ColumnDoesNotExistInTableException() : base() { }
 
-        public ColumnDoesNotExistInTableExecption(string message)
-        {
-            Message = message;
-        }
+        public ColumnDoesNotExistInTableException(string message) : base(message) { }
 
-        public new string Message { get; set; }
+        public ColumnDoesNotExistInTableException(string message,  Exception innerException) : base(message, innerException) { }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            base.GetObjectData(info, context);
-
-            info.AddValue("Message", Message);
-        }
+        protected ColumnDoesNotExistInTableException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }
