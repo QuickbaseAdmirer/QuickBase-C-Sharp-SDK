@@ -391,7 +391,7 @@ namespace Intuit.QuickBase.Client
             int index = Columns.FindIndex(c => c.ColumnName == columnName);
             if (index == -1)
             {
-                throw new ColumnDoesNotExistInTableExecption($"Column '{columnName}' not found in table.");
+                throw new ColumnDoesNotExistInTableException($"Column '{columnName}' not found in table.");
             }
             return index;
         }

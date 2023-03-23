@@ -6,7 +6,6 @@
  * http://www.opensource.org/licenses/eclipse-1.0.php
  */
 using System.Collections.Generic;
-using System.Net;
 using System.Xml.Linq;
 using Intuit.QuickBase.Core;
 using Intuit.QuickBase.Core.Exceptions;
@@ -29,13 +28,10 @@ namespace Intuit.QuickBase.Client
         {
             get
             {
-                int index = base.IndexOf(new QColumn
-                {
-                    ColumnName = columnName
-                });
+                int index = base.IndexOf(new QColumn { ColumnName = columnName });
                 if (index == -1)
                 {
-                    throw new ColumnDoesNotExistInTableExecption($"Column '{columnName}' not found in table.");
+                    throw new ColumnDoesNotExistInTableException($"Column '{columnName}' not found in table.");
                 }
 
                 return base[index];

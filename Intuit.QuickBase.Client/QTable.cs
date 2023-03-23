@@ -226,7 +226,7 @@ namespace Intuit.QuickBase.Client
                     sentArgs += useArgs;
                 }
             }
-            catch (ViewTooLargeException)
+            catch (Exception ex) when (ex is ViewTooLargeException || ex is OperationTookTooLongException)
             {
                 //split into smaller queries auto-magically
                 List<string> optionsList = new List<string>();
@@ -297,9 +297,9 @@ namespace Intuit.QuickBase.Client
                     {
                         stride /= 2;
                     }
-                    catch (ApiRequestLimitExceededException ex)
+                    catch (ApiRequestLimitExceededException extime)
                     {
-                        TimeSpan waitTime = ex.WaitUntil - DateTime.Now;
+                        TimeSpan waitTime = extime.WaitUntil - DateTime.Now;
                         System.Threading.Thread.Sleep(waitTime);
                     }
                 }

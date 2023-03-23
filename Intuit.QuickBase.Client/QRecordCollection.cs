@@ -9,6 +9,7 @@
 using Intuit.QuickBase.Core;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml.Linq;
@@ -64,7 +65,7 @@ namespace Intuit.QuickBase.Client
 
         public new void RemoveAll(Predicate<IQRecord> predicate)
         {
-            int idx = 0;
+            int idx;
             int startIdx = 0;
             while ((idx = this.FindIndex(startIdx, predicate)) >= 0)
             {
@@ -142,13 +143,20 @@ namespace Intuit.QuickBase.Client
         {
             PurgeRecords.Builder prBuild = new PurgeRecords.Builder(Application.Client.Ticket, Application.Token,
                 Application.Client.AccountDomain, Table.TableId);
-            prBuild.SetQuery(qry.ToString());
+            prBuild.SetQuery(qry);
             XElement xml = prBuild.Build().Post();
-            int result = int.Parse(xml.Element("errcode").Value);
-            if (result != 0)
+            if (xml != null)
             {
-                string errmsg = xml.Element("errtxt").Value;
-                throw new ApplicationException("Error in RemoveRecords: '" + errmsg + "'");
+                int result = int.Parse(xml.Element("errcode").Value);
+                if (result != 0)
+                {
+                    string errMsg = xml.Element("errtxt")?.Value;
+                    throw new ApplicationException("Error in RemoveRecords: '" + errMsg + "'");
+                }
+            }
+            else
+            {
+                throw new InvalidDataException("No XML returned from table query!");
             }
         }
     }
