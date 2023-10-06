@@ -24,7 +24,7 @@ namespace Intuit.QuickBase.Core
             XElement parent = new XElement("qdbapi"); ;
             qObject.BuildXmlPayload(ref parent);
             var bytes = Encoding.UTF8.GetBytes(parent.ToString());
-            //File.AppendAllText(@"C:\Temp\QBDebugLog.txt", "**Sent->>" + qObject.Uri + " " + QUICKBASE_HEADER + qObject.Action + "\r\n" + qObject.GetPayload + "\r\n");
+            //File.AppendAllText(@"C:\Temp\QBDebugLog.txt", "**Sent->>" + qObject.Uri + " " + QUICKBASE_HEADER + qObject.Action + "\r\n" + parent + "\r\n");
             Stream requestStream = null;
             WebResponse webResponse = null;
             Stream responseStream = null;

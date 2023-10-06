@@ -66,8 +66,9 @@ namespace Intuit.QuickBase.Client
                     case FieldType.address:
                         return string.Empty;
                     case FieldType.timestamp:
-                    case FieldType.date:
                         return ConvertDateTimeToQBMilliseconds((DateTime)_value);
+                    case FieldType.date:
+                        return ConvertDateToQBMilliseconds((DateTime)_value);
                     case FieldType.timeofday:
                         return ConvertTimeSpanToQBTimeOfDay((TimeSpan)_value);
                     case FieldType.duration:
@@ -164,7 +165,7 @@ namespace Intuit.QuickBase.Client
                 else
                 {
                     if (Column.ColumnSummary || Column.ColumnVirtual || Column.ColumnLookup)
-                        throw new ArgumentException("Cannot set values of summary, virtual or lookup fields.");
+                        throw new ArgumentException("Cannot set values of lookup, summary or virtual fields.");
                     if (_value == null || !_value.Equals(value))
                     {
                         UncleanText = false;
@@ -276,10 +277,12 @@ namespace Intuit.QuickBase.Client
             DateTime dtu = new DateTime(long.Parse(milliseconds) * TimeSpan.TicksPerMillisecond + TSOffset.Ticks, DateTimeKind.Utc);
             return dtu.ToLocalTime();
         }
+
         private static DateTime ConvertQBMillisecondsToDate(string milliseconds)
         {
             DateTime dtu = new DateTime(long.Parse(milliseconds) * TimeSpan.TicksPerMillisecond + TSOffset.Ticks, DateTimeKind.Utc);
-            return dtu.ToLocalTime().Date;
+            //return dtu.ToLocalTime().Date;
+            return dtu.Date;
         }
         private static TimeSpan ConvertQBDurationToTimeSpan(string milliseconds)
         {
@@ -294,6 +297,12 @@ namespace Intuit.QuickBase.Client
         private static string ConvertDateTimeToQBMilliseconds(DateTime inDT)
         {
             DateTime dte = inDT.ToUniversalTime();
+            return ((dte.Ticks - TSOffset.Ticks) / TimeSpan.TicksPerMillisecond).ToString();
+        }
+
+        private static string ConvertDateToQBMilliseconds(DateTime inDT)
+        {
+            DateTime dte = inDT.Date;
             return ((dte.Ticks - TSOffset.Ticks) / TimeSpan.TicksPerMillisecond).ToString();
         }
 
