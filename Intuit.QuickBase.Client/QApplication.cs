@@ -209,6 +209,10 @@ namespace Intuit.QuickBase.Client
         public IQTable GetTable(string dbid)
         {
             QTable tbl = (QTable)(_qbDataTables.ContainsKey(dbid) ? _qbDataTables[dbid] : null);
+            if (tbl == null)
+            {
+                throw new TableDoesNotExistInQuickBase("Table does not exist in this instance of QApplication.");
+            }
             if (!tbl.IsLoaded) tbl.Load();
             return tbl;
         }

@@ -39,6 +39,13 @@ namespace QBFunctionTest
             qbApp = client.Connect(qbSettings["qbAppDBID"], qbSettings["qbAppToken"]);
         }
 
+        public void InitConnection2()
+        {
+            LoadSettings();
+            var client = QuickBase.Login(qbSettings["qbUser"], qbSettings["qbPass"], qbSettings["qbSiteURL"]);
+            qbApp = client.Connect(qbSettings["qbAppDBID2"], qbSettings["qbAppToken"]);
+        }
+
         public static readonly List<string> multiTextOptions = new List<string>
         {
             "Option1",
@@ -108,6 +115,14 @@ namespace QBFunctionTest
         }
 
         [TestMethod]
+        public void NewMultitextTest()
+        {
+            InitConnection2();
+            IQTable testTab = qbApp.GetTable(qbSettings["qbTestTable2"]);
+            testTab.Query();
+        }
+
+        [TestMethod]
         public void UntestedTest()
         {
             InitConnection();
@@ -118,9 +133,9 @@ namespace QBFunctionTest
             var multiLine = rec["MultiLine"];
             var multiChoice = rec["MultiChoice"];
             var fileAttach = rec["FileAttachment"];
-            var address = rec["Address"];
+            QAddress address = (QAddress)rec["Address"];
             var userList = rec["ListUser"];
-            var homeAddress = rec["HomeAddress"];
+            QAddress homeAddress = (QAddress)rec["HomeAddress"];
         }
 
         [TestMethod]
